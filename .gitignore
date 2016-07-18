@@ -3,4 +3,5 @@ EWARM/Release/
 EWARM/BootloaderDebug/
 EWARM/GlassesSystemDebug/
 EWARM/STM32F3-Discovery_Demo/
+EWARM/STM32F4-DISCO/
 si/
