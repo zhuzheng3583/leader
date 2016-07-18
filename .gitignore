@@ -1,0 +1,6 @@
+EWARM/Debug/
+EWARM/Release/
+EWARM/BootloaderDebug/
+EWARM/GlassesSystemDebug/
+EWARM/STM32F3-Discovery_Demo/
+si/
