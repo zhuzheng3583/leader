@@ -129,7 +129,7 @@ s32 i2c::probe(void)
 	_handle = (u32)hi2c;
 	
 	/* Enable the Analog I2C Filter */
-	HAL_I2CEx_ConfigAnalogFilter(hi2c, I2C_ANALOGFILTER_ENABLE);
+	//HAL_I2CEx_ConfigAnalogFilter(hi2c, I2C_ANALOGFILTER_ENABLE);
 	
 #if (I2C_MODE == I2C_DMA_MODE)
 	s8 str[16];

@@ -6,15 +6,17 @@
 ** Modified by:
 ** Modified date:
 ** Descriptions:
-**
-** STM32F3最多有6组IO(A/B/C/D/E/F)，每组有16个IO管脚，共6*16=96个IO管脚
-** 将这96中每个IO管脚抽象成一个设备，且设备ID为线性[0, 95]，具体如下:
+** STM32F4最多有9组IO(A/B/C/D/E/F/G/H/I)，每组有16个IO管脚，共9*16=144个IO管脚
+** 将这144中每个IO管脚抽象成一个设备，且设备ID为线性[0, 143]，具体如下:
 ** A:[0, 15]
 ** B:[16, 31]
 ** C:[32, 47]
 ** D:[48, 63]
 ** E:[64, 79]
 ** F:[80, 95]
+** G:[96, 111]
+** H:[112, 127]
+** I:[128, 143]
 **
 ** 	外部中断： 
 	举例来说，外部中断号3，只可以映射到引脚PA3、PB3、PC3、PD3、PE3、PF3、PG3
@@ -34,8 +36,8 @@
 
 namespace driver {
 
-static GPIO_TypeDef *bank_table[] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF};
-static IRQn_Type irq_table[] = {EXTI0_IRQn, EXTI1_IRQn, EXTI2_TSC_IRQn, EXTI3_IRQn, EXTI4_IRQn};
+static GPIO_TypeDef *bank_table[] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI};
+static IRQn_Type irq_table[] = {EXTI0_IRQn, EXTI1_IRQn, EXTI2_IRQn, EXTI3_IRQn, EXTI4_IRQn};
 static uint16_t index_table[] = { 
 	GPIO_PIN_0, GPIO_PIN_1, GPIO_PIN_2, GPIO_PIN_3, 
 	GPIO_PIN_4, GPIO_PIN_5, GPIO_PIN_6, GPIO_PIN_7, 
