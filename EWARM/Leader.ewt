@@ -1070,6 +1070,9 @@
       <file>
         <name>$PROJ_DIR$\..\src\app\bootloader\iap.cpp</name>
       </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\app\bootloader\iap.h</name>
+      </file>
     </group>
     <group>
       <name>user</name>
@@ -1081,6 +1084,9 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\src\app\user\ffconf.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\app\user\startup_stm32f407xx.s</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\src\app\user\stm32f4xx_hal_conf.h</name>
@@ -1104,12 +1110,6 @@
         <name>$PROJ_DIR$\..\src\app\user\usbd_conf.h</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\src\app\user\usbd_customhid_if.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\..\src\app\user\usbd_customhid_if.h</name>
-      </file>
-      <file>
         <name>$PROJ_DIR$\..\src\app\user\usbd_desc.c</name>
       </file>
       <file>
@@ -1129,9 +1129,36 @@
       <name>Drivers</name>
       <group>
         <name>BSP</name>
+        <file>
+          <name>$PROJ_DIR$\..\src\drivers\Drivers\BSP\STM32F4-Discovery\stm32f4_discovery.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\drivers\Drivers\BSP\STM32F4-Discovery\stm32f4_discovery.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\drivers\Drivers\BSP\STM32F4-Discovery\stm32f4_discovery_accelerometer.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\drivers\Drivers\BSP\STM32F4-Discovery\stm32f4_discovery_accelerometer.h</name>
+        </file>
       </group>
       <group>
         <name>CMSIS</name>
+      </group>
+      <group>
+        <name>Components</name>
+        <file>
+          <name>$PROJ_DIR$\..\src\drivers\Drivers\BSP\Components\lis302dl\lis302dl.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\drivers\Drivers\BSP\Components\lis302dl\lis302dl.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\drivers\Drivers\BSP\Components\lis3dsh\lis3dsh.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\drivers\Drivers\BSP\Components\lis3dsh\lis3dsh.h</name>
+        </file>
       </group>
       <group>
         <name>STM32F4xx_HAL_Driver</name>
@@ -1565,15 +1592,18 @@
                 <name>$PROJ_DIR$\..\src\drivers\Middlewares\ST\STM32_USB_Device_Library\Class\CustomHID\Inc\usbd_customhid.h</name>
               </file>
             </group>
+            <group>
+              <name>HID</name>
+              <file>
+                <name>$PROJ_DIR$\..\src\drivers\Middlewares\ST\STM32_USB_Device_Library\Class\HID\Src\usbd_hid.c</name>
+              </file>
+              <file>
+                <name>$PROJ_DIR$\..\src\drivers\Middlewares\ST\STM32_USB_Device_Library\Class\HID\Inc\usbd_hid.h</name>
+              </file>
+            </group>
           </group>
           <group>
             <name>Core</name>
-            <file>
-              <name>$PROJ_DIR$\..\src\drivers\Middlewares\ST\STM32_USB_Device_Library\Core\Src\usbd_conf_template.c</name>
-            </file>
-            <file>
-              <name>$PROJ_DIR$\..\src\drivers\Middlewares\ST\STM32_USB_Device_Library\Core\Inc\usbd_conf_template.h</name>
-            </file>
             <file>
               <name>$PROJ_DIR$\..\src\drivers\Middlewares\ST\STM32_USB_Device_Library\Core\Src\usbd_core.c</name>
             </file>
@@ -1690,6 +1720,12 @@
   <group>
     <name>os</name>
   </group>
+  <file>
+    <name>$PROJ_DIR$\..\src\app\user\usbd_customhid_if.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\..\src\app\user\usbd_customhid_if.h</name>
+  </file>
 </project>
 
 

@@ -12,9 +12,6 @@
 #include "leader_type.h"
 #include "leader_misc.h"
 
-
-using namespace driver;
-
 namespace app {
 
 class iap

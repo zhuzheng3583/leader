@@ -106,12 +106,12 @@ void USART1_IRQHandler(void)
 //USART1_DMA_TX
 void DMA1_Channel4_IRQHandler (void)
 {
-	interrupt::s_map[DMA1_Channel4_IRQn].handler->isr();
+	//interrupt::s_map[DMA1_Channel4_IRQn].handler->isr();
 }
 //USART1_DMA_RX
 void DMA1_Channel5_IRQHandler(void)
 {
-	interrupt::s_map[DMA1_Channel5_IRQn].handler->isr();
+	//interrupt::s_map[DMA1_Channel5_IRQn].handler->isr();
 }
 
 

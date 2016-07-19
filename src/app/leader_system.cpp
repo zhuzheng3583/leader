@@ -44,7 +44,7 @@ s32 leader_system::init(enum leader_system_mode mode)
 		s_pactive_instance = new aircraft;
 		_mode = M_GLASSES_SYSTEM;
 #else
-#error pre-defined macros required.
+//#error pre-defined macros required.
 #endif	
         break;
 	case M_BOOTLOADER:
@@ -135,7 +135,7 @@ s32 leader_system::init(void)
 
 
   	u8 dev_id = 0;
-	u8 addr = L3GD20_WHO_AM_I_ADDR;
+	u8 addr = 0;//L3GD20_WHO_AM_I_ADDR;
 	if(sizeof(dev_id) > 0x01) {
 		addr |= (u8)(READWRITE_CMD | MULTIPLEBYTE_CMD);
   	} else {

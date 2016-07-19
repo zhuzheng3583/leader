@@ -62,7 +62,9 @@ s32 flash::open(s32 flags)
 	HAL_FLASH_Unlock();
 
 	/* Clear all FLASH flags */
-	__HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_EOP | FLASH_FLAG_PGERR | FLASH_FLAG_WRPERR);
+	__HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_EOP | FLASH_FLAG_PGAERR 
+		| FLASH_FLAG_PGPERR | FLASH_FLAG_PGSERR | FLASH_FLAG_WRPERR);
+  
 	/* Unlock the Program memory */
 	HAL_FLASH_Lock();
 	
@@ -80,6 +82,7 @@ s32 flash::close(void)
 
 s32 flash::erase(u32 page_start_addr, u32 page_n)
 {
+#if 0
 	u32 page_error = 0;
 
 	ASSERT((_offset % FLASH_PAGE_SIZE == 0));
@@ -100,7 +103,7 @@ s32 flash::erase(u32 page_start_addr, u32 page_n)
     	INF("%s: failed to erase.\n", _name);
 		return -1;
 	}	
-
+#endif
 	return 0;
 }
 
