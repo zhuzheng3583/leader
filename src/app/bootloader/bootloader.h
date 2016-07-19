@@ -22,8 +22,10 @@
 
 typedef  void (*iap_func)(void);				//定义一个函数类型的参数.   
 //保留0X08000000~0X0800FFFF的空间为Bootloader使用(共64KB)	  
-#define FLASH_APP_ADDR		FLASH_USER_START_ADDR//0x08010000  	//第一个应用程序起始地址(存放在FLASH)
-
+#define FLASH_BOOTLOADER_START_ADDR FLASH_BASE//0x08000000 
+#define FLASH_BOOTLOADER_END_ADDR   (FLASH_APP_START_ADDR-1)//0x0800FFFF
+#define FLASH_APP_START_ADDR        ADDR_FLASH_SECTOR_4//0x08010000 
+#define FLASH_APP_END_ADDR          FLASH_END
 
 using namespace driver;
 

@@ -13,7 +13,7 @@ CStepIntDis=_ 0
 stlinkserialNo=2798FD0D
 stlinkfoundProbes=
 [DebugChecksum]
-Checksum=-447622452
+Checksum=-1499781377
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -80,6 +80,12 @@ ShowTimeLog=1
 SumEnabled=0
 ShowTimeSum=1
 SumSortOrder=0
+[Disassemble mode]
+mode=0
+[Breakpoints2]
+Bp0=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart.cpp}.154.2" 0 0 1 "" 0 "" 0
+Bp1=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\leader_system.cpp}.91.2" 0 0 1 "" 0 "" 0
+Count=2
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
@@ -87,6 +93,9 @@ Category=_ 0
 [TermIOLog]
 LoggingEnabled=_ 0
 LogFile=_ ""
+[Aliases]
+Count=0
+SuppressDialog=0
 [DriverProfiling]
 Enabled=0
 Mode=3
@@ -97,11 +106,3 @@ Exclusions=
 Enabled=0
 [CallStackStripe]
 ShowTiming=1
-[Disassemble mode]
-mode=0
-[Breakpoints2]
-Bp0=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\leader_system.cpp}.76.2" 0 0 1 "" 0 "" 0
-Count=1
-[Aliases]
-Count=0
-SuppressDialog=0

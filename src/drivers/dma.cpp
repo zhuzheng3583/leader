@@ -6,16 +6,87 @@
 ** Modified by:
 ** Modified date:
 ** Descriptions:
-**
+**				logic_dev_id
+DMA1 		  
+DMA1_Stream0	[0,7]
+DMA1_Stream1	[8,15] 
+DMA1_Stream2	[16,23]
+DMA1_Stream3	[24,31]
+DMA1_Stream4	[32,39]	
+DMA1_Stream5	[40,47] 
+DMA1_Stream6	[48,55]  
+DMA1_Stream7	[56,63]  
+DMA2        
+DMA2_Stream0	[64,71]
+DMA2_Stream1	[72,79]
+DMA2_Stream2	[80,87]
+DMA2_Stream3	[88,95]
+DMA2_Stream4	[96,103]
+DMA2_Stream5	[104,111]
+DMA2_Stream6	[112,119]
+DMA2_Stream7	[120,127]
+
+DMA_CHANNEL_0
+DMA_CHANNEL_1
+DMA_CHANNEL_2
+DMA_CHANNEL_3
+DMA_CHANNEL_4
+DMA_CHANNEL_5
+DMA_CHANNEL_6
+DMA_CHANNEL_7
 ***********************************************************************/
 #include "dma.h"
 
-//id = [1,12]
-#define DMA1_CHANNEL_NUM	 	7
-#define DMA2_CHANNEL_NUM	 	5
-#define DMA_CHANNEL_NUM	 	(DMA1_CHANNEL_NUM + DMA2_CHANNEL_NUM)
+//id = [0,127]
+#define DMA_CNT          		(2)
+#define STREAM_CNT_PER_DMA		(8)
+#define CHANNEL_CNT_PER_STREAM	(8)
+#define CHANNEL_CNT_PER_DMA	(STREAM_CNT_PER_DMA * CHANNEL_CNT_PER_STREAM)
+#define MAX_LINE_CHANNEL_ID	(CHANNEL_CNT_PER_DMA * DMA_CNT - 1)
+#define MIN_LINE_CHANNEL_ID	(0)
 
 namespace driver {
+
+struct stm32_dma_hw_table
+{
+	DMA_TypeDef 			*DMAx;
+	IRQn_Type 			IRQn;
+	DMA_HandleTypeDef		DMA_Handle;
+};
+
+static struct stm32_dma_hw_table dma_hw_table[] = {
+	[0] = { NULL },
+	[44] = { 
+		.DMAx = DMA1,
+		.IRQn = DMA1_Stream5_IRQn,
+		.DMA_Handle = { 
+			.Instance = DMA1_Stream5,
+			.Init = {
+				.Channel			= DMA_CHANNEL_4,
+				.Mode 			= DMA_NORMAL,
+				.FIFOMode       	= DMA_FIFOMODE_DISABLE,
+				.FIFOThreshold	= DMA_FIFO_THRESHOLD_FULL,
+				.MemBurst      	= DMA_MBURST_INC4,
+				.PeriphBurst    	= DMA_PBURST_INC4,
+			},
+		},
+	},
+	[52] = { 
+		.DMAx = DMA1,
+		.IRQn = DMA1_Stream6_IRQn,
+		.DMA_Handle = { 
+			.Instance = DMA1_Stream6,
+			.Init = {
+				.Channel			= DMA_CHANNEL_4,
+				.Mode 			= DMA_NORMAL,
+				.FIFOMode       	= DMA_FIFOMODE_DISABLE,
+				.FIFOThreshold	= DMA_FIFO_THRESHOLD_FULL,
+				.MemBurst      	= DMA_MBURST_INC4,
+				.PeriphBurst    	= DMA_PBURST_INC4,
+			},
+		},
+	},
+};
 
 dma::dma(PCSTR name, s32 id) : 
 	device(name, id)
@@ -37,16 +108,9 @@ s32 dma::probe(void)
 		goto fail0;
 	}
 
-	// _dma_id = [1,2]
-	// _channel_id = (dma1)[1,7]
-	// _channel_id = (dma2)[1,5]
-	if (_id <= DMA1_CHANNEL_NUM) {
-		_dma_id = 1;
-		_channel_id = _id;
-	} else if (_id <= DMA_CHANNEL_NUM) {
-		_dma_id = 2;
-		_channel_id = _id - DMA1_CHANNEL_NUM;	
-	}
+	_dma_id = _id / CHANNEL_CNT_PER_DMA + 1;
+	_stream_id = _id / (_dma_id * STREAM_CNT_PER_DMA);
+	_channel_id = (_dma_id * (_stream_id+1) * CHANNEL_CNT_PER_STREAM) - _id;
 
 	DMA_HandleTypeDef *hdma = &dma_hw_table[_id].DMA_Handle;
 	if(HAL_DMA_GetState(hdma) != HAL_DMA_STATE_RESET)
@@ -106,6 +170,7 @@ fail0:
     return -1;
 }
 
+  
 s32 dma::config(enum dma_dir mode, enum dma_align align, enum dma_pri priority, 
 	s32 en_src_step, s32 en_dst_step)
 {

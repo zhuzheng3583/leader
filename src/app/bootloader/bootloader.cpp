@@ -32,18 +32,21 @@ s32 bootloader::init(void)
 	INF("========Init Skyview_H Bootloader ========\n");
 	
 	_pflash = leader_system::get_instance()->get_flash();
-	
+
+#if 1
 	_pflash->open(NULL);
-	bootloader::iap_upload_firmware(FLASH_APP_ADDR);
-    
+	bootloader::iap_upload_firmware(FLASH_APP_START_ADDR);
+#endif
+
 	return 0;
 }
 
 void bootloader::start(void)
 {
 	INF("Starting Skyview_H Bootloader...\n");
-	
-	bootloader::iap_upload_firmware(FLASH_APP_ADDR);
+
+	_pflash->open(NULL);
+	bootloader::iap_upload_firmware(FLASH_APP_START_ADDR);
 
 	_pflash->close();
 	delete _pflash;
@@ -58,7 +61,7 @@ void bootloader::start(void)
 s32 bootloader::iap_download_firmware(u32 start_addr, u8 *buf, u32 len)
 {
 	s32 ret = 0;
-	_pflash->seek(ADDR_FLASH_PAGE_TO_OFFSET(start_addr), SEEK_SET_M);
+	_pflash->seek(ADDR_FLASH_SECTOR_TO_OFFSET(start_addr), SEEK_SET_M);
 	ret = _pflash->write(buf, len);
 	if (ret != len) {
 		ERR("Failed to %s.\n", __FUNCTION__);

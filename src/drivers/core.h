@@ -88,7 +88,7 @@ public:
     static u32 s_freq_khz;
 
 public:
-    static s32 core_init(void);
+    static s32 init(void);
     static void mdelay(u32 ms);
     static void udelay(u32 us);
 

@@ -12,7 +12,7 @@
           
           
           
-        <Column0>124</Column0><Column1>27</Column1><Column2>27</Column2><Column3>27</Column3></ColumnWidths>
+        <Column0>479</Column0><Column1>27</Column1><Column2>27</Column2><Column3>27</Column3></ColumnWidths>
       </Workspace>
       <Build>
         
@@ -25,7 +25,7 @@
     <Windows>
       
       
-    <Wnd2>
+    <Wnd0>
         <Tabs>
           <Tab>
             <Identity>TabID-28621-785</Identity>
@@ -33,11 +33,11 @@
             <Factory>Workspace</Factory>
             <Session>
               
-            <NodeDict><ExpandedNode>Project</ExpandedNode></NodeDict></Session>
+            <NodeDict><ExpandedNode>Project</ExpandedNode><ExpandedNode>Project/Application</ExpandedNode><ExpandedNode>Project/Application/EWARM</ExpandedNode><ExpandedNode>Project/Application/User</ExpandedNode><ExpandedNode>Project/Drivers</ExpandedNode><ExpandedNode>Project/Drivers/BSP</ExpandedNode><ExpandedNode>Project/Drivers/BSP/Components</ExpandedNode><ExpandedNode>Project/Drivers/BSP/STM32F4_DISCO</ExpandedNode><ExpandedNode>Project/Drivers/CMSIS</ExpandedNode><ExpandedNode>Project/Middlewares</ExpandedNode><ExpandedNode>Project/Middlewares/STM32_USBD_Library</ExpandedNode><ExpandedNode>Project/Middlewares/STM32_USBD_Library/Class</ExpandedNode><ExpandedNode>Project/Middlewares/STM32_USBD_Library/Class/HID</ExpandedNode><ExpandedNode>Project/Middlewares/STM32_USBD_Library/Core</ExpandedNode></NodeDict></Session>
           </Tab>
         </Tabs>
         
-      <SelectedTab>0</SelectedTab></Wnd2><Wnd3>
+      <SelectedTab>0</SelectedTab></Wnd0><Wnd1>
         <Tabs>
           <Tab>
             <Identity>TabID-17350-791</Identity>
@@ -47,20 +47,20 @@
           </Tab>
         </Tabs>
         
-      <SelectedTab>0</SelectedTab></Wnd3></Windows>
+      <SelectedTab>0</SelectedTab></Wnd1></Windows>
     <Editor>
       
       
       
       
-    <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\Src\main.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>90</YPos2><SelStart2>4335</SelStart2><SelEnd2>4335</SelEnd2></Tab><ActiveTab>0</ActiveTab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
+    <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\Src\main.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>90</YPos2><SelStart2>4359</SelStart2><SelEnd2>4359</SelEnd2></Tab><ActiveTab>0</ActiveTab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
     <Positions>
       
       
       
       
       
-    <Top><Row0><Sizes><Toolbar-00758E88><key>iaridepm.enu1</key></Toolbar-00758E88></Sizes></Row0></Top><Left><Row0><Sizes><Wnd2><Rect><Top>-2</Top><Left>-2</Left><Bottom>602</Bottom><Right>198</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>200</yscreen><sizeHorzCX>146199</sizeHorzCX><sizeHorzCY>236686</sizeHorzCY><sizeVertCX>146199</sizeVertCX><sizeVertCY>714793</sizeVertCY></Rect></Wnd2></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes><Wnd3><Rect><Top>-2</Top><Left>-2</Left><Bottom>198</Bottom><Right>1370</Right><x>-2</x><y>-2</y><xscreen>1372</xscreen><yscreen>200</yscreen><sizeHorzCX>1002924</sizeHorzCX><sizeHorzCY>236686</sizeHorzCY><sizeVertCX>146199</sizeVertCX><sizeVertCY>236686</sizeVertCY></Rect></Wnd3></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
+    <Top><Row0><Sizes><Toolbar-00E08E88><key>iaridepm.enu1</key></Toolbar-00E08E88></Sizes></Row0></Top><Left><Row0><Sizes><Wnd0><Rect><Top>-2</Top><Left>-2</Left><Bottom>602</Bottom><Right>570</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>200</yscreen><sizeHorzCX>146199</sizeHorzCX><sizeHorzCY>236686</sizeHorzCY><sizeVertCX>418129</sizeVertCX><sizeVertCY>714793</sizeVertCY></Rect></Wnd0></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes><Wnd1><Rect><Top>-2</Top><Left>-2</Left><Bottom>198</Bottom><Right>1370</Right><x>-2</x><y>-2</y><xscreen>1372</xscreen><yscreen>200</yscreen><sizeHorzCX>1002924</sizeHorzCX><sizeHorzCY>236686</sizeHorzCY><sizeVertCX>146199</sizeVertCX><sizeVertCY>236686</sizeVertCY></Rect></Wnd1></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
   </Desktop>
 </Workspace>
 

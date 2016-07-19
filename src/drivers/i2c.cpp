@@ -17,8 +17,7 @@
 #define I2C_POLLING_MODE			(1 << 0)
 #define I2C_IT_MODE				(1 << 1)
 #define I2C_DMA_MODE				(1 << 2)
-
-#define I2C_MODE 					I2C_DMA_MODE
+#define I2C_MODE 					I2C_POLLING_MOD
 
 namespace driver {
 
@@ -51,7 +50,7 @@ static struct stm32_i2c_hw_table i2c_hw_table[] = {
 			},
 		},
 		.GPIO_Init = {
-			.Pin = (GPIO_PIN_7 | GPIO_PIN_6),
+			.Pin = (GPIO_PIN_6 | GPIO_PIN_9),
 			.Mode = GPIO_MODE_AF_PP, //GPIO_MODE_AF_OD; //
 			.Pull = GPIO_PULLDOWN, //GPIO_PULLUP; //;	//
 			.Speed = GPIO_SPEED_FREQ_HIGH,
@@ -135,14 +134,14 @@ s32 i2c::probe(void)
 	s8 str[16];
 	snprintf((char *)str, 16, "dma-%d", _dma_tx_id);
 	_dmatx = new dma((PCSTR)str, _dma_tx_id);
-	INF("%s: new dmatx %s[dma%d,channel%d].\n", _name, str, _dmatx->_dma_id, _dmatx->_channel_id);
+	INF("%s: new dmatx %s[dma%d,channel%d].\n", _name, str, _dmatx->_dma_id, _dmatx->_stream_id, _dmatx->_channel_id);
 	_dmatx->probe();
 	_dmatx->config(DMA_DIR_MEM_TO_PERIPH, DMA_ALIGN_BYTE, DMA_PRI_LOW, 1, 0);
 	__HAL_LINKDMA(hi2c, hdmatx, *(DMA_HandleTypeDef *)(_dmatx->_handle));
 
     snprintf((char *)str, 16, "dma-%d", _dma_rx_id);
 	_dmarx = new dma((PCSTR)str, _dma_rx_id);
-	INF("%s: new dmarx %s[dma%d,channel%d].\n", _name, str, _dmarx->_dma_id, _dmarx->_channel_id);
+	INF("%s: new dmarx %s[dma%d,channel%d].\n", _name, str, _dmarx->_dma_id, _dmarx->_stream_id, _dmarx->_channel_id);
 	_dmarx->probe();
 	_dmarx->config(DMA_DIR_PERIPH_TO_MEM, DMA_ALIGN_BYTE, DMA_PRI_HIGH, 0, 1);
 	__HAL_LINKDMA(hi2c, hdmarx, *(DMA_HandleTypeDef *)(_dmarx->_handle));
@@ -220,9 +219,10 @@ s32 i2c::transfer(struct i2c_msg *msgs, int num)
 	//if (mutex_lock_interruptible(&d->i2c_mutex) < 0)
 	//	return -EAGAIN;
 
-	if (num > 2)
+	if (num > 2) {
 		WRN("%s: more than 2 i2c messages at a time is not handled yet. TODO.\n", _name);
-
+    }
+    
 	if (num == 2) {
 		/* start addr reg | start addr data ... stop */
 		addr_len = (msgs[0].len == 1 ? I2C_MEMADD_SIZE_8BIT : I2C_MEMADD_SIZE_16BIT);
@@ -231,13 +231,14 @@ s32 i2c::transfer(struct i2c_msg *msgs, int num)
 		addr = msgs[1].addr;
 		len = msgs[1].len;
 		buf = (u8 *)(msgs[1].buf);
-		if (msgs[1].flags & I2C_M_RD) {
 #if (I2C_MODE == I2C_POLLING_MODE) 
+		if (msgs[1].flags & I2C_M_RD) {
 			status = HAL_I2C_Mem_Read(hi2c, addr, (u16)reg, addr_len, buf, len, I2C_POLLING_TIMEOUT_MS);
 		} else {
 			status = HAL_I2C_Mem_Write(hi2c, addr, (u16)reg, addr_len, buf, len, I2C_POLLING_TIMEOUT_MS);
 		}
 #elif (I2C_MODE == I2C_DMA_MODE)
+        if (msgs[1].flags & I2C_M_RD) {
 			status = HAL_I2C_Mem_Read_DMA(hi2c, addr, (u16)reg, addr_len, buf, len);
 			//pend eventrx
 			s32 ret = 0;
@@ -265,18 +266,19 @@ s32 i2c::transfer(struct i2c_msg *msgs, int num)
 			ERR("%s: failed to i2c transfer£¬num = %d!\n", _name, num);
 			return -1;
 		}
-	} else {
+    } else {
 		/* start addr data ... stop */
 		addr = msgs[0].addr;
 		len = msgs[0].len;
 		buf = (u8 *)(msgs[0].buf);
-		if (msgs[0].flags & I2C_M_RD) {	
 #if (I2C_MODE == I2C_POLLING_MODE) 
+        if (msgs[0].flags & I2C_M_RD) {	
 			status = HAL_I2C_Master_Receive(hi2c, addr, buf, len, I2C_POLLING_TIMEOUT_MS);
 		} else {
 			status = HAL_I2C_Master_Transmit(hi2c, addr, buf, len, I2C_POLLING_TIMEOUT_MS);
 		}
 #elif (I2C_MODE == I2C_DMA_MODE)
+        if (msgs[0].flags & I2C_M_RD) {	
 			status = HAL_I2C_Master_Receive_DMA(hi2c, addr, buf, len);
 			//pend eventrx
             s32 ret = 0;
@@ -300,7 +302,6 @@ s32 i2c::transfer(struct i2c_msg *msgs, int num)
 #elif (I2C_MODE == I2C_IT_MODE)
 #error "No I2C interrupt mode!"
 #endif
-		
 		if(status != HAL_OK) {
 			ERR("%s: failed to i2c transfer£¬num = %d!\n", _name, num);
 			return -1;
@@ -312,6 +313,8 @@ s32 i2c::transfer(struct i2c_msg *msgs, int num)
 	return 0;
 }
 
+
+#if 0
 s32 i2c::reset(void)
 {
 	i2c::remove();
@@ -319,6 +322,7 @@ s32 i2c::reset(void)
 
 	return 0;
 }
+#endif
 
 s32 i2c::self_test(void)
 {	

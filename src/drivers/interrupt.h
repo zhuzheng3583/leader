@@ -13,7 +13,7 @@
 #include "leader_misc.h"
 
 //id = [0,81]
-#define STM32F373XC_USER_IRQNUM_MAX	    82
+#define STM32F4xx_USER_IRQNUM_MAX	    82
 
 namespace driver {
 
@@ -41,7 +41,7 @@ public:
 	~interrupt(void);
 
 public:
-	static struct map_table s_map[STM32F373XC_USER_IRQNUM_MAX];
+	static struct map_table s_map[STM32F4xx_USER_IRQNUM_MAX];
 
 public:
 	static s32 irq_init(void);

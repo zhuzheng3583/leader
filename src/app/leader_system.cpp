@@ -73,22 +73,22 @@ void timer_func(void *arg)
 
 s32 leader_system::init(void)
 {
-	demo_main();
+	//demo_main();
     
 	s32 ret = 0;
-	ret = core::core_init();
+	ret = core::init();
 	ret = interrupt::irq_init();
-	_puart1 = new uart("uart-1", 1);
-	_puart1->probe();
-	_puart1->open(NULL);
-    //_puart1->self_test();
+	_puart = new uart("uart-2", 2);
+	_puart->probe();
+	_puart->open(NULL);
+    //_puart->self_test();
     
 	_pflash = new flash("flash", -1);
 	_pflash->probe();
 
 	_i2c1 = new i2c("i2c-1", 1);
 	_i2c1->probe();
-	//_i2c1->self_test();
+	_i2c1->self_test();
 	
 	_usb_dev = new usb_dev("usb_dev", -1);
 	_usb_dev->probe();

@@ -18,7 +18,6 @@
 #define UART_POLLING_MODE			(1 << 0)
 #define UART_IT_MODE				(1 << 1)
 #define UART_DMA_MODE				(1 << 2)
-
 #define UART_MODE 				UART_DMA_MODE
 
 
@@ -38,32 +37,8 @@ struct stm32_uart_hw_table
 
 static struct stm32_uart_hw_table uart_hw_table[] = {
 	[0] = { NULL },
-	[1] = { 
-		.GPIOx = GPIOC,
-		.IRQn = USART1_IRQn,
-		.UART_Handle = { 
-			.Instance = USART1,
-			.Init = {
-				.BaudRate   = 115200,
-				.WordLength = UART_WORDLENGTH_8B,
-				.StopBits   = UART_STOPBITS_1,
-				.Parity     = UART_PARITY_NONE,
-				.HwFlowCtl  = UART_HWCONTROL_NONE,
-				.Mode       = UART_MODE_TX_RX,		
-			},
-		},
-		.GPIO_Init = {
-			.Pin       = GPIO_PIN_4 | GPIO_PIN_5,
-			.Mode      = GPIO_MODE_AF_PP,
-			.Pull      = GPIO_PULLUP,
-			.Speed     = GPIO_SPEED_FREQ_HIGH,
-			.Alternate = GPIO_AF7_USART1,
-		},
-		.dma_tx_id = 4,
-		.dma_rx_id = 5,
-	},
 	[2] = { 
-		.GPIOx = GPIOD,
+		.GPIOx = GPIOA,
 		.IRQn = USART2_IRQn,
 		.UART_Handle = {
 			.Instance = USART2,
@@ -77,14 +52,14 @@ static struct stm32_uart_hw_table uart_hw_table[] = {
 			},
 		},
 		.GPIO_Init = {
-			.Pin       = GPIO_PIN_5 | GPIO_PIN_6,
+			.Pin       = GPIO_PIN_2 | GPIO_PIN_3,
 			.Mode      = GPIO_MODE_AF_PP,
-			.Pull      = GPIO_PULLUP,
+			.Pull      = GPIO_NOPULL,
 			.Speed     = GPIO_SPEED_FREQ_HIGH,
 			.Alternate = GPIO_AF7_USART2,
 		},
-		.dma_tx_id = NULL,
-		.dma_rx_id = NULL,
+		.dma_tx_id = 52,
+		.dma_rx_id = 44,
 	},
 };
 
@@ -122,14 +97,13 @@ s32 uart::probe(void)
     	switch(_id)
     	{
 	case 1:
-		
 		/* 1- Enable USARTx peripherals and GPIO Clocks */
 		//__HAL_RCC_GPIOE_CLK_ENABLE();
 		__HAL_RCC_GPIOC_CLK_ENABLE();
 		__HAL_RCC_USART1_CLK_ENABLE(); 
 		break;
 	case 2:
-		__HAL_RCC_GPIOD_CLK_ENABLE();
+		__HAL_RCC_GPIOA_CLK_ENABLE();
   		__HAL_RCC_USART2_CLK_ENABLE(); 
 		break;
 	case 3:
@@ -157,7 +131,7 @@ s32 uart::probe(void)
 	s8 str[16];
 	snprintf((char *)str, 16, "dma-%d", _dma_tx_id);
 	_dmatx = new dma((PCSTR)str, _dma_tx_id);
-	//INF("%s: new dmatx %s[dma%d,channel%d].\n", _name, str, _dmatx->_dma_id, _dmatx->_channel_id);
+	//INF("%s: new dmatx %s[dma%d,channel%d].\n", _name, str, _dmatx->_dma_id, _dmatx->_stream_id, _dmatx->_channel_id);
 	_dmatx->probe();
 	_dmatx->config(DMA_DIR_MEM_TO_PERIPH, DMA_ALIGN_BYTE, DMA_PRI_LOW, 1, 0);
 	/* Associate the initialized DMA handle to the UART handle */
@@ -165,7 +139,7 @@ s32 uart::probe(void)
 
     snprintf((char *)str, 16, "dma-%d", _dma_rx_id);
 	_dmarx = new dma((PCSTR)str, _dma_rx_id);
-	//INF("%s: new dmarx %s[dma%d,channel%d].\n", _name, str, _dmarx->_dma_id, _dmarx->_channel_id);
+	//INF("%s: new dmarx %s[dma%d,channel%d].\n", _name, str, _dmarx->_dma_id, _dmarx->_stream_id, _dmarx->_channel_id);
 	_dmarx->probe();
 	_dmarx->config(DMA_DIR_PERIPH_TO_MEM, DMA_ALIGN_BYTE, DMA_PRI_HIGH, 0, 1);
 	__HAL_LINKDMA(huart, hdmarx, *(DMA_HandleTypeDef *)(_dmarx->_handle));
@@ -339,6 +313,7 @@ s32 uart::write(u8 *buf, u32 count)
 
 s32 uart::self_test(void)
 {	
+#if 1
 	u8 wbuf[16] = "hello world!";
 	u8 rbuf[16] = { 0 };
 
@@ -347,9 +322,7 @@ s32 uart::self_test(void)
       uart::read(rbuf, ARRAYSIZE(rbuf));
       uart::write(rbuf, ARRAYSIZE(wbuf));
     }
-	
-	
-	
+#else
 	u32 n = 0;
 	while (1) {
 		INF("%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d.\n", 
@@ -357,6 +330,7 @@ s32 uart::self_test(void)
 		n++;
 	}
 	core::udelay(1);
+#endif
 }
 
 void uart::isr(void)

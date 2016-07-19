@@ -14,7 +14,7 @@
 
 namespace driver {
 	
-struct map_table interrupt::s_map[STM32F373XC_USER_IRQNUM_MAX];
+struct map_table interrupt::s_map[STM32F4xx_USER_IRQNUM_MAX];
 
 interrupt::interrupt(void)
 {
@@ -103,21 +103,18 @@ void USART1_IRQHandler(void)
 {
 	interrupt::s_map[USART1_IRQn].handler->isr();
 }
-//USART1_DMA_TX
-void DMA1_Channel4_IRQHandler (void)
-{
-	//interrupt::s_map[DMA1_Channel4_IRQn].handler->isr();
-}
-//USART1_DMA_RX
-void DMA1_Channel5_IRQHandler(void)
-{
-	//interrupt::s_map[DMA1_Channel5_IRQn].handler->isr();
-}
-
 
 void USART2_IRQHandler(void)
 {
 	interrupt::s_map[USART2_IRQn].handler->isr();
+}
+void DMA1_Stream5_IRQHandler(void)
+{
+	interrupt::s_map[DMA1_Stream5_IRQn].handler->isr();
+}
+void DMA1_Stream6_IRQHandler(void)
+{
+	interrupt::s_map[DMA1_Stream6_IRQn].handler->isr();
 }
 
 

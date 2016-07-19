@@ -50,6 +50,7 @@ public:
     
 public:
     enum leader_system_mode _mode;
+    uart                    *_puart;
     uart                    *_puart1;
     uart                    *_puart2;
     uart                    *_puart3;
@@ -71,6 +72,7 @@ public:
     
 public:
     enum leader_system_mode    get_mode(void)		{ return _mode; }
+    uart        *get_uart(void)		    { return _puart; }
     uart        *get_uart1(void)		    { return _puart1; }
     uart        *get_uart2(void)		    { return _puart2; }
     uart        *get_uart3(void)		    { return _puart3; }

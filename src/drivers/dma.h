@@ -47,6 +47,7 @@ public:
 
 public:
     s32 _dma_id;
+    s32 _stream_id;
     s32 _channel_id;
 
 public:
@@ -61,59 +62,6 @@ public:
     
 public:
     virtual void isr(void); 
-};
-
-struct stm32f3_dma_hw_table
-{
-	DMA_TypeDef 			*DMAx;
-	IRQn_Type 			IRQn;
-	DMA_HandleTypeDef		DMA_Handle;
-};
-
-static struct stm32f3_dma_hw_table dma_hw_table[] = {
-	[0] = { NULL },
-#if 0
-	[4] = { 
-		.DMAx = DMA1,
-		.IRQn = DMA1_Channel4_IRQn,
-		.DMA_Handle = { 
-			.Instance = DMA1_Channel4,
-			.Init = {
-				.Mode = DMA_NORMAL,
-			},
-		},
-	},
-	[5] = { 
-		.DMAx = DMA1,
-		.IRQn = DMA1_Channel5_IRQn,
-		.DMA_Handle = { 
-			.Instance = DMA1_Channel5,
-			.Init = {
-				.Mode = DMA_NORMAL,
-			},
-		},
-	},
-	[6] = { 
-		.DMAx = DMA1,
-		.IRQn = DMA1_Channel6_IRQn,
-		.DMA_Handle = { 
-			.Instance = DMA1_Channel6,
-			.Init = {
-				.Mode = DMA_NORMAL,
-			},
-		},
-	},
-	[7] = { 
-		.DMAx = DMA1,
-		.IRQn = DMA1_Channel7_IRQn,
-		.DMA_Handle = { 
-			.Instance = DMA1_Channel7,
-			.Init = {
-				.Mode = DMA_NORMAL,
-			},
-		},
-	},
-#endif
 };
 
 }

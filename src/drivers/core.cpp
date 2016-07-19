@@ -16,8 +16,6 @@
 #define time_after_eq(a,b) 	((s64)(a) - (s64)(b) >= 0)
 #define time_before_eq(a,b)	time_after_eq(b,a)
 
-
-
 namespace driver {
 
 u32 core::s_freq_khz = 0;
@@ -36,7 +34,7 @@ core::~core(void)
 /*
  * ³õÊ¼»¯ÑÓ³Ùº¯Êý
  */
-s32 core::core_init(void)
+s32 core::init(void)
 {
   /* STM32F4xx HAL library initialization:
        - Configure the Flash prefetch, instruction and Data caches

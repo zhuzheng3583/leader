@@ -80,30 +80,42 @@ s32 flash::close(void)
 	return 0;
 }
 
-s32 flash::erase(u32 page_start_addr, u32 page_n)
+s32 flash::erase(u32 start_sector, u32 num_sectors)
 {
-#if 0
-	u32 page_error = 0;
+	u32 sector_error = 0;
 
-	ASSERT((_offset % FLASH_PAGE_SIZE == 0));
-	/*Variable used for Erase procedure*/
 	FLASH_EraseInitTypeDef EraseInitStruct;
-  	/* Erase the user Flash area (area defined by FLASH_USER_START_ADDR and FLASH_USER_END_ADDR) */
-  	EraseInitStruct.TypeErase = FLASH_TYPEERASE_PAGES;
-  	EraseInitStruct.PageAddress = page_start_addr;//FLASH_USER_START_ADDR;
-  	EraseInitStruct.NbPages = page_n;//(FLASH_USER_END_ADDR - FLASH_USER_START_ADDR)/FLASH_PAGE_SIZE;
-
-  	if (HAL_FLASHEx_Erase(&EraseInitStruct, &page_error) != HAL_OK) { 
-	/*
-		Error occurred while page erase. 
+	memset(&EraseInitStruct, 0, sizeof(EraseInitStruct));
+  	/* Fill EraseInit structure*/
+  	EraseInitStruct.TypeErase = FLASH_TYPEERASE_SECTORS;
+  	EraseInitStruct.VoltageRange = FLASH_VOLTAGE_RANGE_3;
+  	EraseInitStruct.Sector = start_sector;
+  	EraseInitStruct.NbSectors = num_sectors;
+  	if(HAL_FLASHEx_Erase(&EraseInitStruct, &sector_error) != HAL_OK) { 
+	    /* 
+		Error occurred while sector erase. 
 		User can add here some code to deal with this error. 
-		PageError will contain the faulty page and then to know the code error on this page,
+		SectorError will contain the faulty sector and then to know the code 
+			error on this sector,
 		user can call function 'HAL_FLASH_GetError()'
-	*/
-    	INF("%s: failed to erase.\n", _name);
+		*/
+    		INF("%s: failed to erase.\n", _name);
 		return -1;
-	}	
-#endif
+  	}
+
+	/* Note: If an erase operation in Flash memory also concerns data in the 
+	data or instruction cache, you have to make sure that these data are rewritten before they are 
+	accessed during code execution. If this cannot be done safely, it is recommended to flush the 
+	caches by setting the DCRST and ICRST bits in the FLASH_CR register. */
+  	__HAL_FLASH_DATA_CACHE_DISABLE();
+  	__HAL_FLASH_INSTRUCTION_CACHE_DISABLE();
+
+  	__HAL_FLASH_DATA_CACHE_RESET();
+ 	__HAL_FLASH_INSTRUCTION_CACHE_RESET();
+
+  	__HAL_FLASH_INSTRUCTION_CACHE_ENABLE();
+  	__HAL_FLASH_DATA_CACHE_ENABLE();
+	
 	return 0;
 }
 
@@ -120,10 +132,9 @@ s32 flash::read(u8 *buf, u32 count)
 	/* Unlock the Flash to enable the flash control register access */ 
 	HAL_FLASH_Unlock();
 
-	ASSERT((_offset % FLASH_PAGE_SIZE == 0));
-	start_addr = FLASH_BASE + _offset;
+	start_addr = OFFSET_TO_ADDR_FLASH_SECTOR(_offset);
 	end_addr = start_addr + count;
-	ASSERT((start_addr >= FLASH_USER_START_ADDR) && (end_addr <= FLASH_USER_END_ADDR));
+	ASSERT((start_addr >= FLASH_BASE) && (end_addr <= FLASH_END));
 
 	cur_addr = start_addr;
     for (readcnt = 0; readcnt < count; ) {
@@ -151,19 +162,19 @@ s32 flash::write(u8 *buf, u32 count)
 	/* Unlock the Flash to enable the flash control register access */ 
 	HAL_FLASH_Unlock();
 
-	ASSERT((_offset % FLASH_PAGE_SIZE == 0));
-	start_addr = FLASH_BASE + _offset;
+	start_addr = OFFSET_TO_ADDR_FLASH_SECTOR(_offset);
 	end_addr = start_addr + count;
-	ASSERT((start_addr >= FLASH_USER_START_ADDR) && (end_addr <= FLASH_USER_END_ADDR));
+	ASSERT((start_addr >= FLASH_BASE) && (end_addr <= FLASH_END));
 
-	if (count % FLASH_PAGE_SIZE == 0) {
-		page_n = count / FLASH_PAGE_SIZE;
-	} else {
-		page_n = count / FLASH_PAGE_SIZE + 1;
+	if((get_sector(start_addr) < 0) && (get_sector_num(start_addr, end_addr) < 0)) {
+		return -1;
 	}
-	ret = flash::erase(start_addr, page_n);
+
+	ret = flash::erase((u32)get_sector(start_addr), 
+		(u32)get_sector_num(start_addr, end_addr));
 	if (ret < 0) {
 		ERR("%s: failed to flash::erase.\n", _name);
+		return -1;
 	}
 
 	cur_addr = start_addr;
@@ -196,10 +207,8 @@ s32 flash::seek(s32 offset, enum seek_mode mode)
 		_offset = offset;
 		break;
 	case SEEK_CUR_M:
-		
 		break;
 	case SEEK_END_M:
-
 		break;
 	default:
         break;
@@ -220,9 +229,9 @@ s32 flash::self_test(void)
 	u8 rbuf[16] = { 0 };
 
 	flash::open(NULL);
-	flash::seek(OFFSET_FLASH_PAGE_63, SEEK_SET_M);
+	flash::seek(ADDR_FLASH_SECTOR_TO_OFFSET(ADDR_FLASH_SECTOR_10), SEEK_SET_M);
 	flash::write(wbuf, 16);
-	flash::seek(OFFSET_FLASH_PAGE_63, SEEK_SET_M);
+	flash::seek(ADDR_FLASH_SECTOR_TO_OFFSET(ADDR_FLASH_SECTOR_10), SEEK_SET_M);
 	flash::read(rbuf, 16);
 	ret = memcmp((char const *)wbuf, (char const *)rbuf, 16);
 	if(ret != 0) {
@@ -231,6 +240,117 @@ s32 flash::self_test(void)
 	}
 	
     return ret;
+}
+
+s32 flash::get_sector(u32 address)
+{
+	s32 sector = 0;
+
+  	if (address < ADDR_FLASH_SECTOR_0) {
+		INF("%s: failed to flash::get_sector.\n", _name);
+		sector = -1; 
+	}
+	else if (address < ADDR_FLASH_SECTOR_1) {
+		sector = FLASH_SECTOR_0;  
+	}
+	else if(address < ADDR_FLASH_SECTOR_2) {
+    		sector = FLASH_SECTOR_1;  
+  	}
+  	else if (address < ADDR_FLASH_SECTOR_3) {
+    		sector = FLASH_SECTOR_2;  
+  	}
+  	else if (address < ADDR_FLASH_SECTOR_4) {
+    		sector = FLASH_SECTOR_3;  
+  	}
+  	else if (address < ADDR_FLASH_SECTOR_5) {
+    		sector = FLASH_SECTOR_4;  
+  	}
+  	else if (address < ADDR_FLASH_SECTOR_6) {
+    		sector = FLASH_SECTOR_5;  
+  	}
+  	else if (address < ADDR_FLASH_SECTOR_7) {
+    		sector = FLASH_SECTOR_6;  
+  	}
+  	else if (address < ADDR_FLASH_SECTOR_8) {
+    		sector = FLASH_SECTOR_7;  
+  	}
+  	else if (address < ADDR_FLASH_SECTOR_9) {
+    		sector = FLASH_SECTOR_8;  
+  	}
+  	else if (address < ADDR_FLASH_SECTOR_10) {
+    		sector = FLASH_SECTOR_9;  
+  	}
+  	else if (address < ADDR_FLASH_SECTOR_11) {
+    		sector = FLASH_SECTOR_10;  
+  	}
+  	else {/* (Address < FLASH_END_ADDR) && (Address >= ADDR_FLASH_SECTOR_11) */
+    		sector = FLASH_SECTOR_11;
+  	}
+
+  	return sector;
+}
+
+s32 flash::get_sector_num(u32 start_addr, u32 end_addr)
+{
+#if 0
+	s32 sector_num = 0;
+
+	if (start_addr < ADDR_FLASH_SECTOR_4) {
+		if (end_addr < ADDR_FLASH_SECTOR_4) {
+			
+		}
+			
+	} else if(start_addr < ADDR_FLASH_SECTOR_5) {
+		if (end_addr )	
+	} 
+	
+  	if (address < ADDR_FLASH_SECTOR_0) {
+		INF("%s: failed to flash::get_sector_num.\n", _name);
+		sector = -1; 
+	}
+	if (address < ADDR_FLASH_SECTOR_1) {
+		sector = FLASH_SECTOR_0;  
+	}
+	else if(address < ADDR_FLASH_SECTOR_2) {
+    		sector = FLASH_SECTOR_1;  
+  	}
+  	else if (address < ADDR_FLASH_SECTOR_3) {
+    		sector = FLASH_SECTOR_2;  
+  	}
+  	else if (address < ADDR_FLASH_SECTOR_4) {
+    		sector = FLASH_SECTOR_3;  
+  	}
+  	else if (address < ADDR_FLASH_SECTOR_5) {
+    		sector = FLASH_SECTOR_4;  
+  	}
+  	else if (address < ADDR_FLASH_SECTOR_6) {
+    		sector = FLASH_SECTOR_5;  
+  	}
+  	else if (address < ADDR_FLASH_SECTOR_7) {
+    		sector = FLASH_SECTOR_6;  
+  	}
+  	else if (address < ADDR_FLASH_SECTOR_8) {
+    		sector = FLASH_SECTOR_7;  
+  	}
+  	else if (address < ADDR_FLASH_SECTOR_9) {
+    		sector = FLASH_SECTOR_8;  
+  	}
+  	else if (address < ADDR_FLASH_SECTOR_10) {
+    		sector = FLASH_SECTOR_9;  
+  	}
+  	else if (address < ADDR_FLASH_SECTOR_11) {
+    		sector = FLASH_SECTOR_10;  
+  	}
+  	else {/* (Address < FLASH_END_ADDR) && (Address >= ADDR_FLASH_SECTOR_11) */
+    		sector = FLASH_SECTOR_11;
+  	}
+
+  	return sector;
+	
+fail:
+	return -1;
+#endif
+	return 0;
 }
 
 }
