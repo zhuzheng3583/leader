@@ -45,7 +45,7 @@ public:
     {
         M_AUTO = 0,
         M_BOOTLOADER,
-        M_GLASSES_SYSTEM,
+        M_AIRCRAFT,
     };
     
 public:

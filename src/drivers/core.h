@@ -95,8 +95,8 @@ public:
     static u32 get_cpu_freq(void);
     static u32 get_timestamp(void);
 
-    static void system_clock_init(void);
-    static void dwt_init(void);
+    static void system_clock_config(void);
+    static void dwt_config(void);
 
     static void self_test(void);
 

@@ -36,6 +36,10 @@ s32 usb_dev::probe(void)
 		ERR("%s: failed to probe.\n", _name);
 		goto fail0;
 	}
+
+    /* Disconnect the USB device */
+    USBD_Stop(hUSBDDevice);
+    USBD_DeInit(hUSBDDevice);
 	
 	/* Init Device Library */
 	USBD_Init(hUSBDDevice, &HID_Desc, 0);

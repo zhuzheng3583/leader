@@ -38,30 +38,27 @@ core::~core(void)
  */
 s32 core::core_init(void)
 {
-  	/* STM32F3xx HAL library initialization:
-       - Configure the Flash prefetch
-       - Systick timer is configured by default as source of time base, but user 
-         can eventually implement his proper time base source (a general purpose 
-         timer for example or other time source), keeping in mind that Time base 
-         duration should be kept 1ms since PPP_TIMEOUT_VALUEs are defined and 
-         handled in milliseconds basis.
+  /* STM32F4xx HAL library initialization:
+       - Configure the Flash prefetch, instruction and Data caches
+       - Configure the Systick to generate an interrupt each 1 msec
        - Set NVIC Group Priority to 4
-       - Low Level Initialization
+       - Global MSP (MCU Support Package) initialization
      */
   	HAL_Init();
-  	/* Configure the system clock to 72 Mhz */
-  	core::system_clock_init();
+	
+  	/* Configure the system clock to 168 MHz */
+  	core::system_clock_config();
     
 	u32 sysclk = core::get_cpu_freq();
 	s_freq_khz = sysclk / 1000;
 	s_freq_mhz = sysclk / 1000000;
 
-	core::dwt_init();
+	core::dwt_config();
 
 	return 0;
 }
 
-void core::dwt_init(void)
+void core::dwt_config(void)
 {
 	//DEMCR寄存器的第24位,如果要使用DWT ETM ITM和TPIU的话DEMCR寄存器的第24位置1
 	#define  BIT_DEM_CR_TRCENA                    (1 << 24)
@@ -71,7 +68,7 @@ void core::dwt_init(void)
   	fclk_freq = HAL_RCC_GetHCLKFreq();
 
 	DWT->CTRL |= BIT_DEM_CR_TRCENA; 	//使用DWT  Enable Cortex-M4's DWT CYCCNT reg.   
-	DWT->CYCCNT = 0u;					 //初始化CYCCNT寄存器
+	DWT->CYCCNT = 0u;					//初始化CYCCNT寄存器
 	DWT->CTRL |= BIT_DWT_CR_CYCCNTENA;	//开启CYCCNT
 }
 
@@ -95,7 +92,7 @@ void core::dwt_init(void)
   * @param  None
   * @retval None
   */
-void core::system_clock_init(void)
+void core::system_clock_config(void)
 {
 	RCC_ClkInitTypeDef RCC_ClkInitStruct;
 	RCC_OscInitTypeDef RCC_OscInitStruct;

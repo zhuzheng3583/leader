@@ -13,6 +13,8 @@
 #include "bootloader.h"
 #include "aircraft.h"
 
+#include "demo_main.h"
+
 namespace app {
 
 leader_system *leader_system::s_pactive_instance = NULL;
@@ -38,19 +40,19 @@ s32 leader_system::init(enum leader_system_mode mode)
 	{
 	case M_AUTO:
 #if defined(BOOTLOADER)
-    		s_pactive_instance = new bootloader;
+        s_pactive_instance = new bootloader;
 		_mode = M_BOOTLOADER;
-#elif defined(GLASSES_SYSTEM)
+#elif defined(AIRCRAFT)
 		s_pactive_instance = new aircraft;
-		_mode = M_GLASSES_SYSTEM;
+		_mode = M_AIRCRAFT;
 #else
-//#error pre-defined macros required.
+#error pre-defined macros required.
 #endif	
         break;
 	case M_BOOTLOADER:
 		s_pactive_instance = new bootloader;
 		break;
-	case M_GLASSES_SYSTEM:
+	case M_AIRCRAFT:
 		s_pactive_instance = new aircraft;
 		break;
 	default:
@@ -71,7 +73,8 @@ void timer_func(void *arg)
 
 s32 leader_system::init(void)
 {
-	//demo_main();
+	demo_main();
+    
 	s32 ret = 0;
 	ret = core::core_init();
 	ret = interrupt::irq_init();
