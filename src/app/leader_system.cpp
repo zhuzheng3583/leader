@@ -73,16 +73,21 @@ void timer_func(void *arg)
 
 s32 leader_system::init(void)
 {
-	//demo_main();
-    
+#if USE_STM32F4_DEMO
+	demo_main();
+#endif
+
 	s32 ret = 0;
 	ret = core::init();
 	ret = interrupt::irq_init();
+	kernel::init();
+	
 	_puart = new uart("uart-2", 2);
 	_puart->probe();
 	_puart->open(NULL);
-    //_puart->self_test();
-    
+    	//_puart->self_test();
+
+#if 0    
 	_pflash = new flash("flash", -1);
 	_pflash->probe();
 
@@ -152,7 +157,11 @@ s32 leader_system::init(void)
 	pgpio->set_value(1);
 	
     while(1);
-   	//interrupt::irq_init();
+#endif
+
+    _heartbeat = new heartbeat;
+	_heartbeat->create(NULL);
+
 	if(ret < 0) {
 		INF("Failed to leader_system::init");
 		CAPTURE_ERR();

@@ -9,7 +9,7 @@
 **
 ***********************************************************************/
 #include "core.h"
-#include "device.h"
+
 
 #define time_after(a,b)		((s64)(b) - (s64)(a) < 0)
 #define time_before(a,b)		time_after(b,a)
@@ -43,31 +43,28 @@ s32 core::init(void)
        - Global MSP (MCU Support Package) initialization
      */
   	HAL_Init();
-	
+
   	/* Configure the system clock to 168 MHz */
   	core::system_clock_config();
-    
+	core::dwt_config();
+
 	u32 sysclk = core::get_cpu_freq();
 	s_freq_khz = sysclk / 1000;
 	s_freq_mhz = sysclk / 1000000;
-
-	core::dwt_config();
 
 	return 0;
 }
 
 void core::dwt_config(void)
 {
-	//DEMCR寄存器的第24位,如果要使用DWT ETM ITM和TPIU的话DEMCR寄存器的第24位置1
-	#define  BIT_DEM_CR_TRCENA                    (1 << 24)
+    	//DEMCR寄存器的第24位,如果要使用DWT ETM ITM和TPIU的话DEMCR寄存器的第24位置1
+	#define  BIT_DEM_CR_TRCENA		(1 << 24)
 	//DWTCR寄存器的第0位,当为1的时候使能CYCCNT计数器,使用CYCCNT之前应当先初始化
-	#define  BIT_DWT_CR_CYCCNTENA                 (1 << 0)
-	u32  fclk_freq;
-  	fclk_freq = HAL_RCC_GetHCLKFreq();
+	#define  BIT_DWT_CR_CYCCNTENA	(1 << 0)
 
-	DWT->CTRL |= BIT_DEM_CR_TRCENA; 	//使用DWT  Enable Cortex-M4's DWT CYCCNT reg.   
-	DWT->CYCCNT = 0u;					//初始化CYCCNT寄存器
-	DWT->CTRL |= BIT_DWT_CR_CYCCNTENA;	//开启CYCCNT
+    CoreDebug->DEMCR |= BIT_DEM_CR_TRCENA;  //使用DWT  Enable Cortex-M4's DWT CYCCNT reg.   
+	DWT->CYCCNT = 0u;					    //初始化CYCCNT寄存器
+	DWT->CTRL |= BIT_DWT_CR_CYCCNTENA;	    //开启CYCCNT
 }
 
 /**
@@ -191,6 +188,30 @@ u32 core::get_timestamp(void)
 {
 	return DWT->CYCCNT;
 }
+
+#if 0
+s32  timestamp_to_us (u32 ts_cnts)
+{
+    CPU_INT64U  ts_us;
+    CPU_INT64U  fclk_freq;
+
+    fclk_freq = BSP_CPU_ClkFreq();
+    ts_us     = ts_cnts / (fclk_freq / DEF_TIME_NBR_uS_PER_SEC);
+
+    return (ts_us);
+}
+
+CPU_INT64U  CPU_TS64_to_uSec (CPU_TS64  ts_cnts)
+{
+    CPU_INT64U  ts_us;
+    CPU_INT64U  fclk_freq;
+
+    fclk_freq = BSP_CPU_ClkFreq();
+    ts_us     = ts_cnts / (fclk_freq / DEF_TIME_NBR_uS_PER_SEC);
+
+    return (ts_us);
+}
+#endif
 
 
 void core::self_test(void)

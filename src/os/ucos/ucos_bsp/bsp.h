@@ -15,8 +15,7 @@
 #include  <cpu_core.h>
 #include  <lib_def.h>
 #include  <lib_ascii.h>
-#include  <stm32f4xx_conf.h>
-
+#include "stm32f4xx_hal.h"
 #endif  
 
 

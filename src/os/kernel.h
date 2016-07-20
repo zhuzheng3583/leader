@@ -62,7 +62,7 @@ public:
 	~kernel(void);
 
 public:
-	static void systick_init(void);
+	static void systick_config(void);
 	static void init(void);
 	static void start(void);
 	static void exit(void);

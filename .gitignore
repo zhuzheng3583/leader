@@ -2,6 +2,7 @@ EWARM/Debug/
 EWARM/Release/
 EWARM/BootloaderDebug/
 EWARM/GlassesSystemDebug/
+EWARM/AircraftDebug/
 EWARM/STM32F3-Discovery_Demo/
 EWARM/STM32F4-DISCO/
 si/

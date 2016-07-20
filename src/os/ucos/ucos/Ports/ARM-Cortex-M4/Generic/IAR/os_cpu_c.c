@@ -52,12 +52,17 @@ const  CPU_CHAR  *os_cpu_c__c = "$Id: $";
 
 #include  <os.h>
 
-
 #ifdef __cplusplus
 extern  "C" {
 #endif
 
-
+#if (CPU_CFG_TS_TMR_EN == DEF_ENABLED)
+CPU_TS_TMR CPU_TS_TmrRd(void)
+{
+	return ((CPU_TS_TMR)(DWT->CYCCNT));
+}
+#endif
+  
 /*
 *********************************************************************************************************
 *                                           IDLE TASK HOOK

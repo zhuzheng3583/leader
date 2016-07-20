@@ -1,7 +1,7 @@
 /*******************************Copyright (c)***************************
 ** 
 ** Porject name:	leader
-** Created by:		zhuzheng<happyzhull@163.com>
+** Created by:	zhuzheng<happyzhull@163.com>
 ** Created date:	2016/07/05
 ** Modified by:
 ** Modified date:
@@ -14,8 +14,8 @@
 ** 4.高级定时器:TIM1和TIM8,包含通用定时器所有功能同时带可编程死区的互补输出。
 **
 ** id baseaddr 	modulefreq 	irq
-** 0  NULL   	NULL		NULL
-** 1  TIM1  	0			TIM1_CC_IRQn
+** 0  NULL   		NULL			NULL
+** 1  TIM1  		0			TIM1_CC_IRQn
 ** 2  TIM2		0			TIM2_IRQn
 ** 3  TIM3		0			TIM3_IRQn
 ** 4  TIM4		0			TIM4_IRQn
@@ -24,11 +24,11 @@
 ** 7  TIM7		0			TIM7_IRQn
 ** 8  TIM8		0			TIM8_CC_IRQn
 ** 9  TIM9		0			TIM1_BRK_TIM9_IRQn
-** 10 TIM10 	0			TIM1_UP_TIM10_IRQn
-** 11 TIM11 	0			TIM1_TRG_COM_TIM11_IRQn
-** 12 TIM12 	0			TIM8_BRK_TIM12_IRQn
-** 13 TIM13 	0			TIM8_UP_TIM13_IRQn
-** 14 TIM14 	0			TIM8_TRG_COM_TIM14_IRQn
+** 10 TIM10 		0			TIM1_UP_TIM10_IRQn
+** 11 TIM11 		0			TIM1_TRG_COM_TIM11_IRQn
+** 12 TIM12 		0			TIM8_BRK_TIM12_IRQn
+** 13 TIM13 		0			TIM8_UP_TIM13_IRQn
+** 14 TIM14 		0			TIM8_TRG_COM_TIM14_IRQn
 **
 ***********************************************************************/
 #include "timer.h"

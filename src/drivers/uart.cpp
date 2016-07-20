@@ -313,7 +313,7 @@ s32 uart::write(u8 *buf, u32 count)
 
 s32 uart::self_test(void)
 {	
-#if 1
+#if 0
 	u8 wbuf[16] = "hello world!";
 	u8 rbuf[16] = { 0 };
 
@@ -329,7 +329,7 @@ s32 uart::self_test(void)
 			n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n);
 		n++;
 	}
-	core::udelay(1);
+	core::mdelay(100);
 #endif
 }
 

@@ -10,7 +10,7 @@
 ***********************************************************************/
 #include "os/kernel.h"
 
-#include "driver/core.h"
+#include "drivers/core.h"
 #include "includes.h"
 #include "os_cfg_app.h"
 /*
@@ -34,19 +34,6 @@ OS_CFG_ISR_POST_DEFERRED_EN 在os_cfg.h文件中定义
 #define ENTER_CRITICAL_SECTION()		OS_CRITICAL_ENTER() // 进入临界区
 #define EXIT_CRITICAL_SECTION() 		OS_CRITICAL_EXIT()	// 退出临界区
 
-
-/**
- * 系统Tick中断服务函数
- */
-extern "C" void SysTick_Handler(void)
-{
-	OSIntEnter();							// 进入中断
-    OSTimeTick();       					// 调用ucos的时钟服务程序
-    OSIntExit();        					// 触发任务切换软中断
-}
-
-
-
 namespace os {
 
 kernel::kernel(void)
@@ -62,29 +49,15 @@ kernel::~kernel(void)
 /**
  *  初始化操作系统Tick
  */
-void kernel::systick_init(void)
+void kernel::systick_config(void)
 {
-	/*
-	 * 根据OS_TICKS_PER_SEC设定溢出时间
-	 * reload为24位寄存器,最大值:16777216,在168M下,约合0.7989s左右
-	 */
-	SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK_Div8);
-	u32 sysclk = driver::core::get_cpu_freq();
-	u32 reload = sysclk / 8 / OS_CFG_TICK_RATE_HZ;
-#if 0
-	if (SysTick_Config(reload))
-	{
-		/* Capture error */
-		while (1);
-	}
-#elif 1
-	SysTick->CTRL |= SysTick_CTRL_TICKINT_Msk; 	// 开启SYSTICK中断
-	/* TODO: OS_CFG_TICK_RATE_HZ 直接更改reload/2，看能否缩短tick周期两倍 */
-	SysTick->LOAD = reload;					 	// 每1/OS_CFG_TICK_RATE_HZ秒中断一次
-	SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;  	// 开启SYSTICK
-#else
-	OS_CPU_SysTickInit(OS_CFG_TICK_RATE_HZ);
-#endif
+	/* Use systick as time base source and configure 1ms tick (default clock after Reset is HSI) */
+  	//HAL_InitTick(TICK_INT_PRIORITY);
+	/*Configure the SysTick to have interrupt in 1ms time basis*/
+	HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/OS_CFG_TICK_RATE_HZ);
+  	/*Configure the SysTick IRQ priority */
+  	HAL_NVIC_SetPriority(SysTick_IRQn, TICK_INT_PRIORITY ,0U);
+	//OS_CPU_SysTickInit(OS_CFG_TICK_RATE_HZ);
 }
 
 /**
@@ -95,12 +68,11 @@ void kernel::init(void)
 {
     s32 error = 0;
 
-    kernel::systick_init();
+    kernel::systick_config();
 
 	// 初始化UCOSIII
 	OSInit((OS_ERR *)&error);
-	if (error != OS_ERR_NONE)
-	{
+	if (error != OS_ERR_NONE) {
 		ERR("error: %s failed, error = %d.\n", __FUNCTION__, error);
 	}
 }

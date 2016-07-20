@@ -2,50 +2,46 @@
 ** 
 ** Porject name:	leader
 ** Created by:	zhuzheng<happyzhull@163.com>
-** Created date:	2016/04/08
+** Created date:	2016/07/20
 ** Modified by:
 ** Modified date:
 ** Descriptions:
 **
 ***********************************************************************/
-#include "aircraft.h"
+#include "heartbeat.h"
+#include "core.h"
 
 namespace app {
 
-aircraft::aircraft(void)
+heartbeat::heartbeat(void)
+{
+	_params.name = "heartbeat";
+	_params.priority = 12;
+	_params.stackbase = NULL;
+	_params.stacksize = 512;
+	_params.func = (void *)task::func;
+	_params.parg = this;
+}
+
+heartbeat::~heartbeat(void)
 {
 
 }
 
-aircraft::~aircraft(void)
+void heartbeat::run(void *parg)
 {
-
-}
-
-s32 aircraft::init(void)
-{
-	leader_system::init();
-	INF("========Init Skyview_H Aircraft App ========\n");
-	
-	return 0;
-}
-
-void aircraft::start(void)
-{
-	INF("========Start Skyview_H Aircraft App ========\n");
-	kernel::start();
-}
-
-s32 aircraft::exit(void)
-{
-
-	return 0;
+	for (u32 cnt = 0; ; cnt++)
+	{
+		INF("%s: LEADER_UAV_HEART_BEAT[%u sec]...\n", _name, cnt);
+		// 获取CPU使用率
+		msleep(1000);
+	}
 }
 
 }
-
-
 /***********************************************************************
 ** End of file
 ***********************************************************************/
+
+
 

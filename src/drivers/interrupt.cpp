@@ -12,6 +12,9 @@
 
 #include "device.h"
 
+#include "includes.h"
+#include "os_cfg_app.h"
+
 namespace driver {
 	
 struct map_table interrupt::s_map[STM32F4xx_USER_IRQNUM_MAX];
@@ -99,22 +102,69 @@ void interrupt::disable_all_irq(void)
 extern "C" {
 #endif
 
+/**
+  * @brief  This function handles SysTick Handler.
+  * @param  None
+  * @retval None
+  */ 
+void SysTick_Handler(void)
+{
+#if USE_UCOS3
+	OSIntEnter();							// 进入中断
+#endif
+
+#if USE_STM32F4_DEMO
+	HAL_IncTick();
+	/* Call user callback */
+	HAL_SYSTICK_IRQHandler();
+#endif
+
+#if USE_UCOS3
+	OSTimeTick();       					// 调用ucos的时钟服务程序
+	OSIntExit();        					// 触发任务切换软中断
+#endif
+}
+
 void USART1_IRQHandler(void)
 {
+#if USE_UCOS3
+	OSIntEnter();		//进入中断
+#endif
 	interrupt::s_map[USART1_IRQn].handler->isr();
+#if USE_UCOS3
+	OSIntExit();        //触发任务切换软中断
+#endif
 }
 
 void USART2_IRQHandler(void)
 {
+#if USE_UCOS3
+	OSIntEnter();	
+#endif
 	interrupt::s_map[USART2_IRQn].handler->isr();
+#if USE_UCOS3
+	OSIntExit();  
+#endif
 }
 void DMA1_Stream5_IRQHandler(void)
 {
+#if USE_UCOS3
+	OSIntEnter();	
+#endif
 	interrupt::s_map[DMA1_Stream5_IRQn].handler->isr();
+#if USE_UCOS3
+	OSIntExit();  
+#endif
 }
 void DMA1_Stream6_IRQHandler(void)
 {
+#if USE_UCOS3
+	OSIntEnter();	
+#endif
 	interrupt::s_map[DMA1_Stream6_IRQn].handler->isr();
+#if USE_UCOS3
+	OSIntExit();  
+#endif
 }
 
 

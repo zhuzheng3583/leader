@@ -2,50 +2,38 @@
 ** 
 ** Porject name:	leader
 ** Created by:	zhuzheng<happyzhull@163.com>
-** Created date:	2016/04/08
+** Created date:	2016/07/20
 ** Modified by:
 ** Modified date:
 ** Descriptions:
 **
 ***********************************************************************/
-#include "aircraft.h"
+#pragma once
+#include "leader_type.h"
+#include "leader_misc.h"
+
+#include "task.h"
+
+using namespace os;
 
 namespace app {
 
-aircraft::aircraft(void)
+class heartbeat : public task
 {
+public:
+	heartbeat(void);
+	~heartbeat(void);
+
+public:
+	virtual void run(void *parg);
+};
 
 }
-
-aircraft::~aircraft(void)
-{
-
-}
-
-s32 aircraft::init(void)
-{
-	leader_system::init();
-	INF("========Init Skyview_H Aircraft App ========\n");
-	
-	return 0;
-}
-
-void aircraft::start(void)
-{
-	INF("========Start Skyview_H Aircraft App ========\n");
-	kernel::start();
-}
-
-s32 aircraft::exit(void)
-{
-
-	return 0;
-}
-
-}
-
 
 /***********************************************************************
 ** End of file
 ***********************************************************************/
+
+
+
 

@@ -26,7 +26,11 @@
 
 #include "demo_main.h"
 
+#include "kernel.h"
+#include "heartbeat.h"
+
 using namespace driver;
+using namespace os;
 
 namespace app {
 
@@ -69,6 +73,8 @@ public:
     timer                   *_timer;
     pwm                     *_pwm;
     spi                     *_spi;
+
+    heartbeat               *_heartbeat;
     
 public:
     enum leader_system_mode    get_mode(void)		{ return _mode; }
@@ -89,10 +95,10 @@ protected:
     static leader_system *s_pactive_instance;
 
 public:
-    virtual s32 init(void);
     s32 init(enum leader_system_mode mode);
-    void start(void);
-    s32 exit(void);
+    virtual s32 init(void);
+    virtual void start(void);
+    virtual s32 exit(void);
 
     // 获取唯一全局实例
     inline static leader_system* get_instance(void) { return s_pactive_instance; }

@@ -12,6 +12,7 @@
 #include "leader_type.h"
 #include "leader_misc.h"
 
+#include "device.h"
 /*
  * 时间探测器，用于测量指定起始位运行到指定末尾位置之间所消耗的时间
  * note 时间戳为32位计数器，在168MHz下，溢出周期 = (0xFFFFFFFF+1) / 168M = 25.6s

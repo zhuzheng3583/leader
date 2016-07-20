@@ -63,6 +63,8 @@
 	#define inline							__inline
 #endif
 
+#define USE_UCOS3                           1
+#define USE_STM32F4_DEMO                    0
 
 //			 类       对象      继承
 // public 	 可访问   可访问	 可继承

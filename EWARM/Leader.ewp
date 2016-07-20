@@ -1301,8 +1301,17 @@
           <state>$PROJ_DIR$\..\src\app\user</state>
           <state>$PROJ_DIR$\..\src\app\bootloader</state>
           <state>$PROJ_DIR$\..\src\app\aircraft</state>
+          <state>$PROJ_DIR$\..\src\app\aircraft\thread</state>
           <state>$PROJ_DIR$\..\src\dsp</state>
           <state>$PROJ_DIR$\..\src\os</state>
+          <state>$PROJ_DIR$\..\src\os\ucos\ucos\Ports\ARM-Cortex-M4\Generic\IAR</state>
+          <state>$PROJ_DIR$\..\src\os\ucos\ucos\Source</state>
+          <state>$PROJ_DIR$\..\src\os\ucos\ucos_bsp</state>
+          <state>$PROJ_DIR$\..\src\os\ucos\ucos_config</state>
+          <state>$PROJ_DIR$\..\src\os\ucos\ucos_cpu</state>
+          <state>$PROJ_DIR$\..\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR</state>
+          <state>$PROJ_DIR$\..\src\os\ucos\ucos_lib</state>
+          <state>$PROJ_DIR$\..\src\os\ucos\ucos_lib\Ports\ARM-Cortex-M4\IAR</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -2128,10 +2137,11 @@
         </option>
         <option>
           <name>CCDefines</name>
+          <state>AIRCRAFT</state>
           <state>STM32F407xx</state>
           <state>USE_HAL_DRIVER</state>
           <state>USE_STM32F4_DISCO</state>
-          <state>AIRCRAFT</state>
+          <state>__FPU_USED</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -2220,7 +2230,7 @@
         </option>
         <option>
           <name>CCSignedPlainChar</name>
-          <state>1</state>
+          <state>0</state>
         </option>
         <option>
           <name>CCRequirePrototypes</name>
@@ -2273,8 +2283,17 @@
           <state>$PROJ_DIR$\..\src\app\user</state>
           <state>$PROJ_DIR$\..\src\app\bootloader</state>
           <state>$PROJ_DIR$\..\src\app\aircraft</state>
+          <state>$PROJ_DIR$\..\src\app\aircraft\thread</state>
           <state>$PROJ_DIR$\..\src\dsp</state>
           <state>$PROJ_DIR$\..\src\os</state>
+          <state>$PROJ_DIR$\..\src\os\ucos\ucos\Ports\ARM-Cortex-M4\Generic\IAR</state>
+          <state>$PROJ_DIR$\..\src\os\ucos\ucos\Source</state>
+          <state>$PROJ_DIR$\..\src\os\ucos\ucos_bsp</state>
+          <state>$PROJ_DIR$\..\src\os\ucos\ucos_config</state>
+          <state>$PROJ_DIR$\..\src\os\ucos\ucos_cpu</state>
+          <state>$PROJ_DIR$\..\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR</state>
+          <state>$PROJ_DIR$\..\src\os\ucos\ucos_lib</state>
+          <state>$PROJ_DIR$\..\src\os\ucos\ucos_lib\Ports\ARM-Cortex-M4\IAR</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -2921,6 +2940,15 @@
     <name>app</name>
     <group>
       <name>aircraft</name>
+      <group>
+        <name>thread</name>
+        <file>
+          <name>$PROJ_DIR$\..\src\app\aircraft\thread\heartbeat.cpp</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\app\aircraft\thread\heartbeat.h</name>
+        </file>
+      </group>
       <file>
         <name>$PROJ_DIR$\..\src\app\aircraft\aircraft.cpp</name>
       </file>
@@ -3597,6 +3625,216 @@
   </group>
   <group>
     <name>os</name>
+    <group>
+      <name>ucos</name>
+      <group>
+        <name>ucos</name>
+        <group>
+          <name>ARM-Cortex-M4</name>
+          <file>
+            <name>$PROJ_DIR$\..\src\os\ucos\ucos\Ports\ARM-Cortex-M4\Generic\IAR\os_cpu.h</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\src\os\ucos\ucos\Ports\ARM-Cortex-M4\Generic\IAR\os_cpu_a.asm</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\src\os\ucos\ucos\Ports\ARM-Cortex-M4\Generic\IAR\os_cpu_c.c</name>
+          </file>
+        </group>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_cfg_app.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_core.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_dbg.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_flag.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_int.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_mem.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_msg.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_mutex.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_pend_multi.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_prio.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_q.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_sem.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_stat.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_task.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_tick.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_time.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_tmr.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_type.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_var.c</name>
+        </file>
+      </group>
+      <group>
+        <name>ucos_bsp</name>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos_bsp\bsp.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos_bsp\bsp.h</name>
+        </file>
+      </group>
+      <group>
+        <name>ucos_config</name>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos_config\app_cfg.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos_config\cpu_cfg.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos_config\includes.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos_config\lib_cfg.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos_config\os_app_hooks.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos_config\os_app_hooks.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos_config\os_cfg.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos_config\os_cfg_app.h</name>
+        </file>
+      </group>
+      <group>
+        <name>ucos_cpu</name>
+        <group>
+          <name>ARM-Cortex-M4</name>
+          <file>
+            <name>$PROJ_DIR$\..\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu.h</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_c.c</name>
+          </file>
+        </group>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos_cpu\cpu_core.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos_cpu\cpu_core.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos_cpu\cpu_def.h</name>
+        </file>
+      </group>
+      <group>
+        <name>ucos_lib</name>
+        <group>
+          <name>ARM-Cortex-M4</name>
+          <file>
+            <name>$PROJ_DIR$\..\src\os\ucos\ucos_lib\Ports\ARM-Cortex-M4\IAR\lib_mem_a.asm</name>
+          </file>
+        </group>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos_lib\lib_ascii.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos_lib\lib_ascii.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos_lib\lib_def.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos_lib\lib_math.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos_lib\lib_math.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos_lib\lib_mem.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos_lib\lib_mem.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos_lib\lib_str.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\os\ucos\ucos_lib\lib_str.h</name>
+        </file>
+      </group>
+    </group>
+    <file>
+      <name>$PROJ_DIR$\..\src\os\event.cpp</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\os\event.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\os\kernel.cpp</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\os\kernel.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\os\msgque.cpp</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\os\msgque.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\os\mutex.cpp</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\os\mutex.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\os\semaphore.cpp</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\os\semaphore.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\os\task.cpp</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\os\task.h</name>
+    </file>
   </group>
   <file>
     <name>$PROJ_DIR$\..\src\leader.cpp</name>

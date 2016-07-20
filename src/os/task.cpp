@@ -70,7 +70,7 @@ BOOL task::create(struct task_params *pparams)
     OSTaskCreate(
         (OS_TCB *)      (_handle),                 // 任务控制块
         (CPU_CHAR *)    (_params.name),             // 任务名字
-        (OS_TASK_PTR)   (_params.run),              // 任务函数
+        (OS_TASK_PTR)   (_params.func),              // 任务函数
         (void *)        (_params.parg),             // 传递给任务函数的参数
         (OS_PRIO)       (_params.priority),         // 任务优先级
         (CPU_STK *)     (_params.stackbase),        // 任务堆栈基地址
@@ -109,8 +109,7 @@ BOOL task::t_delete(void)
 
 	//OSTaskDel(0, (OS_ERR *)&error);
 	OSTaskDel((OS_TCB *)(_handle), (OS_ERR *)&error);
-	if (error != OS_ERR_NONE)
-	{
+	if (error != OS_ERR_NONE) {
         DBG("%s error code = %d.\n", __FUNCTION__, error);
         kernel::on_error(ERR_OPERATION_FAILED, this);
 		return FALSE;
@@ -126,7 +125,7 @@ BOOL task::t_delete(void)
 }
 
 /**
- *  使当前任务睡眠指定时间
+ *  使当前任务睡眠指定时间(不精确延迟，精确延迟使用定时器中断POST信号量)
  *  timeoutms 睡眠时间（单位：ms）
  *  note 1.当timeoutms>=0时，使当前任务睡眠timeoutms时间，直到超时或被唤醒
  *		 2.当timeoutms<0时，使当前任务永久睡眠(最多睡眠0xffffffff tich)，直到被唤醒
@@ -135,21 +134,17 @@ void task::msleep(s32 timeoutms)
 {
     s32 error = OS_ERR_NONE;
 	u32 tick = 0;
-	if (timeoutms < 0)
-	{
+	if (timeoutms < 0) {
 		// note:当ms为-1时，不适用于OSTimeDly的延迟参数转换
 		tick = 0xffffffff;
 		//OSTimeDlyHMSM(99, 59, 59, 999, OS_OPT_TIME_PERIODIC/*OS_OPT_TIME_HMSM_STRICT*/, (OS_ERR *)&error);
 	}
-	else
-	{
+	else {
 		tick = kernel::convertmstotick(timeoutms);
 		//OSTimeDlyHMSM(0, 0, 0, timeoutms, OS_OPT_TIME_PERIODIC/*OS_OPT_TIME_HMSM_STRICT*/, (OS_ERR *)&error);
 	}
 	OSTimeDly (tick, OS_OPT_TIME_PERIODIC, (OS_ERR *)&error);
-
-	if (error != OS_ERR_NONE)
-	{
+	if (error != OS_ERR_NONE) {
         DBG("%s error code = %d.\n", __FUNCTION__, error);
         kernel::on_error(ERR_OPERATION_FAILED, this);
     }

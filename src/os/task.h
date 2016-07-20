@@ -22,7 +22,7 @@ struct task_params
 	s32	priority;						// 任务优先级
 	u32 stackbase;						// 任务堆栈基地址(注意字节对齐，当前系统8字节对齐)
 	u32 stacksize;						// 任务堆栈大小
-	void *run;								// 任务功能
+	void *func;								// 任务功能
 	void *parg;								// 任务功能参数
 };
 

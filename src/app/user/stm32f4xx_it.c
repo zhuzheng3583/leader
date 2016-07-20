@@ -40,7 +40,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "demo_main.h"
 #include "stm32f4xx_it.h"
-   
+
 /** @addtogroup STM32F4xx_HAL_Applications
   * @{
   */
@@ -145,23 +145,24 @@ void DebugMon_Handler(void)
   * @param  None
   * @retval None
   */
-void PendSV_Handler(void)
-{
-}
+//避免与os_cpu_a.c重定义
+//void PendSV_Handler(void)
+//{
+//  while(1);
+//}
 
 /**
   * @brief  This function handles SysTick Handler.
   * @param  None
   * @retval None
   */
-void SysTick_Handler(void)
-{
-  HAL_IncTick();
-  
-  /* Call user callback */
-  HAL_SYSTICK_IRQHandler();
-  
-}
+//void SysTick_Handler(void)
+//{
+//	HAL_IncTick();
+//	/* Call user callback */
+//	HAL_SYSTICK_IRQHandler();
+//}
+
 
 /******************************************************************************/
 /*                 STM32F4xx Peripherals Interrupt Handlers                   */
