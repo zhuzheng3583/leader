@@ -10,10 +10,10 @@ LimitSize=0
 ByteLimit=50
 [StLinkDriver]
 CStepIntDis=_ 0
-stlinkserialNo=EE5626A6
+stlinkserialNo=2798FD0D
 stlinkfoundProbes=
 [DebugChecksum]
-Checksum=-1692614510
+Checksum=-687324595
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -106,7 +106,8 @@ Bp0=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\leader_system.cpp}.163.2" 0 0 1 "" 0
 Bp1=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\leader_system.cpp}.85.2" 0 0 1 "" 0 "" 0
 Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\user\stm32f4xx_it.c}.181.3" 0 0 1 "" 0 "" 0
 Bp3=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\task.cpp}.94.5" 0 0 1 "" 0 "" 0
-Count=4
+Bp4=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\core.cpp}.114.7" 0 0 1 "" 0 "" 0
+Count=5
 [Aliases]
 Count=0
 SuppressDialog=0
