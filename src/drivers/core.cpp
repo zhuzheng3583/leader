@@ -76,8 +76,8 @@ void core::dwt_config(void)
   *            AHB Prescaler                  = 1
   *            APB1 Prescaler                 = 4
   *            APB2 Prescaler                 = 2
-  *            HSE Frequency(Hz)              = 8000000
-  *            PLL_M                          = 8
+  *            HSE Frequency(Hz)              = 24000000//8000000 HSE_VALUE
+  *            PLL_M                          = 24//8
   *            PLL_N                          = 336
   *            PLL_P                          = 2
   *            PLL_Q                          = 7
@@ -105,7 +105,18 @@ void core::system_clock_config(void)
   	RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  	RCC_OscInitStruct.PLL.PLLM = 8;
+
+#if !defined  (HSE_VALUE) 
+#error "No macro definition HSE_VALUE, Please check..."
+#endif
+
+    if (HSE_VALUE == 24000000U) {
+      RCC_OscInitStruct.PLL.PLLM = 24;
+    } else if (HSE_VALUE == 8000000U) {
+      RCC_OscInitStruct.PLL.PLLM = 8;
+    } else {
+      return;
+    }
   	RCC_OscInitStruct.PLL.PLLN = 336;
   	RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   	RCC_OscInitStruct.PLL.PLLQ = 7;
@@ -126,6 +137,8 @@ void core::system_clock_config(void)
     		/* Enable the Flash prefetch */
     		__HAL_FLASH_PREFETCH_BUFFER_ENABLE();
   	}
+    
+    return;
 }
 
 /*

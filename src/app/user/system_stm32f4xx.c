@@ -66,6 +66,7 @@
 #include "stm32f4xx.h"
 
 #if !defined  (HSE_VALUE) 
+#error "Dnot macro definition HSE_VALUE here, Please check..."
   #define HSE_VALUE    ((uint32_t)8000000) /*!< Default value of the External oscillator in Hz */
 #endif /* HSE_VALUE */
 
