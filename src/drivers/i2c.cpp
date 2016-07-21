@@ -355,14 +355,20 @@ void i2c::write_reg(u16 addr, u8 reg, u8 *buf, u32 len)
 		ERR("%s: failed to i2c HAL_I2C_Mem_Write!\n", _name);
 	}
 #else
-	struct i2c_msg msgs[2];
-	msgs[0].len = 1;
-	msgs[0].buf = &reg;
-	
-	msgs[1].addr = addr;
-	msgs[1].flags = 0;
-	msgs[1].len = len;		
-	msgs[1].buf = buf;		
+	struct i2c_msg msgs[] = {
+		[0] = {
+			.addr = addr,
+			.flags = 0,
+			.len = 1,		
+			.buf = &reg,
+		},
+		[1] = {
+			.addr = addr,
+			.flags = 0,
+			.len = len,		
+			.buf = buf,	
+		},
+	};
 	if (i2c::transfer(msgs, 2) != 0) {
 		ERR("%s: failed to i2c transfer!\n", _name);
 	}
@@ -378,14 +384,20 @@ void i2c::read_reg(u16 addr, u8 reg, u8 *buf, u32 len)
 		ERR("%s: failed to i2c HAL_I2C_Mem_Read!\n", _name);
 	}
 #else
-	struct i2c_msg msgs[2];
-	msgs[0].len = 1;
-	msgs[0].buf = &reg;
-	
-	msgs[1].addr = addr;
-	msgs[1].flags = I2C_M_RD;
-	msgs[1].len = len;		
-	msgs[1].buf = buf;		
+	struct i2c_msg msgs[] = {
+		[0] = {
+			.addr = addr,
+			.flags = 0,
+			.len = 1,		
+			.buf = &reg,
+		},
+		[1] = {
+			.addr = addr,
+			.flags = I2C_M_RD,
+			.len = len,		
+			.buf = buf,	
+		},
+	};
 	if (i2c::transfer(msgs, 2) != 0) {
 		ERR("%s: failed to i2c transfer!\n", _name);
 	}

@@ -2,7 +2,7 @@
 
 "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.3\arm\bin\armstlink2.dll" 
 
-"E:\code\SKYVIEW_H_SUB\LeaderUAV\EWARM\BootloaderDebug\Exe\bootloader_debug.out" 
+"E:\UAV\LeaderUAV\EWARM\BootloaderDebug\Exe\bootloader_debug.out" 
 
 --plugin "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.3\arm\bin\armbat.dll" 
 

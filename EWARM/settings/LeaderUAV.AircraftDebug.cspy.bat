@@ -25,7 +25,7 @@ if not "%~1" == "" goto debugFile
 
 @echo on 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.3\common\bin\cspybat" -f "E:\code\SKYVIEW_H_SUB\LeaderUAV\EWARM\settings\Leader.STM32F4-DISCO.general.xcl" --backend -f "E:\code\SKYVIEW_H_SUB\LeaderUAV\EWARM\settings\Leader.STM32F4-DISCO.driver.xcl" 
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.3\common\bin\cspybat" -f "E:\UAV\LeaderUAV\EWARM\settings\LeaderUAV.AircraftDebug.general.xcl" --backend -f "E:\UAV\LeaderUAV\EWARM\settings\LeaderUAV.AircraftDebug.driver.xcl" 
 
 @echo off 
 goto end 
@@ -34,7 +34,7 @@ goto end
 
 @echo on 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.3\common\bin\cspybat" -f "E:\code\SKYVIEW_H_SUB\LeaderUAV\EWARM\settings\Leader.STM32F4-DISCO.general.xcl" "--debug_file=%~1" --backend -f "E:\code\SKYVIEW_H_SUB\LeaderUAV\EWARM\settings\Leader.STM32F4-DISCO.driver.xcl" 
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.3\common\bin\cspybat" -f "E:\UAV\LeaderUAV\EWARM\settings\LeaderUAV.AircraftDebug.general.xcl" "--debug_file=%~1" --backend -f "E:\UAV\LeaderUAV\EWARM\settings\LeaderUAV.AircraftDebug.driver.xcl" 
 
 @echo off 
 :end

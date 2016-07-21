@@ -87,7 +87,7 @@ s32 leader_system::init(void)
 	_puart->open(NULL);
     	//_puart->self_test();
 
-#if 0    
+#if 1
 	_pflash = new flash("flash", -1);
 	_pflash->probe();
 

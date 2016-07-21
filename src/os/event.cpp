@@ -52,13 +52,13 @@ BOOL event::create(PCSTR name)
 		goto fail1;
 	}
 
-	return TRUE;
+	return true;
 
 fail1:
 	free((void *)_handle);
 	_handle = NULL;
 fail0:
-	return FALSE;
+	return false;
 }
 
 BOOL event::e_delete(void)
@@ -77,17 +77,17 @@ BOOL event::e_delete(void)
         DBG("%s error code = %d.\n", __FUNCTION__, error);
         kernel::on_error(ERR_OPERATION_FAILED, this);
 
-		return FALSE;
+		return false;
 	}
     if (count > 0) {
         WRN("%d tasks waiting on the event flag group are now readied and informed.\n", count);
-        return FALSE;
+        return false;
     }
 
 	free((void *)_handle);
 	_handle = NULL;
 
-	return TRUE;
+	return true;
 }
 
 BOOL event::pend(s32 timeoutms)
@@ -112,14 +112,14 @@ BOOL event::pend(s32 timeoutms)
         DBG("%s error code = %d.\n", __FUNCTION__, error);
         kernel::on_error(ERR_OPERATION_FAILED, this);
 
-		return FALSE;
+		return false;
 	}
     if (flags == 0) {
         WRN("flah = %d ,a timeout or an error occurred.\n", flags);
-        return FALSE;
+        return false;
     }
 
-	return TRUE;
+	return true;
 }
 
 BOOL event::post(s32 timeoutms)
@@ -146,7 +146,7 @@ loopOSEventPost:
             DBG("%s error code = %d.\n", __FUNCTION__, error);
             kernel::on_error(ERR_OPERATION_FAILED, this);
 
-			return FALSE;
+			return false;
 		}
 		goto loopOSEventPost;
 	}
@@ -156,14 +156,14 @@ out:
         DBG("%s error code = %d.\n", __FUNCTION__, error);
         kernel::on_error(ERR_OPERATION_FAILED, this);
 
-		return FALSE;
+		return false;
 	}
     if (flags == 0) {
         WRN("the new value=%d of the event flags bits that are still set.\n", flags);
-        return FALSE;
+        return false;
     }
 
-	return TRUE;
+	return true;
 }
 
 }

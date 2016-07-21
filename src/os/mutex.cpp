@@ -48,13 +48,13 @@ BOOL mutex::create(PCSTR name)
 		goto fail1;
 	}
 
-	return TRUE;
+	return true;
 
 fail1:
 	free((void *)_handle);
 	_handle = NULL;
 fail0:
-	return FALSE;
+	return false;
 }
 
 BOOL mutex::m_delete(void)
@@ -72,17 +72,17 @@ BOOL mutex::m_delete(void)
 	if (error != OS_ERR_NONE) {
         DBG("%s error code = %d.\n", __FUNCTION__, error);
         kernel::on_error(ERR_OPERATION_FAILED, this);
-		return FALSE;
+		return false;
 	}
     if (count > 0) {
         WRN("%d tasks waiting on the mutex are now readied and informed.\n", count);
-        return FALSE;
+        return false;
     }
 
 	free((void *)_handle);
 	_handle = NULL;
 
-	return TRUE;
+	return true;
 }
 
 BOOL mutex::pend(s32 timeoutms)
@@ -103,10 +103,10 @@ BOOL mutex::pend(s32 timeoutms)
 	if (error != OS_ERR_NONE) {
         DBG("%s error code = %d.\n", __FUNCTION__, error);
         kernel::on_error(ERR_OPERATION_FAILED, this);
-		return FALSE;
+		return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
 BOOL mutex::post(s32 timeoutms)
@@ -133,7 +133,7 @@ loopOSMutexPost:
 		{
             DBG("%s error code = %d.\n", __FUNCTION__, error);
             kernel::on_error(ERR_OPERATION_FAILED, this);
-		    return FALSE;
+		    return false;
 		}
 		goto loopOSMutexPost;
 	}
@@ -142,10 +142,10 @@ out:
 	if (error != OS_ERR_NONE) {
         DBG("%s error code = %d.\n", __FUNCTION__, error);
         kernel::on_error(ERR_OPERATION_FAILED, this);
-		return FALSE;
+		return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
 }

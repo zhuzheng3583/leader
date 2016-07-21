@@ -26,9 +26,9 @@ typedef int                                 BOOL;
 typedef void *                              HANDLE;
 typedef const char*                         PCSTR;
 
-#if !defined(TRUE)
-#define TRUE                                (1)
-#define FALSE                               (0)//(~TRUE)
+#if !defined(true)
+#define true                                (1)
+#define false                               (0)//(~TRUE)
 #endif
 
 #ifndef NULL

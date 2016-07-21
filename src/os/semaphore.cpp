@@ -52,13 +52,13 @@ BOOL semaphore::create(PCSTR name, u32 semcnt)
 		goto fail1;
 	}
 
-	return TRUE;
+	return true;
 
 fail1:
 	free((void *)_handle);
 	_handle = NULL;
 fail0:
-	return FALSE;
+	return false;
 }
 
 BOOL semaphore::s_delete(void)
@@ -77,17 +77,17 @@ BOOL semaphore::s_delete(void)
         DBG("%s error code = %d.\n", __FUNCTION__, error);
         kernel::on_error(ERR_OPERATION_FAILED, this);
 
-		return FALSE;
+		return false;
 	}
     if (count > 0) {
         WRN("%d tasks waiting on the semaphore are now readied and informed.\n", count);
-        return FALSE;
+        return false;
     }
 
 	free((void *)_handle);
 	_handle = NULL;
 
-	return TRUE;
+	return true;
 }
 
 BOOL semaphore::pend(s32 timeoutms)
@@ -110,14 +110,14 @@ BOOL semaphore::pend(s32 timeoutms)
 	{
         DBG("%s error code = %d.\n", __FUNCTION__, error);
         kernel::on_error(ERR_OPERATION_FAILED, this);
-		return FALSE;
+		return false;
 	}
 
     //if (count ) {
     INF("func_name: %s, count = %d.\n", __FUNCTION__, count);
     //}
 
-	return TRUE;
+	return true;
 }
 
 BOOL semaphore::post(s32 timeoutms)
@@ -147,7 +147,7 @@ loopOSSemPost:
             DBG("%s error code = %d.\n", __FUNCTION__, error);
             kernel::on_error(ERR_OPERATION_FAILED, this);
 
-			return FALSE;
+			return false;
 		}
 		goto loopOSSemPost;
 	}
@@ -156,13 +156,13 @@ out:
 	if (error != OS_ERR_NONE) {
         DBG("%s error code = %d.\n", __FUNCTION__, error);
         kernel::on_error(ERR_OPERATION_FAILED, this);
-		return FALSE;
+		return false;
 	}
     //if (count ) {
     INF("func_name: %s, count = %d.\n", __FUNCTION__, count);
     //}
 
-	return TRUE;
+	return true;
 }
 
 void semaphore::reset(void)

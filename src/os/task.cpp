@@ -91,7 +91,7 @@ BOOL task::create(struct task_params *pparams)
     }
 
     DBG("OSTaskCreate: %s\n", _params.name);
-    return TRUE;
+    return true;
 
 fail2:
     free((void *)_params.stackbase);
@@ -100,7 +100,7 @@ fail1:
     free((void *)_handle);
     _handle = NULL;
 fail0:
-    return FALSE;
+    return false;
 }
 
 BOOL task::t_delete(void)
@@ -112,7 +112,7 @@ BOOL task::t_delete(void)
 	if (error != OS_ERR_NONE) {
         DBG("%s error code = %d.\n", __FUNCTION__, error);
         kernel::on_error(ERR_OPERATION_FAILED, this);
-		return FALSE;
+		return false;
 	}
 
 	free((void *)_params.stackbase);
@@ -121,7 +121,7 @@ BOOL task::t_delete(void)
 	free((void *)_handle);
     _handle = NULL;
 
-	return TRUE;
+	return true;
 }
 
 /**
@@ -162,7 +162,7 @@ BOOL task::func(task* ptask)
 
 	ptask->run(ptask->_params.parg);
 
-	return TRUE;
+	return true;
 }
 
 void task::run(void *parg)
@@ -174,16 +174,16 @@ void task::run(void *parg)
 
 BOOL task::set_param(struct task_params *param)
 {
-    if (param == NULL) return FALSE;
+    if (param == NULL) return false;
     _params = *param;
-    return TRUE;
+    return true;
 }
 
 BOOL task::get_param(struct task_params *param) const
 {
-    if (param == NULL) return FALSE;
+    if (param == NULL) return false;
     *param = _params;
-    return TRUE;
+    return true;
 }
 
 }

@@ -20,10 +20,11 @@
 #include "leader.h"
 
 /* 打印出时间戳信息*/
-#define ERR(fmt, ...) print(3, ("[err][%d][%s]: " fmt), __LINE__, __FUNCTION__, ##__VA_ARGS__)
-#define WRN(fmt, ...) print(2, ("[wrn][%s]: " fmt), __FUNCTION__, ##__VA_ARGS__)
-#define INF(fmt, ...) print(1, ("[inf][%s]: " fmt), __FUNCTION__, ##__VA_ARGS__)
-#define DBG(fmt, ...) print(0, ("[dbg][%s]: " fmt), __FUNCTION__, ##__VA_ARGS__)
+#define ERR(fmt, ...) print(3, ("[ERR] --%s--(%d)-<%s>: " fmt), \
+    __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
+#define WRN(fmt, ...) print(2, ("[WRN]<%s>: " fmt), __FUNCTION__, ##__VA_ARGS__)
+#define INF(fmt, ...) print(1, ("[INF]<%s>: " fmt), __FUNCTION__, ##__VA_ARGS__)
+#define DBG(fmt, ...) print(0, ("[DBG]<%s>: " fmt), __FUNCTION__, ##__VA_ARGS__)
 
 #define MIN(a, b)                           ((a) > (b) ? (b) : (a))
 #define MAX(a, b)                           ((a) < (b) ? (b) : (a))
