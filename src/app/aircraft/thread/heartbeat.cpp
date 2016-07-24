@@ -20,7 +20,7 @@ heartbeat::heartbeat(void)
 	_params.priority = 12;
 	_params.stackbase = NULL;
 	_params.stacksize = 512;
-	_params.func = (void *)task::func;
+	_params.func = (void *)thread::func;
 	_params.parg = this;
 }
 

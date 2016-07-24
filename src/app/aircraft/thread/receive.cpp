@@ -20,7 +20,7 @@ receive::receive(void)
 	_params.priority = 4;
 	_params.stackbase = NULL;
 	_params.stacksize = 1024;
-	_params.func = (void *)task::func;
+	_params.func = (void *)thread::func;
 	_params.parg = this;
 }
 

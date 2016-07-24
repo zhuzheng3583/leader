@@ -15,6 +15,8 @@
 
 #include "demo_main.h"
 
+#include "cmsis_os.h"
+
 namespace app {
 
 leader_system *leader_system::s_pactive_instance = NULL;
@@ -71,6 +73,27 @@ void timer_func(void *arg)
 	INF("timer_func: success call!\n");
 }
 
+osThreadId LEDThread1Handle, LEDThread2Handle;
+void LED_Thread1(void const *argument)
+{
+  u32 count = 0;
+  (void) argument;
+  
+  for(;;)
+  {
+    
+    count = osKernelSysTick() + 5000;
+    
+    /* Toggle LED3 every 400 ms for 5 s */
+    while (count >= osKernelSysTick())
+    {
+        INF("hello freeRTOS.\n");
+      osDelay(400);
+    }
+    
+  }
+}
+
 s32 leader_system::init(void)
 {
 #if USE_STM32F4_DEMO
@@ -80,13 +103,29 @@ s32 leader_system::init(void)
 	s32 ret = 0;
 	ret = core::init();
 	ret = interrupt::irq_init();
-	kernel::init();
+	//kernel::init();
 
 	_puart = new uart("uart-2", 2);
 	_puart->probe();
 	_puart->open(NULL);
     //_puart->self_test();
 
+      /* Thread 1 definition */
+  osThreadDef(LED3, LED_Thread1, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
+  
+  /* Thread 2 definition */
+  //osThreadDef(LED4, LED_Thread2, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
+  
+  /* Start thread 1 */
+  LEDThread1Handle = osThreadCreate (osThread(LED3), NULL);
+  
+  /* Start thread 2 */
+  //LEDThread2Handle = osThreadCreate (osThread(LED4), NULL);
+  
+  /* Start scheduler */
+  osKernelStart();
+    
+    
     _mpu6000 = new mpu6000("mpu6000", -1);
    // _mpu6000->probe();
 

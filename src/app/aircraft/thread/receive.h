@@ -13,7 +13,7 @@
 #include "leader_type.h"
 #include "leader_misc.h"
 
-#include "os/task.h"
+#include "os/thread.h"
 #include "os/msgque.h"
 
 #include "drivers/core.h"
@@ -23,7 +23,7 @@ using namespace os;
 
 namespace app {
 
-class receive : public task
+class receive : public thread
 {
 public:
 	receive(void);

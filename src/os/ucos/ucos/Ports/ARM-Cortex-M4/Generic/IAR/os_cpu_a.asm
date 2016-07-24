@@ -39,7 +39,6 @@
     PUBLIC  OSCtxSw
     PUBLIC  OSIntCtxSw
     PUBLIC  OS_CPU_PendSVHandler
-    PUBLIC PendSV_Handler
     
 #ifdef __ARMVFP__
     PUBLIC  OS_CPU_FP_Reg_Push
@@ -217,20 +216,7 @@ OSIntCtxSw
 ;           4) Since PendSV is set to lowest priority in the system (by OSStartHighRdy() above), we
 ;              know that it will only be run when no other exception or interrupt is active, and
 ;              therefore safe to assume that context being switched out was using the process stack (PSP).
-;********************************************************************************************************
-PendSV_Handler
-    CPSID   I                                                   ; Prevent interruption during context switch
-    MRS     R0, PSP                                             ; PSP is process stack pointer
-    CBZ     R0, OS_CPU_PendSVHandler_nosave                     ; Skip register save the first time
-
-    SUBS    R0, R0, #0x20                                       ; Save remaining regs r4-11 on process stack
-    STM     R0, {R4-R11}
-
-    LDR     R1, =OSTCBCurPtr                                    ; OSTCBCurPtr->OSTCBStkPtr = SP;
-    LDR     R1, [R1]
-    STR     R0, [R1]                                            ; R0 is SP of process being switched out
-    
-    
+;********************************************************************************************************                                        ; R0 is SP of process being switched out
 OS_CPU_PendSVHandler
     CPSID   I                                                   ; Prevent interruption during context switch
     MRS     R0, PSP                                             ; PSP is process stack pointer

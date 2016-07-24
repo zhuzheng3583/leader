@@ -12,7 +12,7 @@
 #include "leader_type.h"
 #include "leader_misc.h"
 
-#include "os/task.h"
+#include "os/thread.h"
 
 #include "drivers/core.h"
 
@@ -22,7 +22,7 @@ using namespace os;
 
 namespace app {
 
-class heartbeat : public task
+class heartbeat : public thread
 {
 public:
 	heartbeat(void);

@@ -15,6 +15,8 @@
 #include "includes.h"
 #include "os_cfg_app.h"
 
+#include "cmsis_os.h"
+
 namespace driver {
 
 struct map_table interrupt::s_map[STM32F4xx_USER_IRQNUM_MAX];
@@ -102,11 +104,13 @@ void interrupt::disable_all_irq(void)
 extern "C" {
 #endif
 
+
 /**
   * @brief  This function handles SysTick Handler.
   * @param  None
   * @retval None
   */
+#if 0
 void SysTick_Handler(void)
 {
 #if USE_UCOS3
@@ -126,6 +130,12 @@ void SysTick_Handler(void)
 	OSIntExit();        					// 触发任务切换软中断
 #endif
 }
+#else
+void SysTick_Handler(void)
+{
+    osSystickHandler();
+}
+#endif
 
 void USART1_IRQHandler(void)
 {
