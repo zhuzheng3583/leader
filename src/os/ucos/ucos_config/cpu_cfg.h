@@ -94,7 +94,7 @@
 *                   See also 'cpu_core.h  FUNCTION PROTOTYPES  CPU_TS_TmrRd()  Note #2a'.
 *********************************************************************************************************
 */
-#define  CPU_CFG_TS_TMR_EN                      DEF_ENABLED
+
                                                                 /* Configure CPU timestamp features (see Note #1) :     */
 #define  CPU_CFG_TS_32_EN                       DEF_ENABLED
 #define  CPU_CFG_TS_64_EN                       DEF_DISABLED

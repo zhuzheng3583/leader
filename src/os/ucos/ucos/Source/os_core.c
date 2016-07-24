@@ -782,6 +782,8 @@ void  OS_IdleTask (void  *p_arg)
 {
     CPU_SR_ALLOC();
 
+
+
     p_arg = p_arg;                                          /* Prevent compiler warning for not using 'p_arg'         */
 
     while (DEF_ON) {

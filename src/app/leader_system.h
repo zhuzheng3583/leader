@@ -1,5 +1,5 @@
 /*******************************Copyright (c)***************************
-** 
+**
 ** Porject name:	leader
 ** Created by:		zhuzheng<happyzhull@163.com>
 ** Created date:	2016/04/05
@@ -24,10 +24,19 @@
 #include "pwm.h"
 #include "spi.h"
 
+#include "mpu6000.h"
+
 #include "demo_main.h"
 
 #include "kernel.h"
 #include "heartbeat.h"
+#include "receive.h"
+#include "calculate.h"
+#include "transmit.h"
+#include "terminal.h"
+
+#include "msgque.h"
+
 
 using namespace driver;
 using namespace os;
@@ -51,19 +60,19 @@ public:
         M_BOOTLOADER,
         M_AIRCRAFT,
     };
-    
+
 public:
     enum leader_system_mode _mode;
     uart                    *_puart;
     uart                    *_puart1;
     uart                    *_puart2;
     uart                    *_puart3;
-    
+
     flash                   *_pflash;
-    
+
     i2c                     *_i2c1;
     i2c                     *_i2c2;
-    
+
     usb_dev                 *_usb_dev;
     sensorhub               *_sensorhub;
 
@@ -74,15 +83,25 @@ public:
     pwm                     *_pwm;
     spi                     *_spi;
 
-    heartbeat               *_heartbeat;
-    
+	mpu6000					*_mpu6000;
+
+	msgque					*_sync_r_c;
+	msgque					*_sync_c_t;
+
+
+	heartbeat               *_heartbeat;
+	receive					*_receive;
+	calculate				*_calculate;
+	transmit				*_transmit;
+	terminal				*_terminal;
+
 public:
     enum leader_system_mode    get_mode(void)		{ return _mode; }
-    uart        *get_uart(void)		    { return _puart; }
+    uart        *get_uart(void)		    	{ return _puart; }
     uart        *get_uart1(void)		    { return _puart1; }
     uart        *get_uart2(void)		    { return _puart2; }
     uart        *get_uart3(void)		    { return _puart3; }
-    
+
     flash       *get_flash(void)            { return _pflash; }
 
     i2c         *get_i2c1(void)             { return _i2c1; }
@@ -90,7 +109,12 @@ public:
 
     usb_dev     *get_usb_dev(void)          { return _usb_dev; }
     sensorhub   *get_sensorhub(void)        { return _sensorhub; }
-    
+
+	mpu6000   	*get_mpu6000(void)        	{ return _mpu6000; }
+
+	msgque   	*get_sync_r_c(void)			{ return _sync_r_c; }
+	msgque   	*get_sync_c_t(void)			{ return _sync_c_t; }
+
 protected:
     static leader_system *s_pactive_instance;
 

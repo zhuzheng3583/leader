@@ -71,7 +71,7 @@ public:
     virtual s32 write(u8 *buf, u32 count);
     virtual s32 close(void);
 
-    	virtual s32 seek(s32 offset, enum seek_mode mode);
+    virtual s32 seek(s32 offset, enum seek_mode mode);
 	virtual s32 tell(void);
 };
 

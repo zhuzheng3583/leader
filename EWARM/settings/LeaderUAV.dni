@@ -10,10 +10,10 @@ LimitSize=0
 ByteLimit=50
 [StLinkDriver]
 CStepIntDis=_ 0
-stlinkserialNo=2798FD0D
+stlinkserialNo=037B5AB6
 stlinkfoundProbes=
 [DebugChecksum]
-Checksum=-814963569
+Checksum=1535735728
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -80,13 +80,26 @@ ShowTimeLog=1
 SumEnabled=0
 ShowTimeSum=1
 SumSortOrder=0
+[Disassemble mode]
+mode=0
+[Breakpoints2]
+Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\dma.cpp}.94.2" 0 0 1 "" 0 "" 0
+Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\spi.cpp}.380.7" 0 0 1 "" 0 "" 0
+Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\spi.cpp}.358.7" 0 0 1 "" 0 "" 0
+Bp3=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\interrupt.cpp}.191.2" 0 0 1 "" 0 "" 0
+Bp4=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\kernel.cpp}.57.2" 0 0 1 "" 0 "" 0
+Bp5=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\calculate.cpp}.59.3" 0 0 1 "" 0 "" 0
+Bp6=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\receive.cpp}.42.9" 0 0 1 "" 0 "" 0
+Bp7=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\receive.cpp}.44.9" 0 0 1 "" 0 "" 0
+Count=8
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
 Category=_ 0
-[TermIOLog]
-LoggingEnabled=_ 0
-LogFile=_ ""
+[Aliases]
+A0=_ "E:\code\leader\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
+Count=1
+SuppressDialog=0
 [DriverProfiling]
 Enabled=0
 Mode=3
@@ -97,10 +110,6 @@ Exclusions=
 Enabled=0
 [CallStackStripe]
 ShowTiming=1
-[Disassemble mode]
-mode=0
-[Breakpoints2]
-Count=0
-[Aliases]
-Count=0
-SuppressDialog=0
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""

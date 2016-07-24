@@ -51,18 +51,21 @@ const  CPU_CHAR  *os_cpu_c__c = "$Id: $";
 */
 
 #include  <os.h>
-
-#ifdef __cplusplus
-extern  "C" {
-#endif
+#include "includes.h"   	//添加头文件 
 
 #if (CPU_CFG_TS_TMR_EN == DEF_ENABLED)
-CPU_TS_TMR CPU_TS_TmrRd(void)
+CPU_TS_TMR  CPU_TS_TmrRd (void)
 {
-	return ((CPU_TS_TMR)(DWT->CYCCNT));
+#if 0
+    CPU_TS_TMR  ts_tmr_cnts;
+
+    ts_tmr_cnts = (CPU_TS_TMR)BSP_REG_DWT_CYCCNT;
+    return (ts_tmr_cnts);
+#else
+	return ((CPU_TS_TMR)BSP_REG_DWT_CYCCNT);
+#endif
 }
 #endif
-  
 /*
 *********************************************************************************************************
 *                                           IDLE TASK HOOK
@@ -583,7 +586,3 @@ void  OS_CPU_SysTickInit (CPU_INT32U  cnts)
                                                             /* Enable timer interrupt.                                */
     CPU_REG_NVIC_ST_CTRL |= CPU_REG_NVIC_ST_CTRL_TICKINT;
 }
-
-#ifdef __cplusplus
-}
-#endif

@@ -1,5 +1,5 @@
 /*******************************Copyright (c)***************************
-** 
+**
 ** Porject name:	leader
 ** Created by:	zhuzheng<happyzhull@163.com>
 ** Created date:	2016/07/20
@@ -12,7 +12,11 @@
 #include "leader_type.h"
 #include "leader_misc.h"
 
-#include "task.h"
+#include "os/task.h"
+
+#include "drivers/core.h"
+
+
 
 using namespace os;
 

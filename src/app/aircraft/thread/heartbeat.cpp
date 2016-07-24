@@ -1,5 +1,5 @@
 /*******************************Copyright (c)***************************
-** 
+**
 ** Porject name:	leader
 ** Created by:	zhuzheng<happyzhull@163.com>
 ** Created date:	2016/07/20
@@ -9,7 +9,8 @@
 **
 ***********************************************************************/
 #include "heartbeat.h"
-#include "core.h"
+
+#include "leader_system.h"
 
 namespace app {
 
@@ -30,7 +31,8 @@ heartbeat::~heartbeat(void)
 
 void heartbeat::run(void *parg)
 {
-	for (u32 cnt = 0; ; cnt++)
+    u32 cnt = 0;
+	for (cnt = 0; ; cnt++)
 	{
 		INF("%s: LEADER_UAV_HEART_BEAT[%u sec]...\n", _name, cnt);
 		// 获取CPU使用率

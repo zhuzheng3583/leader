@@ -1,5 +1,5 @@
 /*******************************Copyright (c)***************************
-** 
+**
 ** Porject name:	LeaderUAV-Plus
 ** Created by:		zhuzheng<happyzhull@163.com>
 ** Created date:	2015/08/28
@@ -12,6 +12,10 @@
 #include "leader_type.h"
 #include "leader_misc.h"
 
+#include "core.h"
+#include "interrupt.h"
+#include "device.h"
+#include "dma.h"
 #include "spi.h"
 
 #define REG_SAMPLE_RATE_DIV     0x19
@@ -95,7 +99,7 @@
 #define BIT_LPA_FREQ_MASK       0xC0
 #define BITS_PWR_ALL_AXIS_STBY  (BIT_PWR_ACCEL_STBY_MASK | \
                                     BIT_PWR_GYRO_STBY_MASK)
-                                    
+
 #define REG_FIFO_COUNT_H        0x72
 #define REG_FIFO_R_W            0x74
 #define REG_WHOAMI              0x75
@@ -143,13 +147,22 @@ enum mpu_device_id {
 	MPU6500_ID = 0x70,
 };
 
-enum mpu_fsr {
-	MPU_FSR_250DPS = 0,
-	MPU_FSR_500DPS,
-	MPU_FSR_1000DPS,
-	MPU_FSR_2000DPS,
-	NUM_FSR
+enum mpu_gyro_fsr {
+	GYRO_FSR_250DPS = 0,
+	GYRO_FSR_500DPS,
+	GYRO_FSR_1000DPS,
+	GYRO_FSR_2000DPS,
+	NUM_GYRO_FSR
 };
+
+enum mpu_accl_fsr {
+	ACCEL_FSR_2G = 0,
+	ACCEL_FSR_4G,
+	ACCEL_FSR_8G,
+	ACCEL_FSR_16G,
+	NUM_ACCL_FSR
+};
+
 
 enum mpu_filter {
 	MPU_DLPF_256HZ_NOLPF2 = 0,
@@ -169,13 +182,7 @@ enum mpu_clock_source {
 	NUM_CLK
 };
 
-enum mpu_accl_fs {
-	ACCEL_FS_02G = 0,
-	ACCEL_FS_04G,
-	ACCEL_FS_08G,
-	ACCEL_FS_16G,
-	NUM_ACCL_FSR
-};
+
 
 /* Sensitivity Scale Factor */
 /* Sensor HAL will take 1024 LSB/g */
@@ -453,45 +460,38 @@ struct mpu_fifo_packet
 };
 
 
-class mpu6000 : public device
+class mpu6000 : public device, public interrupt
 {
 public:
-	mpu6000(PCSTR name, u32 chip_select, spi *spi);
+	mpu6000(PCSTR name, s32 id);
 	~mpu6000(void);
 
 protected:
-#ifdef TARGET_STM32
-	struct chip_cfg_s _cfg;
-#endif
-	PCSTR 		_name;
-	u32 		_max_fifo;
-	u32 		_chip_select;
-	spi 		*_spi;
-	gpio 		*_gpio;
-	static spi  *_spi_s;
-	static gpio *_gpio_s;
-
-	s8 gyro_orientation[9]; //Õ”¬›“«∑ΩœÚ…Ë÷√
-
+	u32		_max_fifo;
+	u32		_chip_select;
+	spi		*_spi;
+	gpio	*_gpio;
 
 public:
-	virtual s32 open(s32 flags);
- 	virtual s32 read(s8 *buf, u32 count);
- 	virtual s32 write(s8 *buf, u32 count);
- 	virtual s32 close(void);
-
-	virtual s32 pendio(enum dir_rw dir, s32 timeoutms);
-
+    s32 probe(void);
+    s32 remove(void);
+#if 0
+public:
+    virtual s32 open(s32 flags);
+    virtual s32 read(u8 *buf, u32 count);
+    virtual s32 write(u8 *buf, u32 count);
+    virtual s32 close(void);
+#endif
 public:
 	s32 reset_fifo(void);
 	s32 read_fifo(struct mpu_fifo_packet *data, u32 packet_cnt);
 	s32 configure_fifo(u8 sensors);
 	s32 set_int_enable(u8 enable);
 
-	s8 	set_gyro_fsr(u16 fsr);
-	s8 	set_accel_fsr(u8 fsr);
-	s8 	set_lpf(u16 lpf);
-	s8 	set_sample_rate(u16 rate);
+	s32 set_gyro_fsr(u16 fsr);
+	s32 set_accel_fsr(u8 fsr);
+	s32 set_lpf(u16 lpf);
+	s32 set_sample_rate(u16 rate);
 
 	s32 get_gyro_raw(s16 *gyro);
 	s32 get_accel_raw(s16 *accel);
@@ -502,13 +502,10 @@ public:
 	s8 	dmp_get_data(f32 *pitch, f32 *roll, f32 *yaw);
 
 
-	inline u8 	reg_read_byte(u8 reg);
-	inline void reg_write_byte(u8 reg, u8 data);
-	s8 reg_read(u8 reg, u8 len, u8 *buf);
-	s8 reg_write(u8 reg, u8 len, u8 *buf);
-
-	s8 _reg_read(u8 reg, u8 len, u8 *buf);
-	s8 _reg_write(u8 reg, u8 len, u8 *buf);
+	inline s32 reg_read_byte(u8 reg);
+	inline s32 reg_write_byte(u8 reg, u8 data);
+	s32 reg_read(u8 reg, u8 len, u8 *buf);
+	s32 reg_write(u8 reg, u8 len, u8 *buf);
 
 public:
 	s32 self_test(void);

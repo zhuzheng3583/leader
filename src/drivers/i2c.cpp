@@ -1,5 +1,5 @@
 /*******************************Copyright (c)***************************
-** 
+**
 ** Porject name:	leader
 ** Created by:	zhuzheng<happyzhull@163.com>
 ** Created date:	2016/04/05
@@ -17,7 +17,7 @@
 #define I2C_POLLING_MODE			(1 << 0)
 #define I2C_IT_MODE				(1 << 1)
 #define I2C_DMA_MODE				(1 << 2)
-#define I2C_MODE 					I2C_POLLING_MOD
+#define I2C_MODE 					I2C_POLLING_MODE
 
 namespace driver {
 
@@ -27,7 +27,7 @@ struct stm32_i2c_hw_table
 	IRQn_Type 			IRQn;
 	I2C_HandleTypeDef		I2C_Handle;
 	GPIO_InitTypeDef  	GPIO_Init;
-	
+
 	s32             		dma_tx_id;
 	s32             		dma_rx_id;
 	i2c 					*pi2c;
@@ -35,10 +35,10 @@ struct stm32_i2c_hw_table
 
 static struct stm32_i2c_hw_table i2c_hw_table[] = {
 	[0] = { NULL },
-	[1] = { 
+	[1] = {
 		.GPIOx = GPIOB,
 		.IRQn = (IRQn_Type)NULL,
-		.I2C_Handle = { 
+		.I2C_Handle = {
 			.Instance = I2C1,
 			.Init = {
 				.OwnAddress1 =  0xff,//_slave_addr
@@ -62,8 +62,8 @@ static struct stm32_i2c_hw_table i2c_hw_table[] = {
 };
 
 //id = [1,2]
-i2c::i2c(PCSTR name, s32 id) : 
-	device(name, id) 
+i2c::i2c(PCSTR name, s32 id) :
+	device(name, id)
 {
 	// For stm32_cube_lib C callback
 	i2c_hw_table[_id].pi2c= this;
@@ -85,9 +85,9 @@ s32 i2c::probe(void)
 	if(HAL_I2C_GetState(hi2c) != HAL_I2C_STATE_RESET)
 	{
 		ERR("%s: failed HAL_I2C_GetState.\n", _name);
-		goto fail1;	
+		goto fail1;
 	}
-	
+
   	/*Configure the I2C peripheral*/
 	//HAL_I2C_MspDeInit
     	switch(_id)
@@ -111,10 +111,10 @@ s32 i2c::probe(void)
 		break;
     	}
 	/* I2Cx SDA/SCL pin configuration */
-	GPIO_TypeDef  *GPIOx = i2c_hw_table[_id].GPIOx; 
-	GPIO_InitTypeDef *GPIO_Init= &i2c_hw_table[_id].GPIO_Init; 
+	GPIO_TypeDef  *GPIOx = i2c_hw_table[_id].GPIOx;
+	GPIO_InitTypeDef *GPIO_Init= &i2c_hw_table[_id].GPIO_Init;
 	HAL_GPIO_Init(GPIOx, GPIO_Init);
-	
+
 	_irq = i2c_hw_table[_id].IRQn;
 	_dma_tx_id = i2c_hw_table[_id].dma_tx_id;
 	_dma_rx_id = i2c_hw_table[_id].dma_rx_id;
@@ -126,22 +126,24 @@ s32 i2c::probe(void)
 		goto fail2;
 	}
 	_handle = (u32)hi2c;
-	
+
 	/* Enable the Analog I2C Filter */
 	//HAL_I2CEx_ConfigAnalogFilter(hi2c, I2C_ANALOGFILTER_ENABLE);
-	
+
 #if (I2C_MODE == I2C_DMA_MODE)
 	s8 str[16];
 	snprintf((char *)str, 16, "dma-%d", _dma_tx_id);
 	_dmatx = new dma((PCSTR)str, _dma_tx_id);
-	INF("%s: new dmatx %s[dma%d,channel%d].\n", _name, str, _dmatx->_dma_id, _dmatx->_stream_id, _dmatx->_channel_id);
+	INF("%s: new dmatx %s[dma%d,stream%d,channel%d].\n",
+        _name, str, _dmatx->_dma_id, _dmatx->_stream_id, _dmatx->_channel_id);
 	_dmatx->probe();
 	_dmatx->config(DMA_DIR_MEM_TO_PERIPH, DMA_ALIGN_BYTE, DMA_PRI_LOW, 1, 0);
 	__HAL_LINKDMA(hi2c, hdmatx, *(DMA_HandleTypeDef *)(_dmatx->_handle));
 
     snprintf((char *)str, 16, "dma-%d", _dma_rx_id);
 	_dmarx = new dma((PCSTR)str, _dma_rx_id);
-	INF("%s: new dmarx %s[dma%d,channel%d].\n", _name, str, _dmarx->_dma_id, _dmarx->_stream_id, _dmarx->_channel_id);
+	INF("%s: new dmarx %s[dma%d,stream%d,channel%d].\n",
+        _name, str, _dmarx->_dma_id, _dmarx->_stream_id, _dmarx->_channel_id);
 	_dmarx->probe();
 	_dmarx->config(DMA_DIR_PERIPH_TO_MEM, DMA_ALIGN_BYTE, DMA_PRI_HIGH, 0, 1);
 	__HAL_LINKDMA(hi2c, hdmarx, *(DMA_HandleTypeDef *)(_dmarx->_handle));
@@ -155,17 +157,17 @@ fail2:
 fail1:
 	device::remove();
 fail0:
-	return -1;	
+	return -1;
 }
 
 s32 i2c::remove(void)
 {
 	I2C_HandleTypeDef *hi2c = (I2C_HandleTypeDef *)_handle;
-	
+
 	if (device::remove() < 0) {
 		goto fail0;
 	}
-	
+
 #if (I2C_MODE == I2C_DMA_MODE)
 	_dmatx->remove();
 	_dmarx->remove();
@@ -173,7 +175,7 @@ s32 i2c::remove(void)
 	delete _dmarx;
 	_dmatx = NULL;
 	_dmarx = NULL;
-#endif		
+#endif
 
 	if(HAL_I2C_DeInit((I2C_HandleTypeDef*)_handle) != HAL_OK) {
     		goto fail1;
@@ -194,23 +196,23 @@ s32 i2c::remove(void)
 		break;
     	}
 	/* 2- Disable peripherals and GPIO Clocks */
-	GPIO_TypeDef  *GPIOx = i2c_hw_table[_id].GPIOx; 
-	uint32_t GPIO_Pin = i2c_hw_table[_id].GPIO_Init.Pin; 
+	GPIO_TypeDef  *GPIOx = i2c_hw_table[_id].GPIOx;
+	uint32_t GPIO_Pin = i2c_hw_table[_id].GPIO_Init.Pin;
 	HAL_GPIO_DeInit(GPIOx, GPIO_Pin);
-	
+
 	_handle = NULL;
 	return 0;
 
 fail1:
 fail0:
-    return -1;	
+    return -1;
 }
 
 s32 i2c::transfer(struct i2c_msg *msgs, int num)
 {
 	HAL_StatusTypeDef status = HAL_OK;
 	I2C_HandleTypeDef *hi2c = (I2C_HandleTypeDef *)_handle;
-	
+
 	u16 addr, flags, len, addr_len;
 	u8 *buf;
 	u8 reg;
@@ -222,16 +224,16 @@ s32 i2c::transfer(struct i2c_msg *msgs, int num)
 	if (num > 2) {
 		WRN("%s: more than 2 i2c messages at a time is not handled yet. TODO.\n", _name);
     }
-    
+
 	if (num == 2) {
 		/* start addr reg | start addr data ... stop */
 		addr_len = (msgs[0].len == 1 ? I2C_MEMADD_SIZE_8BIT : I2C_MEMADD_SIZE_16BIT);
 		reg = msgs[0].buf[0];
-		
+
 		addr = msgs[1].addr;
 		len = msgs[1].len;
 		buf = (u8 *)(msgs[1].buf);
-#if (I2C_MODE == I2C_POLLING_MODE) 
+#if (I2C_MODE == I2C_POLLING_MODE)
 		if (msgs[1].flags & I2C_M_RD) {
 			status = HAL_I2C_Mem_Read(hi2c, addr, (u16)reg, addr_len, buf, len, I2C_POLLING_TIMEOUT_MS);
 		} else {
@@ -271,14 +273,14 @@ s32 i2c::transfer(struct i2c_msg *msgs, int num)
 		addr = msgs[0].addr;
 		len = msgs[0].len;
 		buf = (u8 *)(msgs[0].buf);
-#if (I2C_MODE == I2C_POLLING_MODE) 
-        if (msgs[0].flags & I2C_M_RD) {	
+#if (I2C_MODE == I2C_POLLING_MODE)
+        if (msgs[0].flags & I2C_M_RD) {
 			status = HAL_I2C_Master_Receive(hi2c, addr, buf, len, I2C_POLLING_TIMEOUT_MS);
 		} else {
 			status = HAL_I2C_Master_Transmit(hi2c, addr, buf, len, I2C_POLLING_TIMEOUT_MS);
 		}
 #elif (I2C_MODE == I2C_DMA_MODE)
-        if (msgs[0].flags & I2C_M_RD) {	
+        if (msgs[0].flags & I2C_M_RD) {
 			status = HAL_I2C_Master_Receive_DMA(hi2c, addr, buf, len);
 			//pend eventrx
             s32 ret = 0;
@@ -325,10 +327,10 @@ s32 i2c::reset(void)
 #endif
 
 s32 i2c::self_test(void)
-{	
+{
 	s32 ret = 0;
 	s8 wbuf[16] = "hello world!";//{ 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0xAB };
-    
+
 	s8 rbuf[16] = { 0 };
 
  	u8 who_i = 0; //0x33
@@ -359,14 +361,14 @@ void i2c::write_reg(u16 addr, u8 reg, u8 *buf, u32 len)
 		[0] = {
 			.addr = addr,
 			.flags = 0,
-			.len = 1,		
+			.len = 1,
 			.buf = &reg,
 		},
 		[1] = {
 			.addr = addr,
 			.flags = 0,
-			.len = len,		
-			.buf = buf,	
+			.len = len,
+			.buf = buf,
 		},
 	};
 	if (i2c::transfer(msgs, 2) != 0) {
@@ -388,14 +390,14 @@ void i2c::read_reg(u16 addr, u8 reg, u8 *buf, u32 len)
 		[0] = {
 			.addr = addr,
 			.flags = 0,
-			.len = 1,		
+			.len = 1,
 			.buf = &reg,
 		},
 		[1] = {
 			.addr = addr,
 			.flags = I2C_M_RD,
-			.len = len,		
-			.buf = buf,	
+			.len = len,
+			.buf = buf,
 		},
 	};
 	if (i2c::transfer(msgs, 2) != 0) {

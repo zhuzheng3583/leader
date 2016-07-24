@@ -1,5 +1,5 @@
 /*******************************Copyright (c)***************************
-** 
+**
 ** Porject name:	LeaderUAV-Plus
 ** Created by:		zhuzheng<happyzhull@163.com>
 ** Created date:	2015/08/28
@@ -8,6 +8,363 @@
 ** Descriptions:
 **
 ***********************************************************************/
+#include "mpu6000.h"
+
+namespace driver {
+
+mpu6000::mpu6000(PCSTR name, s32 id) :
+    device(name, id)
+{
+
+}
+
+mpu6000::~mpu6000(void)
+{
+
+}
+
+
+s32 mpu6000::probe(void)
+{
+	if (device::probe() < 0) {
+		ERR("%s: failed to probe.\n", _name);
+		goto fail0;
+	}
+
+	_gpio = new gpio("gpio-34", 34);
+	_gpio->probe();
+	_gpio->set_direction_output();
+    _gpio->set_value(true);
+
+    _spi = new spi("spi-1", 1);
+    _spi->probe();
+
+    reg_write_byte(MPUREG_PWR_MGMT1, 0X80); 	// 复位MPU6050
+    core::mdelay(100);
+    reg_write_byte(MPUREG_PWR_MGMT1, 0X00);  	// 唤醒MPU6050
+
+    set_gyro_fsr(2000);                         //陀螺仪传感器,±2000dps
+    set_accel_fsr(2);                           //加速度传感器,±2g
+    set_sample_rate(50);                        //设置采样率50Hz
+    reg_write_byte(MPUREG_INT_ENABLE, 0X00);    //关闭所有中断
+    reg_write_byte(MPUREG_USER_CTRL, 0X00);     //I2C主模式关闭
+    reg_write_byte(MPUREG_FIFO_ENABLE, 0X00);   //关闭FIFO
+    reg_write_byte(MPUREG_INT_PIN_CFG, 0X80);   //INT引脚低电平有效
+    u8 who_am_i = reg_read_byte(MPUREG_DEVICE_ID);
+    core::mdelay(1000);
+    if(who_am_i != MPU_I2C_SLAVE_ADDR) {
+        // 器件ID不正确
+        ERR("Failed to read mpu6000 ID...\n");
+        return -1;
+    }
+    reg_write_byte(MPUREG_PWR_MGMT1, 0X01);     //设置CLKSEL,PLL X轴为参考
+    reg_write_byte(MPUREG_PWR_MGMT2, 0X00);     // 加速度与陀螺仪都工作
+    set_sample_rate(200);                        //设置采样率为50Hz
+
+    s16 gyro[3] = { 0 };
+    s16 accel[3] = { 0 };
+    while (1) {
+        mpu6000::get_gyro_raw(gyro);
+        mpu6000::get_accel_raw(accel);
+        INF("accel[0]=%d, accel[1]=%d, accel[2]=%d "
+            "gyro[0]=%d, gyro[1]=%d, gyro[2]=%d.\n",
+            accel[0], accel[1], accel[2],gyro[0], gyro[1], gyro[2]);
+    }
+
+    return 0;
+
+fail0:
+    return -1;
+}
+
+/*
+ * 设置MPU6000陀螺仪传感器满量程范围
+ * fsr:0,±250dps;1,±500dps;2,±1000dps;3,±2000dps
+ * return:成功返回0
+ */
+s32 mpu6000::set_gyro_fsr(u16 fsr)
+{
+    s32 ret = 0;
+    u8 data;
+
+    switch (fsr) {
+    case 250:
+        data = (u8)(GYRO_FSR_250DPS << 3);
+        break;
+    case 500:
+        data = (u8)(GYRO_FSR_500DPS << 3);
+        break;
+    case 1000:
+        data = (u8)(GYRO_FSR_1000DPS << 3);
+        break;
+    case 2000:
+        data = (u8)(GYRO_FSR_2000DPS << 3);
+        break;
+    default:
+        return -1;
+    }
+
+    ret = reg_write_byte(MPUREG_GYRO_CONFIG, data);
+    if (ret) {
+        return -1;
+    }
+
+    return 0;
+}
+
+/*
+ * 设置MPU6000加速度传感器满量程范围
+ * fsr:0,±2g;1,±4g;2,±8g;3,±16g
+ * return:成功返回0
+ */
+s32 mpu6000::set_accel_fsr(u8 fsr)
+{
+    s32 ret = 0;
+    u8 data;
+
+    switch (fsr) {
+    case 2:
+        data = (u8)(ACCEL_FSR_2G << 3);
+        break;
+    case 4:
+        data = (u8)(ACCEL_FSR_4G << 3);
+        break;
+    case 8:
+        data = (u8)(ACCEL_FSR_8G << 3);
+        break;
+    case 16:
+        data = (u8)(ACCEL_FSR_16G << 3);
+        break;
+    default:
+        return -1;
+    }
+
+    ret = reg_write_byte(MPUREG_ACCEL_CONFIG, data);
+    if (ret) {
+        return -1;
+    }
+
+    return 0;
+}
+
+#if 0
+/*
+ * 设置MPU6000的数字低通滤波器
+ * lpf:数字低通滤波频率(Hz)
+ * return:成功返回0
+ */
+s32 mpu6000::set_lpf(u16 lpf)
+{
+    s32 ret = 0;
+    u8 data;
+
+    if (lpf >= 188)
+        data = INV_FILTER_188HZ;
+    else if (lpf >= 98)
+        data = INV_FILTER_98HZ;
+    else if (lpf >= 42)
+        data = INV_FILTER_42HZ;
+    else if (lpf >= 20)
+        data = INV_FILTER_20HZ;
+    else if (lpf >= 10)
+        data = INV_FILTER_10HZ;
+    else
+        data = INV_FILTER_5HZ;
+
+    ret = reg_write_byte(LPF, &data);
+    if (ret) {
+        return -1;
+    }
+
+    return 0;
+}
+#endif
+
+/*
+ * 设置MPU6000的采样率(假定Fs=1KHz)
+ * rate:4~1000(Hz)
+ * return:成功返回0
+ */
+s32 mpu6000::set_sample_rate(u16 rate)
+{
+    s32 ret = 0;
+    u8 data = 0;
+
+    if (rate < 4) {
+        rate = 4;
+    }
+    else if (rate > 1000) {
+        rate = 1000;
+    }
+
+    data = 1000 / rate - 1;
+    ret = reg_write_byte(MPUREG_SAMPLE_RATE_DIV, data);
+    if (ret) {
+        return -1;
+    }
+
+    return 0;
+}
+
+
+/**
+ *  @brief      Read raw gyro data directly from the registers.
+ *  @param[out] gyro        Raw data in hardware units.
+ *  @return     0 if successful.
+ *  @note		gyro_x gyro_y gyro_z = [-32768, 32767]
+ */
+s32 mpu6000::get_gyro_raw(s16 *gyro)
+{
+    u8 tmp[6];
+	if (mpu6000::reg_read(MPUREG_GYRO_XOUTH, 6, tmp))
+        return -1;
+    gyro[0] = (tmp[0] << 8) | tmp[1];
+    gyro[1] = (tmp[2] << 8) | tmp[3];
+    gyro[2] = (tmp[4] << 8) | tmp[5];
+
+    return 0;
+}
+
+/**
+ *  @brief      Read raw accel data directly from the registers.
+ *  @param[out] data        Raw data in hardware units.
+ *  @return     0 if successful.
+ *  @note		accel_x accel_y accel_z = [-32768, 32767]
+ */
+s32 mpu6000::get_accel_raw(s16 *accel)
+{
+    u8 tmp[6];
+	if (mpu6000::reg_read(MPUREG_ACCEL_XOUTH, 6, tmp))
+        return -1;
+
+    accel[0] = (tmp[0] << 8) | tmp[1];
+    accel[1] = (tmp[2] << 8) | tmp[3];
+    accel[2] = (tmp[4] << 8) | tmp[5];
+
+    return 0;
+}
+
+/**
+ *  @brief      Read temperature data directly from the registers.
+ *  @param[out] temperature	Data in q16 format.
+ *  @return     0 if successful.
+ */
+s32 mpu6000::get_temperature(f32 *temperature)
+{
+    u8 tmp[2];
+    s16 raw;
+	if (mpu6000::reg_read(MPUREG_TEMP_OUTH, 2, tmp))
+        return -1;
+    raw = (tmp[0]<<8) | tmp[1];
+    //data[0] = (long)((35 + ((raw - (float)st.hw->temp_offset) / st.hw->temp_sens)) * 65536L);
+	temperature[0] = 36.53 + ((double)raw)/340;
+	return 0;
+}
+
+
+
+s32 mpu6000::reg_read_byte(u8 reg)
+{
+    s32 ret = 0;
+    u8 data = 0;
+    mpu6000::reg_read(reg, 1, &data);
+    if (ret < 0) {
+        return -1;
+    }
+
+    return ((s32)data);
+}
+
+
+s32 mpu6000::reg_write_byte(u8 reg, u8 data)
+{
+    s32 ret = 0;
+    ret = mpu6000::reg_write(reg, 1, &data);
+    if (ret < 0) {
+        return -1;
+    }
+
+    return 0;
+}
+
+s32 mpu6000::reg_read(u8 reg, u8 len, u8 *buf)
+{
+    s32 ret = 0;
+    reg = READ_CMD | reg;
+    _gpio->set_value(false);
+    //core::mdelay(10);
+    struct spi_msg msgs[] = {
+        [0] = {
+            .buf = &reg,
+            .len = sizeof(reg),
+            .flags = 0,
+        },
+        [1] = {
+            .buf = buf,
+            .len = len,
+            .flags = SPI_M_RD,
+        },
+    };
+    ret = _spi->transfer(&msgs[0]);
+    if (ret < 0) {
+        goto fail0;
+    }
+    ret = _spi->transfer(&msgs[1]);
+    if (ret < 0) {
+        goto fail1;
+    }
+    //core::mdelay(10);
+    _gpio->set_value(true);
+
+    return 0;
+
+fail1:
+fail0:
+    _gpio->set_value(true);
+    return -1;
+}
+
+s32 mpu6000::reg_write(u8 reg, u8 len, u8 *buf)
+{
+    s32 ret = 0;
+    reg = WRITE_CMD & reg;
+    _gpio->set_value(false);
+    //core::mdelay(10);
+    struct spi_msg msgs[] = {
+        [0] = {
+            .buf = &reg,
+            .len = sizeof(reg),
+            .flags = 0,
+        },
+        [1] = {
+            .buf = buf,
+            .len = len,
+            .flags = 0,
+        },
+    };
+    ret = _spi->transfer(&msgs[0]);
+    if (ret < 0) {
+        goto fail0;
+    }
+    ret = _spi->transfer(&msgs[1]);
+    if (ret < 0) {
+        goto fail1;
+    }
+    //core::mdelay(10);
+    _gpio->set_value(true);
+
+    return 0;
+
+fail1:
+fail0:
+    _gpio->set_value(true);
+    return -1;
+}
+
+
+}
+
+#if 0
 #include "mpu6000.h"
 #include "core.h"
 
@@ -19,12 +376,6 @@
 #define MPU_USER   0
 
 namespace driver {
-
-/**
- * For Called C
- */
-spi  *mpu6000::_spi_s = NULL;
-gpio *mpu6000::_gpio_s= NULL;
 
 
 mpu6000::mpu6000(PCSTR name, u32 chip_select, spi *spi) :
@@ -252,20 +603,6 @@ s32 mpu6000::read(s8 *buf, u32 count)
     return readcnt;
 }
 
-s32 mpu6000::write(s8 *buf, u32 count)
-{
-    return true;
-}
-
-s32 mpu6000::close(void)
-{
-    return true;
-}
-
-s32 mpu6000::pendio(enum dir_rw dir, s32 timeoutms)
-{
-    return true;
-}
 
 s32 mpu6000::self_test(void)
 {
@@ -704,41 +1041,6 @@ s8 mpu6000::reg_write(u8 reg, u8 len, u8 *buf)
 
 
 /**
- * For Called C
- */
-s8 mpu6000::_reg_read(u8 reg, u8 len, u8 *buf)
-{
-    reg = 0x80 | reg;
-    _spi_s->chip_select_active(_gpio_s);
-    _spi_s->transfer((s8*)&reg, NULL, sizeof(reg));
-    if (_spi_s->transfer(NULL, (s8*)buf, len) != len)
-        return -1;
-    _spi_s->chip_select_deactive(_gpio_s);
-    return 0;
-}
-
-s8 mpu6000::_reg_write(u8 reg, u8 len, u8 *buf)
-{
-    reg = 0x7f & reg;
-    _spi_s->chip_select_active(_gpio_s);
-    _spi_s->transfer((s8*)&reg, NULL, sizeof(reg));
-    if (_spi_s->transfer((s8*)buf, NULL, len) != len)
-        return -1;
-    _spi_s->chip_select_deactive(_gpio_s);
-    return 0;
-}
-
-extern "C" s8 call_c_reg_read(mpu6000* p, u8 reg, u8 len, u8 *buf)
-{
-    return p->_reg_read(reg, len, buf);
-}
-
-extern "C" s8 call_c_reg_write(mpu6000* p, u8 reg, u8 len, u8 *buf)
-{
-    return p->_reg_write(reg, len, buf);
-}
-
-/**
  *  struct mpu6050_sensor - Cached chip configuration data
  *  @client:		I2C client
  *  @dev:		device structure
@@ -867,7 +1169,7 @@ int mpu6000::mpu_check_chip_type(void)
 {
 	s32 ret;
 	struct mpu_reg_map *reg;
-	
+
 	if (!strcmp(sensor->name, "mpu6050"))
 		sensor->chip_type = INV_MPU6050;
 	else if (!strcmp(sensor->name, "mpu6500"))
@@ -908,8 +1210,8 @@ int mpu6000::mpu_check_chip_type(void)
 }
 
 }
+#endif
 
 /***********************************************************************
 ** End of file
 ***********************************************************************/
-

@@ -1,5 +1,5 @@
 /*******************************Copyright (c)***************************
-** 
+**
 ** Porject name:	leader
 ** Created by:		zhuzheng<happyzhull@163.com>
 ** Created date:	2016/04/05
@@ -34,7 +34,7 @@ s32 leader_system::init(enum leader_system_mode mode)
 {
 	// TODO: 调试时在此强制指定系统模式
 	//mode = M_BOOTLOADER;
-	
+
 	_mode = mode;
 	switch(mode)
 	{
@@ -47,7 +47,7 @@ s32 leader_system::init(enum leader_system_mode mode)
 		_mode = M_AIRCRAFT;
 #else
 #error pre-defined macros required.
-#endif	
+#endif
         break;
 	case M_BOOTLOADER:
 		s_pactive_instance = new bootloader;
@@ -58,7 +58,7 @@ s32 leader_system::init(enum leader_system_mode mode)
 	default:
 		break;
 	}
-	
+
 	if (s_pactive_instance) {
 		return s_pactive_instance->init();
 	}
@@ -81,24 +81,29 @@ s32 leader_system::init(void)
 	ret = core::init();
 	ret = interrupt::irq_init();
 	kernel::init();
-	
+
 	_puart = new uart("uart-2", 2);
 	_puart->probe();
 	_puart->open(NULL);
-    	//_puart->self_test();
+    //_puart->self_test();
 
-#if 1
+    _mpu6000 = new mpu6000("mpu6000", -1);
+   // _mpu6000->probe();
+
+
+#if 0
+
 	_pflash = new flash("flash", -1);
 	_pflash->probe();
 
 	_i2c1 = new i2c("i2c-1", 1);
 	_i2c1->probe();
 	_i2c1->self_test();
-	
+
 	_usb_dev = new usb_dev("usb_dev", -1);
 	_usb_dev->probe();
 	//_usbd->self_test();
-	
+
 	_sensorhub = new sensorhub("sensorhub", -1);
 	_sensorhub->probe(_usb_dev);
 	//_sensorhub->self_test();
@@ -121,7 +126,7 @@ s32 leader_system::init(void)
 	_timer->set_function(timer_func, (void *)1111);
 //	_timer->start();
 	//while(1);
-    
+
 	_pwm = new pwm("timer-3", 3);
 	_pwm->probe();
 	_pwm->set_dutycycle(PWM_CHANNEL_1, 50);
@@ -149,18 +154,32 @@ s32 leader_system::init(void)
   	} else {
 		addr |= (u8)READWRITE_CMD;
   	}
-  
+
 	pgpio->set_value(0);
 	_spi->tx(&addr, sizeof(addr));
 	_spi->rx(&dev_id, sizeof(dev_id));
 	INF("dev_id = 0x%02x.\n", dev_id);
 	pgpio->set_value(1);
-	
+
     while(1);
 #endif
 
+    _sync_r_c = new msgque;
+    _sync_r_c->create("sync_r_c", 1);
+    _sync_c_t = new msgque;
+    _sync_c_t->create("sync_c_t", 1);
+
     _heartbeat = new heartbeat;
+    _receive = new receive;
+    _calculate = new calculate;
+    _transmit = new transmit;
+    _terminal = new terminal;
+
 	_heartbeat->create(NULL);
+	_receive->create(NULL);
+    _calculate->create(NULL);
+	//_transmit->create(NULL);
+	//_terminal->create(NULL);
 
 	if(ret < 0) {
 		INF("Failed to leader_system::init");

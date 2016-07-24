@@ -1,5 +1,5 @@
 /*******************************Copyright (c)***************************
-** 
+**
 ** Porject name:	leader
 ** Created by:	zhuzheng<happyzhull@163.com>
 ** Created date:	2016/07/11
@@ -7,16 +7,16 @@
 ** Modified date:
 ** Descriptions:
 **				logic_dev_id
-DMA1 		  
+DMA1
 DMA1_Stream0	[0,7]
-DMA1_Stream1	[8,15] 
+DMA1_Stream1	[8,15]
 DMA1_Stream2	[16,23]
 DMA1_Stream3	[24,31]
-DMA1_Stream4	[32,39]	
-DMA1_Stream5	[40,47] 
-DMA1_Stream6	[48,55]  
-DMA1_Stream7	[56,63]  
-DMA2        
+DMA1_Stream4	[32,39]
+DMA1_Stream5	[40,47]
+DMA1_Stream6	[48,55]
+DMA1_Stream7	[56,63]
+DMA2
 DMA2_Stream0	[64,71]
 DMA2_Stream1	[72,79]
 DMA2_Stream2	[80,87]
@@ -56,49 +56,81 @@ struct stm32_dma_hw_table
 
 static struct stm32_dma_hw_table dma_hw_table[] = {
 	[0] = { NULL },
-	[44] = { 
+	[44] = {
 		.DMAx = DMA1,
 		.IRQn = DMA1_Stream5_IRQn,
-		.DMA_Handle = { 
+		.DMA_Handle = {
 			.Instance = DMA1_Stream5,
 			.Init = {
-				.Channel			= DMA_CHANNEL_4,
+				.Channel		= DMA_CHANNEL_4,
 				.Mode 			= DMA_NORMAL,
-				.FIFOMode       	= DMA_FIFOMODE_DISABLE,
+				.FIFOMode       = DMA_FIFOMODE_DISABLE,
 				.FIFOThreshold	= DMA_FIFO_THRESHOLD_FULL,
 				.MemBurst      	= DMA_MBURST_INC4,
-				.PeriphBurst    	= DMA_PBURST_INC4,
+				.PeriphBurst    = DMA_PBURST_INC4,
 			},
 		},
 	},
-	[52] = { 
+	[52] = {
 		.DMAx = DMA1,
 		.IRQn = DMA1_Stream6_IRQn,
-		.DMA_Handle = { 
+		.DMA_Handle = {
 			.Instance = DMA1_Stream6,
 			.Init = {
-				.Channel			= DMA_CHANNEL_4,
+				.Channel		= DMA_CHANNEL_4,
 				.Mode 			= DMA_NORMAL,
-				.FIFOMode       	= DMA_FIFOMODE_DISABLE,
+				.FIFOMode       = DMA_FIFOMODE_DISABLE,
 				.FIFOThreshold	= DMA_FIFO_THRESHOLD_FULL,
 				.MemBurst      	= DMA_MBURST_INC4,
-				.PeriphBurst    	= DMA_PBURST_INC4,
+				.PeriphBurst    = DMA_PBURST_INC4,
 			},
 		},
 	},
+    [83] = {
+        .DMAx = DMA2,
+        .IRQn = DMA2_Stream2_IRQn,
+        .DMA_Handle = {
+        .Instance = DMA2_Stream2,
+            .Init = {
+                .Channel        = DMA_CHANNEL_3,
+                .Mode           = DMA_NORMAL,
+                .FIFOMode       = DMA_FIFOMODE_DISABLE,
+                .FIFOThreshold  = DMA_FIFO_THRESHOLD_FULL,
+                .MemBurst       = DMA_MBURST_INC4,
+                .PeriphBurst    = DMA_PBURST_INC4,
+            },
+        },
+    },
+    [91] = {
+        .DMAx = DMA2,
+        .IRQn = DMA2_Stream3_IRQn,
+        .DMA_Handle = {
+        .Instance = DMA2_Stream3,
+            .Init = {
+                .Channel        = DMA_CHANNEL_3,
+                .Mode           = DMA_NORMAL,
+                .FIFOMode       = DMA_FIFOMODE_DISABLE,
+                .FIFOThreshold  = DMA_FIFO_THRESHOLD_FULL,
+                .MemBurst       = DMA_MBURST_INC4,
+                .PeriphBurst    = DMA_PBURST_INC4,
+            },
+        },
+    },
 };
 
-dma::dma(PCSTR name, s32 id) : 
+dma::dma(PCSTR name, s32 id) :
 	device(name, id)
 {
-
+	_dma_id = _id / CHANNEL_CNT_PER_DMA + 1;
+	_stream_id = _id / STREAM_CNT_PER_DMA - (_dma_id-1)*STREAM_CNT_PER_DMA;
+	_channel_id = (_id - (_dma_id-1)*STREAM_CNT_PER_DMA*CHANNEL_CNT_PER_STREAM) \
+        / CHANNEL_CNT_PER_STREAM;
 }
 
 dma::~dma(void)
 {
-
 }
-	
+
 s32 dma::probe(void)
 {
 	//ASSERT(_id <= DMA_CHANNEL_MAX_NUM && _id > 0);
@@ -108,17 +140,13 @@ s32 dma::probe(void)
 		goto fail0;
 	}
 
-	_dma_id = _id / CHANNEL_CNT_PER_DMA + 1;
-	_stream_id = _id / (_dma_id * STREAM_CNT_PER_DMA);
-	_channel_id = (_dma_id * (_stream_id+1) * CHANNEL_CNT_PER_STREAM) - _id;
-
 	DMA_HandleTypeDef *hdma = &dma_hw_table[_id].DMA_Handle;
 	if(HAL_DMA_GetState(hdma) != HAL_DMA_STATE_RESET)
 	{
 		//ERR("%s: failed HAL_DMA_GetState.\n", _name);
-		goto fail1;	
+		goto fail1;
 	}
-	
+
 	switch(_dma_id)
     	{
 	case 1:
@@ -137,7 +165,7 @@ s32 dma::probe(void)
 	/*  Configure the NVIC for DMA */
   	/* NVIC configuration for DMA transfer complete interrupt*/
 	interrupt::request_irq(_irq, this);
-	interrupt::enable_irq(_irq); 	
+	interrupt::enable_irq(_irq);
 	//INF("%s: probe success.\n", _name);
 	return 0;
 
@@ -146,7 +174,7 @@ fail1:
 	device::remove();
 fail0:
 	free(hdma);
-	return -1;	
+	return -1;
 }
 
 s32 dma::remove(void)
@@ -156,10 +184,10 @@ s32 dma::remove(void)
 		goto fail0;
 	}
 
-	interrupt::disable_irq(_irq); 
-	
+	interrupt::disable_irq(_irq);
+
 	if(HAL_DMA_DeInit(hdma)!= HAL_OK) {
-    		goto fail1;  
+    		goto fail1;
 	}
 	_handle = NULL;
 
@@ -170,8 +198,8 @@ fail0:
     return -1;
 }
 
-  
-s32 dma::config(enum dma_dir mode, enum dma_align align, enum dma_pri priority, 
+
+s32 dma::config(enum dma_dir mode, enum dma_align align, enum dma_pri priority,
 	s32 en_src_step, s32 en_dst_step)
 {
 	DMA_HandleTypeDef *hdma = (DMA_HandleTypeDef *)_handle;
@@ -181,7 +209,7 @@ s32 dma::config(enum dma_dir mode, enum dma_align align, enum dma_pri priority,
     {
 	case DMA_DIR_PERIPH_TO_MEM:
 		hdma->Init.Direction = DMA_PERIPH_TO_MEMORY;
-        	hdma->Init.MemInc = en_src_step ? DMA_PINC_ENABLE : DMA_PINC_DISABLE;	    	
+        	hdma->Init.MemInc = en_src_step ? DMA_PINC_ENABLE : DMA_PINC_DISABLE;
         	hdma->Init.PeriphInc = en_dst_step ? DMA_MINC_ENABLE : DMA_MINC_DISABLE;
         	break;
     	case DMA_DIR_MEM_TO_PERIPH:
@@ -191,7 +219,7 @@ s32 dma::config(enum dma_dir mode, enum dma_align align, enum dma_pri priority,
 		break;
     	case DMA_DIR_MEM_TO_MEM:
 		hdma->Init.Direction = DMA_MEMORY_TO_MEMORY;
-		hdma->Init.MemInc = en_src_step ? DMA_MINC_ENABLE : DMA_MINC_DISABLE;	    	
+		hdma->Init.MemInc = en_src_step ? DMA_MINC_ENABLE : DMA_MINC_DISABLE;
 		hdma->Init.PeriphInc = en_dst_step ? DMA_MINC_ENABLE : DMA_MINC_DISABLE;
         break;
     	default:
@@ -199,7 +227,7 @@ s32 dma::config(enum dma_dir mode, enum dma_align align, enum dma_pri priority,
         CAPTURE_ERR();
         break;
     }
-	
+
 	switch (align)
 	{
     	case DMA_ALIGN_BYTE:
@@ -219,7 +247,7 @@ s32 dma::config(enum dma_dir mode, enum dma_align align, enum dma_pri priority,
 		CAPTURE_ERR();
 		break;
 	}
-	
+
  	switch (priority)
 	{
     	case DMA_PRI_LOW:
@@ -238,14 +266,14 @@ s32 dma::config(enum dma_dir mode, enum dma_align align, enum dma_pri priority,
 		//ERR("%s: error DMA priority.\n", _name);
 		CAPTURE_ERR();
 		break;
-	}   
-	
+	}
+
   	if(HAL_DMA_Init(hdma) != HAL_OK) {
 		//ERR("%s: faile to config.\n", _name);
 		CAPTURE_ERR();
-		return -1;  
+		return -1;
   	}
-	
+
 	return 0;
 }
 
