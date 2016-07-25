@@ -1,5 +1,5 @@
 /*******************************Copyright (c)***************************
-** 
+**
 ** Porject name:	leader
 ** Created by:	zhuzheng<happyzhull@163.com>
 ** Created date:	2015/08/28
@@ -13,7 +13,7 @@
 namespace app {
 
 packet::packet(void) :
-    _pheader(NULL)
+    _ppacket(NULL)
 {
 	_attr.revision = PACKET_REVISION;
 	_attr.num_raw_acce = 20;
@@ -32,7 +32,7 @@ packet::~packet(void)
 
 BOOL packet::create(const packet_attribute_t* pattr)
 {
-    BOOL b = FALSE;
+    BOOL b = false;
     u32  packet_size = 0;
     u32  memory_size = 0;
     void *pmemory = NULL;
@@ -59,43 +59,34 @@ BOOL packet::create(const packet_attribute_t* pattr)
 #endif
     _pheader = (packet_header_t *)pmemory;
     b = packet::init_packet(&_attr, _pheader, packet_size);
-    if (b == FALSE)
-        return FALSE;
+    if (b == false)
+        return false;
 
-	return TRUE;
+	return true;
 }
 
 BOOL packet::attach(void *pmemory, const packet_attribute_t* pattr)
 {
-    BOOL b = FALSE;
-    u32  packet_size = 0;
+    _ppacket = (packet_header_t *)pmemory;
+    packet::init_packet(pattr, _ppacket);
 
-    if (pattr == NULL)
-        return FALSE;
-
-    packet_size = packet::calculate_total_size(pattr);
-    _pheader = (packet_header_t *)pmemory;
-    b = packet::init_packet(pattr, _pheader, packet_size);
-    if (b == FALSE)
-        return FALSE;
-
-    return TRUE;
+    return true;
 }
 
 u32 packet::get_total_size(void)
 {
-	return _pheader ? _pheader->size : 0;
+	return _ppacket ? _ppacket->size : 0;
 }
 
 u32 packet::get_item_count(void)
 {
     u32 i = 0;
 	u32 count = 0;
-	item_index_t *pindex = _pheader->index_table;
+	item_index_t *pindex = _ppacket->index_table;
 
-	if (_pheader == NULL) return 0;
+	if (_ppacket == NULL) return 0;
 
-	for (i = 0; i < _pheader->item_count; i++) {
+	for (i = 0; i < _ppacket->item_count; i++) {
 		if (pindex[i].size > 0) {
 			count++;
 		}
@@ -106,23 +97,24 @@ u32 packet::get_item_count(void)
 
 u32 packet::get_packet_tag(void)
 {
-	return _pheader ? _pheader->packettag : 0;
+	return _ppacket ? _ppacket->packettag : 0;
 }
 
 u32 packet::get_config_key(void)
 {
-	return _pheader ? _pheader->configkey : 0;
+	return _ppacket ? _ppacket->configkey : 0;
 }
 
 u32 packet::get_timestamp(void)
 {
-	return _pheader ? _pheader->timestamp : 0;
+	return _ppacket ? _ppacket->timestamp : 0;
 }
 
 const packet_header_t* packet::get_packet_data(void) const
 {
-	return _pheader;
+	return _ppacket;
 }
+
 
 void *packet::get_item_data(u32 item_id) const
 {
@@ -130,9 +122,9 @@ void *packet::get_item_data(u32 item_id) const
     item_index_t *pindex = NULL;
 
     item_magic = ITEM_ID_TO_MAGIC(item_id);
-    pindex = _pheader->index_table;
+    pindex = _ppacket->index_table;
 
-    if (item_id < _pheader->item_count) {
+    if (item_id < _ppacket->item_count) {
         /**
          *  @brief 为了保证取数据时的效率，在创建包时需要保证
          *         各个项目均被创建在与其magic对应的索引ID处。
@@ -148,7 +140,7 @@ void *packet::get_item_data(u32 item_id) const
         if (pindex[item_id].size == 0)
             return NULL;
 
-        return (((char*)_pheader) + pindex[item_id].offset);
+        return (((char*)_ppacket) + pindex[item_id].offset);
     }
 
     return NULL;
@@ -160,9 +152,9 @@ u32 packet::get_item_size(u32 item_id) const
     item_index_t *pindex = NULL;
 
     item_magic = ITEM_ID_TO_MAGIC(item_id);
-    pindex = _pheader->index_table;
+    pindex = _ppacket->index_table;
 
-    if (item_id < _pheader->item_count) {
+    if (item_id < _ppacket->item_count) {
         /**
          *  @brief 为了保证取数据时的效率，在创建包时需要保证
          *         各个项目均被创建在与其magic对应的索引ID处。
@@ -182,123 +174,84 @@ u32 packet::get_item_size(u32 item_id) const
 	return 0;
 }
 
-
-
-u32 packet::init_item_index_table(
-    const packet_attribute_t*   pattr,
-    item_index_t                item_index_table[PACKET_DEF_ITEM_COUNT],
-    u32                         item_count
-    )
+BOOL packet::init(const packet_attribute_t *pattr,
+    packet_header_t *ppacket)
 {
-    u32 i = 0;
-    u32 size = 0;
-    u32 offset = 0;
-
-    if (pattr == NULL)
-        return 0;
-
-    if (item_count != packet::calculate_item_count(pattr) ||
-        item_count == 0                                   ||
-        item_count > PACKET_DEF_ITEM_COUNT)
-        return 0;
-
-    memset(item_index_table, 0 , sizeof(item_index_t) * item_count);
-
-	/**
-	 * @brief 初始化item index
-	 * @note  offset 按顺序偏置
-	 */
-	offset = sizeof(packet_header_t);
-	item_index_table[ID_ITEM_ACCE].magic = ITEM_ID_TO_MAGIC(ID_ITEM_ACCE);
-	item_index_table[ID_ITEM_ACCE].size = sizeof(item_acce_t) 	\
-		+ sizeof(data_acce_t) * pattr->num_raw_acce;	
-	item_index_table[ID_ITEM_ACCE].offset = offset;
-	offset += item_index_table[ID_ITEM_ACCE].size;
-
-	item_index_table[ID_ITEM_GYRO].magic = ITEM_ID_TO_MAGIC(ID_ITEM_GYRO);
-	item_index_table[ID_ITEM_GYRO].size = sizeof(item_gyro_t) 	\
-		+ sizeof(data_gyro_t) * pattr->num_raw_gyro,
-	item_index_table[ID_ITEM_GYRO].offset = offset;
-	offset += item_index_table[ID_ITEM_GYRO].size;
-
-	item_index_table[ID_ITEM_MPU].magic = ITEM_ID_TO_MAGIC(ID_ITEM_MPU);
-	item_index_table[ID_ITEM_MPU].size = sizeof(item_mpu_t) 		\
-		+ sizeof(data_mpu_t) * pattr->num_raw_mpu,
-	item_index_table[ID_ITEM_MPU].offset = offset;
-	offset += item_index_table[ID_ITEM_MPU].size;
-
-	item_index_table[ID_ITEM_MAGN].magic = ITEM_ID_TO_MAGIC(ID_ITEM_MAGN);
-	item_index_table[ID_ITEM_MAGN].size = sizeof(item_magn_t) 	\
-		+ sizeof(data_magn_t) * pattr->num_raw_magn,
-	item_index_table[ID_ITEM_MAGN].offset = offset;
-	offset += item_index_table[ID_ITEM_MAGN].size;
-	
-	item_index_table[ID_ITEM_BARO].magic = ITEM_ID_TO_MAGIC(ID_ITEM_BARO);
-	item_index_table[ID_ITEM_BARO].size = sizeof(item_baro_t) 	\
-		+ sizeof(data_baro_t) * pattr->num_raw_baro,
-	item_index_table[ID_ITEM_BARO].offset = offset;
-	offset += item_index_table[ID_ITEM_BARO].size;
-
-	item_index_table[ID_ITEM_GPS].magic = ITEM_ID_TO_MAGIC(ID_ITEM_GPS);
-	item_index_table[ID_ITEM_GPS].size = sizeof(item_gps_t) 		\
-		+ sizeof(data_gps_t) * pattr->num_raw_gps,
-	item_index_table[ID_ITEM_GPS].offset = offset;
-	offset += item_index_table[ID_ITEM_GPS].size;
-	
-	item_index_table[ID_ITEM_ATTITUDE].magic = ITEM_ID_TO_MAGIC(ID_ITEM_ATTITUDE);
-	item_index_table[ID_ITEM_ATTITUDE].size = sizeof(item_attitude_t) 	\
-		+ sizeof(data_attitude_t) * pattr->num_raw_attitude,
-	item_index_table[ID_ITEM_ATTITUDE].offset = offset;
-	offset += item_index_table[ID_ITEM_ATTITUDE].size;
-
+    u32 item_count = ITEM_COUNT;
 
     /**
-     *  @brief calculate packet header, All items and data, End flag total size.
+     *  @brief init packet header
      */
-    for (i = 0; i < item_count; i++) {
-        size += item_index_table[i].size;
-    }
-	size += sizeof(packet_header_t);
-    size += sizeof(u32) * 4;
-
-    return size;
-}
-
-BOOL packet::init_packet(
-    const packet_attribute_t*   pattr,
-    packet_header_t*            pheader,
-    u32                         packet_size
-    )
-{
-    u32 size = 0;
-    u32 offset = 0;
-    u32 item_count = 0;
-
-    if (pattr == NULL)
-        return FALSE;
-
-    size = packet::calculate_total_size(pattr);
-    if (size != packet_size)
-        return FALSE;
-    item_count = packet::calculate_item_count(pattr);
-    if (item_count == 0 || item_count > PACKET_DEF_ITEM_COUNT)
-        return FALSE;
-
-	memset(pheader, 0, sizeof(packet_header_t));
-
-    pheader->magic        = PACKET_SOP_MAGIC;
-    pheader->revision     = pattr->revision;
-    pheader->size         = size;
-    pheader->checksum     = 0;
-    pheader->packettag    = 0;
-    pheader->configkey    = 0;
-    pheader->timestamp    = 0;
-    pheader->item_count   = item_count;
+	memset(ppacket, 0, sizeof(packet_header_t));
+    ppacket->magic        = PACKET_SOP_MAGIC;
+    ppacket->revision     = pattr->revision;
+    ppacket->size         = 0;
+    ppacket->checksum     = 0;
+    ppacket->packettag    = 0;
+    ppacket->configkey    = 0;
+    ppacket->timestamp    = 0;
+    ppacket->item_count   = item_count;
 
     /**
      *  @brief init item_index_table
      */
-    packet::init_item_index_table(pattr, pheader->index_table, item_count);
+    item_index_t *pindex = ppacket->item_index_table;
+
+    u32 offset = 0; //offset按顺序叠加偏置
+    offset = sizeof(packet_header_t);
+    pindex[ID_ITEM_ACCE].magic = ITEM_ID_TO_MAGIC(ID_ITEM_ACCE);
+    pindex[ID_ITEM_ACCE].size = sizeof(item_acce_t)  \
+        + sizeof(data_acce_t) * pattr->num_raw_acce;
+    pindex[ID_ITEM_ACCE].offset = offset;
+    offset += pindex[ID_ITEM_ACCE].size;
+
+    pindex[ID_ITEM_GYRO].magic = ITEM_ID_TO_MAGIC(ID_ITEM_GYRO);
+    pindex[ID_ITEM_GYRO].size = sizeof(item_gyro_t)  \
+        + sizeof(data_gyro_t) * pattr->num_raw_gyro,
+    pindex[ID_ITEM_GYRO].offset = offset;
+    offset += pindex[ID_ITEM_GYRO].size;
+
+    pindex[ID_ITEM_MPU].magic = ITEM_ID_TO_MAGIC(ID_ITEM_MPU);
+    pindex[ID_ITEM_MPU].size = sizeof(item_mpu_t)        \
+        + sizeof(data_mpu_t) * pattr->num_raw_mpu,
+    pindex[ID_ITEM_MPU].offset = offset;
+    offset += pindex[ID_ITEM_MPU].size;
+
+    pindex[ID_ITEM_MAGN].magic = ITEM_ID_TO_MAGIC(ID_ITEM_MAGN);
+    pindex[ID_ITEM_MAGN].size = sizeof(item_magn_t)  \
+        + sizeof(data_magn_t) * pattr->num_raw_magn,
+    pindex[ID_ITEM_MAGN].offset = offset;
+    offset += pindex[ID_ITEM_MAGN].size;
+
+    pindex[ID_ITEM_BARO].magic = ITEM_ID_TO_MAGIC(ID_ITEM_BARO);
+    pindex[ID_ITEM_BARO].size = sizeof(item_baro_t)  \
+        + sizeof(data_baro_t) * pattr->num_raw_baro,
+    pindex[ID_ITEM_BARO].offset = offset;
+    offset += pindex[ID_ITEM_BARO].size;
+
+    pindex[ID_ITEM_GPS].magic = ITEM_ID_TO_MAGIC(ID_ITEM_GPS);
+    pindex[ID_ITEM_GPS].size = sizeof(item_gps_t)        \
+        + sizeof(data_gps_t) * pattr->num_raw_gps,
+    pindex[ID_ITEM_GPS].offset = offset;
+    offset += pindex[ID_ITEM_GPS].size;
+
+    pindex[ID_ITEM_ATTITUDE].magic = ITEM_ID_TO_MAGIC(ID_ITEM_ATTITUDE);
+    pindex[ID_ITEM_ATTITUDE].size = sizeof(item_attitude_t)  \
+        + sizeof(data_attitude_t) * pattr->num_raw_attitude,
+    pindex[ID_ITEM_ATTITUDE].offset = offset;
+    offset += pindex[ID_ITEM_ATTITUDE].size;
+
+    /**
+     *  @brief End flag
+     */
+    ((u32*)((u32)ppacket + offset))[0] = 0xBFBFBFBF;
+    ((u32*)((u32)ppacket + offset))[1] = 0xBFBFBFBF;
+    ((u32*)((u32)ppacket + offset))[2] = 0xBFBFBFBF;
+    ((u32*)((u32)ppacket + offset))[3] = PACKET_EOP_MAGIC;
+    offset += sizeof(u32) * 4;
+    //packet total size
+    ppacket->size = offset;
+
 
     /**
      *  @brief init item data
@@ -353,63 +306,21 @@ BOOL packet::init_packet(
         pattitude->data_attitude    = (data_attitude_t *)((u32)pattitude + sizeof(item_attitude_t));
     }
 
-    item_index_t *pindex = pheader->index_table;
-    offset = pindex[item_count - 1].offset + pindex[item_count - 1].size;
-    ((u32*)((u32)pheader + offset))[0] = 0xBFBFBFBF;
-    ((u32*)((u32)pheader + offset))[1] = 0xBFBFBFBF;
-    ((u32*)((u32)pheader + offset))[2] = 0xBFBFBFBF;
-    ((u32*)((u32)pheader + offset))[3] = PACKET_EOP_MAGIC;
 
-    offset += sizeof(u32) * 4;
-    ASSERT(offset == packet_size);
+    ppacket->checksum     = packet::calc_checksum(ppacket);
 
-    pheader->checksum = 0x00000000u - packet::calculate_checksum(pheader);
-
-    return TRUE;
+    return true;
 }
 
-
-
-u32 packet::calculate_checksum(const packet_header_t* pheader)
+u32 packet::calc_checksum(const packet_header_t* ppacket)
 {
 	u32 checksum = 0;
 
-	for (u32 i = 0; i < sizeof(*pheader) / sizeof(u32); i++) {
-		checksum += ((u32 *)pheader)[i];
+	for (u32 i = 0; i < sizeof(*ppacket) / sizeof(u32); i++) {
+		checksum += ((u32 *)ppacket)[i];
 	}
 
 	return checksum;
-}
-
-u32 packet::calculate_item_count(const packet_attribute_t* pattr)
-{
-	u32 i = 0;
-	u32 item_count = 0;
-	if (pattr == NULL) return 0;
-
-	for (i = 0; i < 32; i++) {
-		if (pattr->item_mask_enable & (1u << i)) {
-			item_count++;
-		}
-	}
-
-	if (item_count > PACKET_DEF_ITEM_COUNT) {
-		ERR("Failed to item_count = %d > %d.\n", item_count, PACKET_DEF_ITEM_COUNT);
-		return 0;
-	}
-
-	return item_count;
-}
-
-u32 packet::calculate_total_size(const packet_attribute_t* pattr)
-{
-	u32 size = 0;
-	item_index_t table[PACKET_DEF_ITEM_COUNT];
-
-	u32 item_count = calculate_item_count(pattr);
-	size = packet::init_item_index_table(pattr, table, item_count);
-
-	return size;
 }
 
 }

@@ -1,5 +1,5 @@
 /*******************************Copyright (c)***************************
-** 
+**
 ** Porject name:	leader
 ** Created by:	zhuzheng<happyzhull@163.com>
 ** Created date:	2015/08/28
@@ -8,12 +8,9 @@
 ** Descriptions:
 **
 ***********************************************************************/
-
 #pragma once
 #include "leader_type.h"
 #include "leader_misc.h"
-
-#define PACKET_DEF_ITEM_COUNT		16
 
 /**
  *  @struct data_acce
@@ -190,6 +187,7 @@ typedef struct item_index
     u32 magic;                        		// 数据块的magic
     u32 size;                          		// 数据块的大小，data_size为0表示数据包中不包含此项数据
     u32 offset;                        		// 数据块在数据包中的偏移量（包括包头在内的总偏移量）
+	u32 reserved;
 } item_index_t;
 
 /**
@@ -213,7 +211,7 @@ typedef struct packet_attribute
 
 /**
  *  @struct packet_header
- *  @brief
+ *  @brief 数据包的包头
  */
 typedef struct packet_header
 {
@@ -229,9 +227,8 @@ typedef struct packet_header
 	u32 item_count;                         // 索引项总个数（根据索引项的magic确定是否有效）
 	u32 reserved[4];                        // 保留字段，用于扩展
 
-	item_index_t index_table[7];
-
-    item_index_t reserved_index[ITEM_COUNT - 7/*item_count*/];
+	item_index_t item_index_table[ITEM_COUNT];
+    item_index_t reserved_index[8 - ITEM_COUNT];
                                             // 保留数据索引，用于扩展
 } packet_header_t;
 
@@ -285,7 +282,7 @@ enum item_id
 
 #define ITEM_ID(id)                     ((id) < ITEM_COUNT ? (id) : ASSERT(0))
 
-#define MAGIC_ITEM					(0xABCD0000 & 0xFFFF0000)
+#define MAGIC_ITEM						(0xABCD0000 & 0xFFFF0000)
 #define ITEM_MAGIC_TO_ID(magic)			((magic) & 0x0000FFFF)
 #define ITEM_ID_TO_MAGIC(id)			(MAGIC_ITEM | ITEM_ID(id))
 
@@ -306,7 +303,7 @@ public:
 	~packet(void);
 
 public:
-    packet_header_t* _pheader;            // 实际数据包存储区
+    packet_header_t* _ppacket;            // 实际数据包存储区
     packet_attribute_t _attr;
 
 public:

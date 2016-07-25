@@ -10,10 +10,10 @@ LimitSize=0
 ByteLimit=50
 [StLinkDriver]
 CStepIntDis=_ 0
-stlinkserialNo=2798FD0D
+stlinkserialNo=037B5AB6
 stlinkfoundProbes=
 [DebugChecksum]
-Checksum=-713811932
+Checksum=-1063393557
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -82,6 +82,23 @@ ShowTimeLog=1
 SumEnabled=0
 ShowTimeSum=1
 SumSortOrder=0
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""
+[DriverProfiling]
+Enabled=0
+Mode=3
+Graph=0
+Symbiont=0
+Exclusions=
+[CallStackLog]
+Enabled=0
+[CallStackStripe]
+ShowTiming=1
 [Disassemble mode]
 mode=0
 [Breakpoints2]
@@ -97,27 +114,9 @@ Bp8=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\platform\Middlewares\Third_Party\FreeRTO
 Bp9=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\thread.cpp}.50.5" 0 0 1 "" 0 "" 0
 Bp10=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\msgque.cpp}.73.2" 0 0 1 "" 0 "" 0
 Bp11=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\transmit.cpp}.51.3" 0 0 1 "" 0 "" 0
-Bp12=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\transmit.cpp}.50.3" 0 0 1 "" 0 "" 0
-Count=13
-[Log file]
-LoggingEnabled=_ 0
-LogFile=_ ""
-Category=_ 0
+Count=12
 [Aliases]
 A0=_ "E:\code\SKYVIEW_H_SUB\LeaderUAV\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
 A1=_ "E:\code\leader\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
 Count=2
 SuppressDialog=0
-[DriverProfiling]
-Enabled=0
-Mode=3
-Graph=0
-Symbiont=0
-Exclusions=
-[CallStackLog]
-Enabled=0
-[CallStackStripe]
-ShowTiming=1
-[TermIOLog]
-LoggingEnabled=_ 0
-LogFile=_ ""
