@@ -17,9 +17,8 @@ namespace app {
 receive::receive(void)
 {
 	_params.name = "receive";
-	_params.priority = 4;
-	_params.stackbase = NULL;
-	_params.stacksize = 1024;
+	_params.priority = 0;
+	_params.stacksize = 512;
 	_params.func = (void *)thread::func;
 	_params.parg = this;
 }
@@ -31,18 +30,19 @@ receive::~receive(void)
 
 void receive::run(void *parg)
 {
+  receive *p = (receive *)parg;
     u32 cnt = 0;
     u32 msg_data = 1;
-    msgque *sync_r_c = leader_system::get_instance()->get_sync_r_c();
+    msgque *sync_rc = leader_system::get_instance()->get_sync_rc();
 
     mpu6000 *mpu6000 = leader_system::get_instance()->get_mpu6000();
 
 	for (cnt = 0; ;cnt++)
 	{
-        msleep(1000);
-        //sync_r_c->post(&msg_data, sizeof(msg_data), 1000);
-        INF("%s: task is active[%u]...\n", _params.name, cnt);
-
+        sync_rc->post((void *)0xffffffff/*&msg_data*/, sizeof(msg_data), 1000);
+        
+        INF("%s: task is active[%u]...\n", _name, cnt);
+        msleep(1);
     }
     #if 0
     Mpu6000 *pmpu6000 = SystemUav::get_system_uav()->get_mpu6000();

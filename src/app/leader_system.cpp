@@ -17,6 +17,7 @@
 
 #include "cmsis_os.h"
 
+
 namespace app {
 
 leader_system *leader_system::s_pactive_instance = NULL;
@@ -48,7 +49,7 @@ s32 leader_system::init(enum leader_system_mode mode)
 		s_pactive_instance = new aircraft;
 		_mode = M_AIRCRAFT;
 #else
-#error pre-defined macros required.
+#error Pre-defined macros required.
 #endif
         break;
 	case M_BOOTLOADER:
@@ -73,7 +74,7 @@ void timer_func(void *arg)
 	INF("timer_func: success call!\n");
 }
 
-osThreadId LEDThread1Handle, LEDThread2Handle;
+
 void LED_Thread1(void const *argument)
 {
   u32 count = 0;
@@ -87,7 +88,47 @@ void LED_Thread1(void const *argument)
     /* Toggle LED3 every 400 ms for 5 s */
     while (count >= osKernelSysTick())
     {
-        INF("hello freeRTOS.\n");
+        INF("hello freeRTOS LED_Thread1.\n");
+      osDelay(400);
+    }
+    
+  }
+}
+
+void LED_Thread2(void const *argument)
+{
+  u32 count = 0;
+  (void) argument;
+  
+  for(;;)
+  {
+    
+    count = osKernelSysTick() + 5000;
+    
+    /* Toggle LED3 every 400 ms for 5 s */
+    while (count >= osKernelSysTick())
+    {
+        INF("hello freeRTOS LED_Thread2.\n");
+      osDelay(400);
+    }
+    
+  }
+}
+
+void LED_Thread3(void const *argument)
+{
+  u32 count = 0;
+  (void) argument;
+  
+  for(;;)
+  {
+    
+    count = osKernelSysTick() + 5000;
+    
+    /* Toggle LED3 every 400 ms for 5 s */
+    while (count >= osKernelSysTick())
+    {
+        INF("hello freeRTOS LED_Thread3.\n");
       osDelay(400);
     }
     
@@ -103,28 +144,32 @@ s32 leader_system::init(void)
 	s32 ret = 0;
 	ret = core::init();
 	ret = interrupt::irq_init();
-	//kernel::init();
+	kernel::init();
 
 	_puart = new uart("uart-2", 2);
 	_puart->probe();
 	_puart->open(NULL);
     //_puart->self_test();
 
+#if 0
+osThreadId LEDThread1Handle, LEDThread2Handle, LEDThread3Handle;
       /* Thread 1 definition */
-  osThreadDef(LED3, LED_Thread1, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
-  
+  osThreadDef(LED1, LED_Thread1, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
   /* Thread 2 definition */
-  //osThreadDef(LED4, LED_Thread2, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
+  osThreadDef(LED2, LED_Thread2, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
+  /* Thread 4 definition */
+  osThreadDef(LED3, LED_Thread3, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
   
   /* Start thread 1 */
-  LEDThread1Handle = osThreadCreate (osThread(LED3), NULL);
-  
+  LEDThread1Handle = osThreadCreate (osThread(LED1), NULL);
   /* Start thread 2 */
-  //LEDThread2Handle = osThreadCreate (osThread(LED4), NULL);
-  
+  LEDThread2Handle = osThreadCreate (osThread(LED2), NULL);
+    /* Start thread 3 */
+  LEDThread3Handle = osThreadCreate (osThread(LED3), NULL);
+	
   /* Start scheduler */
   osKernelStart();
-    
+    #endif
     
     _mpu6000 = new mpu6000("mpu6000", -1);
    // _mpu6000->probe();
@@ -203,21 +248,23 @@ s32 leader_system::init(void)
     while(1);
 #endif
 
-    _sync_r_c = new msgque;
-    _sync_r_c->create("sync_r_c", 1);
-    _sync_c_t = new msgque;
-    _sync_c_t->create("sync_c_t", 1);
-
+    _sync_rc = new msgque;
+    _sync_rc->create("sync_rc", 1);
+    _sync_ct = new msgque;
+    _sync_ct->create("sync_ct", 1);
+    _sync = new msgque;
+    _sync->create("sync", 1);
+    
     _heartbeat = new heartbeat;
     _receive = new receive;
     _calculate = new calculate;
     _transmit = new transmit;
-    _terminal = new terminal;
+    //_terminal = new terminal;
 
 	_heartbeat->create(NULL);
 	_receive->create(NULL);
     _calculate->create(NULL);
-	//_transmit->create(NULL);
+	_transmit->create(NULL);
 	//_terminal->create(NULL);
 
 	if(ret < 0) {

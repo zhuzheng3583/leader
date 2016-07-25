@@ -18,9 +18,8 @@ namespace app {
 terminal::terminal(void)
 {
 	_params.name = "terminal";
-	_params.priority = 10;
-	_params.stackbase = NULL;
-	_params.stacksize = 512;
+	_params.priority = 0;
+	_params.stacksize = configMINIMAL_STACK_SIZE;//;
 	_params.func = (void *)thread::func;
 	_params.parg = this;
 }

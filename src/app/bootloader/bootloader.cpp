@@ -29,7 +29,7 @@ bootloader::~bootloader(void)
 s32 bootloader::init(void)
 {
 	leader_system::init();
-	INF("========Init Skyview_H Bootloader ========\n");
+	INF("========Init LeaderUAV Bootloader ========\n");
 	
 	_pflash = leader_system::get_instance()->get_flash();
 
@@ -43,7 +43,7 @@ s32 bootloader::init(void)
 
 void bootloader::start(void)
 {
-	INF("Starting Skyview_H Bootloader...\n");
+	INF("Starting LeaderUAV Bootloader...\n");
 
 	_pflash->open(NULL);
 	bootloader::iap_upload_firmware(FLASH_APP_START_ADDR);

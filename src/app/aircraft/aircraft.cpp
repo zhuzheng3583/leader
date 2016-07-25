@@ -25,14 +25,14 @@ aircraft::~aircraft(void)
 s32 aircraft::init(void)
 {
 	leader_system::init();
-	INF("========Init Skyview_H Aircraft App ========\n");
+	INF("========Init LeaderUAV Aircraft App ========\n");
 	
 	return 0;
 }
 
 void aircraft::start(void)
 {
-	INF("========Start Skyview_H Aircraft App ========\n");
+	INF("========Start LeaderUAV Aircraft App ========\n");
 	kernel::start();
 }
 

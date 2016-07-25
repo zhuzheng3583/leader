@@ -13,7 +13,7 @@ CStepIntDis=_ 0
 stlinkserialNo=2798FD0D
 stlinkfoundProbes=
 [DebugChecksum]
-Checksum=-2031097961
+Checksum=-713811932
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -40,6 +40,8 @@ ITMportsEnable=0
 ITMportsTermIO=0
 ITMportsLogFile=0
 ITMlogFile=$PROJ_DIR$\ITM.log
+[watch_formats]
+Fmt0={W}1:msg_data	4	0
 [Trace2]
 Enabled=0
 ShowSource=0
@@ -87,22 +89,24 @@ Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\dma.cpp}.94.2" 0 0 1 "" 0 "" 0
 Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\spi.cpp}.380.7" 0 0 1 "" 0 "" 0
 Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\spi.cpp}.358.7" 0 0 1 "" 0 "" 0
 Bp3=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\interrupt.cpp}.201.2" 0 0 1 "" 0 "" 0
-Bp4=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\kernel.cpp}.57.2" 0 0 1 "" 0 "" 0
-Bp5=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\calculate.cpp}.59.3" 0 0 1 "" 0 "" 0
-Bp6=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\receive.cpp}.42.9" 0 0 1 "" 0 "" 0
-Bp7=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\receive.cpp}.44.9" 0 0 1 "" 0 "" 0
-Bp8=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\leader_system.cpp}.90.9" 0 0 1 "" 0 "" 0
-Count=9
+Bp4=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\kernel.cpp}.58.2" 0 0 1 "" 0 "" 0
+Bp5=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\receive.cpp}.1.1" 0 0 1 "" 0 "" 0
+Bp6=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\receive.cpp}.1.1" 0 0 1 "" 0 "" 0
+Bp7=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\platform\Middlewares\Third_Party\FreeRTOS\Source\portable\IAR\ARM_CM4F\port.c}.264.2" 0 0 1 "" 0 "" 0
+Bp8=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\platform\Middlewares\Third_Party\FreeRTOS\Source\portable\IAR\ARM_CM4F\port.c}.265.2" 0 0 1 "" 0 "" 0
+Bp9=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\thread.cpp}.50.5" 0 0 1 "" 0 "" 0
+Bp10=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\msgque.cpp}.73.2" 0 0 1 "" 0 "" 0
+Bp11=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\transmit.cpp}.51.3" 0 0 1 "" 0 "" 0
+Bp12=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\transmit.cpp}.50.3" 0 0 1 "" 0 "" 0
+Count=13
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
 Category=_ 0
-[TermIOLog]
-LoggingEnabled=_ 0
-LogFile=_ ""
 [Aliases]
-A0=_ "E:\code\leader\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
-Count=1
+A0=_ "E:\code\SKYVIEW_H_SUB\LeaderUAV\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
+A1=_ "E:\code\leader\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
+Count=2
 SuppressDialog=0
 [DriverProfiling]
 Enabled=0
@@ -114,3 +118,6 @@ Exclusions=
 Enabled=0
 [CallStackStripe]
 ShowTiming=1
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""

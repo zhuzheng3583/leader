@@ -18,9 +18,8 @@ namespace app {
 calculate::calculate(void)
 {
 	_params.name = "calculate";
-	_params.priority = 5;
-	_params.stackbase = NULL;
-	_params.stacksize = 512;
+	_params.priority = 0;
+	_params.stacksize = 1024;
 	_params.func = (void *)thread::func;
 	_params.parg = this;
 }
@@ -32,12 +31,12 @@ calculate::~calculate(void)
 
 void calculate::run(void *parg)
 {
-    u32 cnt = 0;
-    u32 msg_data = 0;
+	calculate *p = (calculate *)parg;
+	u32 cnt = 0;
+	u32 msg_data = 0;
 	u32 msg_size = 0;
-    msgque *sync_r_c = leader_system::get_instance()->get_sync_r_c();
-    msgque *sync_c_t = leader_system::get_instance()->get_sync_c_t();
-
+	msgque *sync_rc = leader_system::get_instance()->get_sync_rc();
+	msgque *sync_ct = leader_system::get_instance()->get_sync_ct();
 	for (cnt = 0;  ;cnt++)
 	{
 		// 等待rece任务发送的消息队列，获取数据包缓冲区首地址
@@ -52,12 +51,11 @@ void calculate::run(void *parg)
 		//INF("%s[%d]: post: msg[0x%08x], size[%d].\n",
 		//	calc.ptask->taskname, cnt, msg_pend, msg_size);
 
-        //sync_r_c->pend(&msg_data, &msg_size, 1000);
-        //msleep(300);
-        //sync_c_t->post(&msg_data, msg_size, 1000);
-
-		INF("%s: task is active[%u]...\n", _params.name, cnt);
-		msleep(200);
+        sync_rc->pend(&msg_data, &msg_size, 1000);
+        msleep(10);
+        sync_ct->post((void *)0xffffffff/*&msg_data*/, sizeof(msg_data), 1000);
+		INF("%s: task is active[%u]...\n", _name, cnt);
+		msleep(1);
 	}
 
 }

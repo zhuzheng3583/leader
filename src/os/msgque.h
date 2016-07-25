@@ -28,8 +28,8 @@ public:
 public:
 	BOOL create(PCSTR name, u32 msgcnt);
 	BOOL q_delete(void);
-	BOOL pend(void *pmessage, u32 *psize, s32 timeoutms);
-	BOOL post(void *pmessage, u32 size, s32 timeoutms);
+	BOOL pend(void *pmsg, u32 *psize, s32 timeoutms);
+	BOOL post(void *pmsg, u32 size, s32 timeoutms);
 	void reset(void);
 };
 

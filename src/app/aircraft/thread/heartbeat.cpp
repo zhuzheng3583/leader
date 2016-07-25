@@ -17,9 +17,8 @@ namespace app {
 heartbeat::heartbeat(void)
 {
 	_params.name = "heartbeat";
-	_params.priority = 12;
-	_params.stackbase = NULL;
-	_params.stacksize = 512;
+	_params.priority = 0;
+	_params.stacksize = 128;
 	_params.func = (void *)thread::func;
 	_params.parg = this;
 }
@@ -31,6 +30,7 @@ heartbeat::~heartbeat(void)
 
 void heartbeat::run(void *parg)
 {
+  heartbeat *p = (heartbeat *)parg;
     u32 cnt = 0;
 	for (cnt = 0; ; cnt++)
 	{

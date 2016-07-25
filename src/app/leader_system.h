@@ -85,9 +85,9 @@ public:
 
 	mpu6000					*_mpu6000;
 
-	msgque					*_sync_r_c;
-	msgque					*_sync_c_t;
-
+	msgque					*_sync_rc;
+	msgque					*_sync_ct;
+    msgque					*_sync;
 
 	heartbeat               *_heartbeat;
 	receive					*_receive;
@@ -110,10 +110,11 @@ public:
     usb_dev     *get_usb_dev(void)          { return _usb_dev; }
     sensorhub   *get_sensorhub(void)        { return _sensorhub; }
 
-	mpu6000   	*get_mpu6000(void)        	{ return _mpu6000; }
+    mpu6000   	*get_mpu6000(void)        	{ return _mpu6000; }
 
-	msgque   	*get_sync_r_c(void)			{ return _sync_r_c; }
-	msgque   	*get_sync_c_t(void)			{ return _sync_c_t; }
+    msgque   	*get_sync_rc(void)			{ return _sync_rc; }
+    msgque   	*get_sync_ct(void)			{ return _sync_ct; }
+    msgque   	*get_sync(void)			    { return _sync; }
 
 protected:
     static leader_system *s_pactive_instance;

@@ -24,7 +24,7 @@ s32 main(const s8* argv[], s32 argc)
 	ret = leader_system.init(leader_system::M_AUTO);
 	if (ret < 0)
 	{
-		INF("Failed to initialize the Skyview_H system.\n");
+		INF("Failed to initialize the LeaderUAV system.\n");
 		return -1;
 	}
 

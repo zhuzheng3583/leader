@@ -13,6 +13,7 @@
 #include "drivers/core.h"
 #include "includes.h"
 #include "os_cfg_app.h"
+#include "cmsis_os.h"
 /*
 CPU_CFG_CRITICAL_METHOD
 
@@ -54,9 +55,9 @@ void kernel::systick_config(void)
 	/* Use systick as time base source and configure 1ms tick (default clock after Reset is HSI) */
   	//HAL_InitTick(TICK_INT_PRIORITY);
 	/*Configure the SysTick to have interrupt in 1ms time basis*/
-	HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq() / OS_CFG_TICK_RATE_HZ);
+	HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq() / configTICK_RATE_HZ);
   	/*Configure the SysTick IRQ priority */
-  	HAL_NVIC_SetPriority(SysTick_IRQn, TICK_INT_PRIORITY ,TICK_INT_PRIORITY);
+  	HAL_NVIC_SetPriority(SysTick_IRQn, TICK_INT_PRIORITY ,0);
 	//OS_CPU_SysTickInit(OS_CFG_TICK_RATE_HZ);
 
 #if 0
@@ -90,15 +91,7 @@ void kernel::systick_config(void)
  */
 void kernel::init(void)
 {
-    s32 error = 0;
-
     kernel::systick_config();
-
-	// ³õÊ¼»¯UCOSIII
-	OSInit((OS_ERR *)&error);
-	if (error != OS_ERR_NONE) {
-		ERR("error: %s failed, error = %d.\n", __FUNCTION__, error);
-	}
 }
 
 /**
@@ -106,12 +99,10 @@ void kernel::init(void)
  */
 void kernel::start(void)
 {
-	s32 error = 0;
-	// ¿ªÆôUCOSIII
-	OSStart((OS_ERR *)&error);
-	if (error != OS_ERR_NONE)
-	{
-		ERR("error: %s failed, error = %d.\n", __FUNCTION__, error);
+	osStatus status = osOK;
+	status = osKernelStart();
+	if (status != osOK) {
+		ERR("kernel::start status = %d.\n", status);
 	}
 }
 
