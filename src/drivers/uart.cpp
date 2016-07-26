@@ -61,6 +61,30 @@ static struct stm32_uart_hw_table uart_hw_table[] = {
 		.dma_tx_id = 52,
 		.dma_rx_id = 44,
 	},
+	[3] = {
+		.GPIOx = GPIOC,
+		.IRQn = USART3_IRQn,
+		.UART_Handle = {
+			.Instance = USART3,
+			.Init = {
+				.BaudRate   = 115200,
+				.WordLength = UART_WORDLENGTH_8B,
+				.StopBits   = UART_STOPBITS_1,
+				.Parity     = UART_PARITY_NONE,
+				.HwFlowCtl  = UART_HWCONTROL_NONE,
+				.Mode       = UART_MODE_TX_RX,
+			},
+		},
+		.GPIO_Init = {
+			.Pin       = GPIO_PIN_10 | GPIO_PIN_11,
+			.Mode      = GPIO_MODE_AF_PP,
+			.Pull      = GPIO_NOPULL,
+			.Speed     = GPIO_SPEED_FREQ_HIGH,
+			.Alternate = GPIO_AF7_USART3,
+		},
+		.dma_tx_id = 28,
+		.dma_rx_id = 12,
+	},
 };
 
 //id = [1,3]
@@ -107,6 +131,8 @@ s32 uart::probe(void)
   		__HAL_RCC_USART2_CLK_ENABLE();
 		break;
 	case 3:
+		__HAL_RCC_GPIOC_CLK_ENABLE();
+  		__HAL_RCC_USART3_CLK_ENABLE();
 		break;
 	default:
 		break;
@@ -193,8 +219,12 @@ s32 uart::remove(void)
 	 	__HAL_RCC_USART1_RELEASE_RESET();
 		break;
 	case 2:
+		__HAL_RCC_USART2_FORCE_RESET();
+	 	__HAL_RCC_USART2_RELEASE_RESET();
 		break;
 	case 3:
+		__HAL_RCC_USART3_FORCE_RESET();
+	 	__HAL_RCC_USART3_RELEASE_RESET();
 		break;
 	default:
 		break;

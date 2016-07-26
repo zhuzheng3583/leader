@@ -56,6 +56,36 @@ struct stm32_dma_hw_table
 
 static struct stm32_dma_hw_table dma_hw_table[] = {
 	[0] = { NULL },
+	[12] = {
+		.DMAx = DMA1,
+		.IRQn = DMA1_Stream1_IRQn,
+		.DMA_Handle = {
+			.Instance = DMA1_Stream1,
+			.Init = {
+				.Channel		= DMA_CHANNEL_4,
+				.Mode 			= DMA_NORMAL,
+				.FIFOMode       = DMA_FIFOMODE_DISABLE,
+				.FIFOThreshold	= DMA_FIFO_THRESHOLD_FULL,
+				.MemBurst      	= DMA_MBURST_INC4,
+				.PeriphBurst    = DMA_PBURST_INC4,
+			},
+		},
+	},
+	[28] = {
+		.DMAx = DMA1,
+		.IRQn = DMA1_Stream3_IRQn,
+		.DMA_Handle = {
+			.Instance = DMA1_Stream3,
+			.Init = {
+				.Channel		= DMA_CHANNEL_4,
+				.Mode 			= DMA_NORMAL,
+				.FIFOMode       = DMA_FIFOMODE_DISABLE,
+				.FIFOThreshold	= DMA_FIFO_THRESHOLD_FULL,
+				.MemBurst      	= DMA_MBURST_INC4,
+				.PeriphBurst    = DMA_PBURST_INC4,
+			},
+		},
+	},
 	[44] = {
 		.DMAx = DMA1,
 		.IRQn = DMA1_Stream5_IRQn,

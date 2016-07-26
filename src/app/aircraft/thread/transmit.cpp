@@ -12,6 +12,7 @@
 #include "transmit.h"
 
 #include "leader_system.h"
+#include "niming.h"
 
 namespace app {
 
@@ -32,21 +33,48 @@ transmit::~transmit(void)
 void transmit::run(void *parg)
 {
 	transmit *p = (transmit *)parg;
-	u32 cnt = 0;
+
 	u32 msg_data = 0;
 	u32 msg_size = 0;
 	msgque *sync_ct = leader_system::get_instance()->get_sync_ct();
-	for (cnt = 0; ; cnt++)
+	niming *niming = leader_system::get_instance()->get_niming();
+	
+	u32 packet_addr = 0;
+	packet *ppacket  = NULL;
+	packet_attribute_t *pattr = NULL;
+	item_mpu_t  *pitem_mpu  = NULL;
+	item_magn_t *pitem_magn = NULL;
+	item_baro_t *pitem_baro = NULL;
+	item_gps_t  *pitem_gps  = NULL;
+	item_attitude_t *pitem_attitude = NULL;
+	item_rc_t *pitem_rc = NULL;
+	for (u32 cnt = 0; ; cnt++)
 	{
 		// 等待calc任务发送的消息队列，获取数据包缓冲区首地址
-		//msgque_pend(tran.syncq_calc, &msg_pend, &msg_size, -1);
-		//DBG("%s[%d]: pend: msg[0x%08x], size[%d].\n",
-		//	tran.ptask->taskname, cnt, msg_pend, msg_size);
+		sync_ct->pend(&packet_addr, NULL, 1000);
+		ppacket = (packet *)packet_addr;
+		pattr = ppacket->get_attribute();
+		
 		/* TODO:发起DMA传输，将各个传感器数据分通道发送至上位机 */
+		pitem_mpu  = (item_mpu_t *)(ppacket->get_item_data(ID_ITEM_MPU));
+		pitem_magn  = (item_magn_t *)(ppacket->get_item_data(ID_ITEM_MAGN));
+		if (pattr->num_mpu == pattr->num_magn) {
+			for (u32 i = 0; i < pattr->num_mpu; i++) {
+				niming->report_sensor(&pitem_mpu->data_mpu[i], &pitem_magn->data_magn[i]);
+			}
+		}
 
-        sync_ct->pend(&msg_data, &msg_size, 1000);
-        msleep(20);
-        INF("%s: transmit task is active[%u]...\n", _name, cnt);
+		pitem_attitude  = (item_attitude_t *)(ppacket->get_item_data(ID_ITEM_ATTITUDE));
+		for (u32 i = 0; i < pattr->num_attitude; i++) {
+			niming->report_status(&pitem_attitude->data_attitude[i]);
+		}
+
+		pitem_rc  = (item_rc_t *)(ppacket->get_item_data(ID_ITEM_RC));
+		for (u32 i = 0; i < pattr->num_rc; i++) {
+			niming->report_rc(&pitem_rc->data_rc[i]);
+		}
+		//msleep(20);
+		INF("%s: task is active[%u]...\n", _name, cnt);
 		msleep(10);
 	}
 }

@@ -32,12 +32,20 @@ calculate::~calculate(void)
 void calculate::run(void *parg)
 {
 	calculate *p = (calculate *)parg;
-	u32 cnt = 0;
-	u32 msg_data = 0;
-	u32 msg_size = 0;
+	
 	msgque *sync_rc = leader_system::get_instance()->get_sync_rc();
 	msgque *sync_ct = leader_system::get_instance()->get_sync_ct();
-	for (cnt = 0;  ;cnt++)
+
+	u32 packet_addr = 0;
+    packet *ppacket = NULL;
+	packet_attribute_t *pattr = NULL;
+	item_mpu_t  *pitem_mpu  = NULL;
+	item_magn_t *pitem_magn = NULL;
+	item_baro_t *pitem_baro = NULL;
+	item_gps_t  *pitem_gps  = NULL;
+	item_attitude_t *pitem_attitude = NULL;
+	item_rc_t *pitem_rc = NULL;
+	for (u32 cnt = 0;  ;cnt++)
 	{
 		// 等待rece任务发送的消息队列，获取数据包缓冲区首地址
 		//msgque_pend(calc.syncq_rece, &msg_pend, &msg_size, -1);
@@ -51,9 +59,13 @@ void calculate::run(void *parg)
 		//INF("%s[%d]: post: msg[0x%08x], size[%d].\n",
 		//	calc.ptask->taskname, cnt, msg_pend, msg_size);
 
-        sync_rc->pend(&msg_data, &msg_size, 1000);
-        msleep(10);
-        sync_ct->post((void *)0xffffffff/*&msg_data*/, sizeof(msg_data), 1000);
+		sync_rc->pend(&packet_addr, NULL, 1000);
+		ppacket = (packet *)packet_addr;
+        
+		pitem_mpu  = (item_mpu_t *)(ppacket->get_item_data(ID_ITEM_MPU));
+		
+		sync_ct->post((void *)packet_addr, sizeof(void *), 1000);
+		
 		INF("%s: task is active[%u]...\n", _name, cnt);
 		msleep(1);
 	}

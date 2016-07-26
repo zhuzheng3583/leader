@@ -75,66 +75,6 @@ void timer_func(void *arg)
 }
 
 
-void LED_Thread1(void const *argument)
-{
-  u32 count = 0;
-  (void) argument;
-  
-  for(;;)
-  {
-    
-    count = osKernelSysTick() + 5000;
-    
-    /* Toggle LED3 every 400 ms for 5 s */
-    while (count >= osKernelSysTick())
-    {
-        INF("hello freeRTOS LED_Thread1.\n");
-      osDelay(400);
-    }
-    
-  }
-}
-
-void LED_Thread2(void const *argument)
-{
-  u32 count = 0;
-  (void) argument;
-  
-  for(;;)
-  {
-    
-    count = osKernelSysTick() + 5000;
-    
-    /* Toggle LED3 every 400 ms for 5 s */
-    while (count >= osKernelSysTick())
-    {
-        INF("hello freeRTOS LED_Thread2.\n");
-      osDelay(400);
-    }
-    
-  }
-}
-
-void LED_Thread3(void const *argument)
-{
-  u32 count = 0;
-  (void) argument;
-  
-  for(;;)
-  {
-    
-    count = osKernelSysTick() + 5000;
-    
-    /* Toggle LED3 every 400 ms for 5 s */
-    while (count >= osKernelSysTick())
-    {
-        INF("hello freeRTOS LED_Thread3.\n");
-      osDelay(400);
-    }
-    
-  }
-}
-
 s32 leader_system::init(void)
 {
 #if USE_STM32F4_DEMO
@@ -149,30 +89,15 @@ s32 leader_system::init(void)
 	_puart = new uart("uart-2", 2);
 	_puart->probe();
 	_puart->open(NULL);
-    //_puart->self_test();
+	//_puart->self_test();
 
-#if 0
-osThreadId LEDThread1Handle, LEDThread2Handle, LEDThread3Handle;
-      /* Thread 1 definition */
-  osThreadDef(LED1, LED_Thread1, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
-  /* Thread 2 definition */
-  osThreadDef(LED2, LED_Thread2, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
-  /* Thread 4 definition */
-  osThreadDef(LED3, LED_Thread3, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
-  
-  /* Start thread 1 */
-  LEDThread1Handle = osThreadCreate (osThread(LED1), NULL);
-  /* Start thread 2 */
-  LEDThread2Handle = osThreadCreate (osThread(LED2), NULL);
-    /* Start thread 3 */
-  LEDThread3Handle = osThreadCreate (osThread(LED3), NULL);
+	_puart3 = new uart("uart-3", 3);
+	_puart3->probe();
+	_niming = new niming;
+	_niming->attach(_puart3);
 	
-  /* Start scheduler */
-  osKernelStart();
-    #endif
-    
-    _mpu6000 = new mpu6000("mpu6000", -1);
-   // _mpu6000->probe();
+	_mpu6000 = new mpu6000("mpu6000", -1);
+	_mpu6000->probe();
 
 
 #if 0
@@ -248,6 +173,9 @@ osThreadId LEDThread1Handle, LEDThread2Handle, LEDThread3Handle;
     while(1);
 #endif
 
+    _packet = new packet;
+    _packet->create(NULL);
+    
     _sync_rc = new msgque;
     _sync_rc->create("sync_rc", 1);
     _sync_ct = new msgque;

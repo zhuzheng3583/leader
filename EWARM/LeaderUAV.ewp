@@ -2280,6 +2280,7 @@
           <state>$PROJ_DIR$\..\src\drivers\accel</state>
           <state>$PROJ_DIR$\..\src\dsp</state>
           <state>$PROJ_DIR$\..\src\os</state>
+          <state>$PROJ_DIR$\..\src\protocols</state>
           <state>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Include</state>
           <state>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Device\ST\STM32F4xx\Include</state>
           <state>$PROJ_DIR$\..\src\platform\Drivers\STM32F4xx_HAL_Driver\Inc</state>
@@ -2984,6 +2985,12 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\src\app\aircraft\aircraft.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\app\aircraft\packet.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\app\aircraft\packet.h</name>
       </file>
     </group>
     <group>
@@ -3985,6 +3992,15 @@
         </group>
       </group>
     </group>
+  </group>
+  <group>
+    <name>protocols</name>
+    <file>
+      <name>$PROJ_DIR$\..\src\protocols\niming.cpp</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\protocols\niming.h</name>
+    </file>
   </group>
   <file>
     <name>$PROJ_DIR$\..\src\leader.cpp</name>

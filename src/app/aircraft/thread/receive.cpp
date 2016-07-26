@@ -30,22 +30,79 @@ receive::~receive(void)
 
 void receive::run(void *parg)
 {
-  receive *p = (receive *)parg;
-    u32 cnt = 0;
-    u32 msg_data = 1;
-    msgque *sync_rc = leader_system::get_instance()->get_sync_rc();
+  	receive *p = (receive *)parg;
 
-    mpu6000 *mpu6000 = leader_system::get_instance()->get_mpu6000();
+	msgque *sync_rc = leader_system::get_instance()->get_sync_rc();
 
-	for (cnt = 0; ;cnt++)
+	mpu6000 *mpu6000 = leader_system::get_instance()->get_mpu6000();
+
+	packet *ppacket  = leader_system::get_instance()->get_packet();
+	u32 packet_addr = (u32)ppacket;
+	packet_attribute_t *pattr = ppacket->get_attribute();
+	item_mpu_t  *pitem_mpu  = (item_mpu_t *)(ppacket->get_item_data(ID_ITEM_MPU));
+	item_magn_t *pitem_magn = (item_magn_t *)(ppacket->get_item_data(ID_ITEM_MAGN));
+	item_baro_t *pitem_baro = (item_baro_t *)(ppacket->get_item_data(ID_ITEM_BARO));
+	item_gps_t  *pitem_gps  = (item_gps_t *)(ppacket->get_item_data(ID_ITEM_GPS));
+	item_attitude_t *pitem_atti = (item_attitude_t *)(ppacket->get_item_data(ID_ITEM_ATTITUDE));
+	item_rc_t *pitem_rc = (item_rc_t *)ppacket->get_item_data(ID_ITEM_RC);
+	
+	for (u32 cnt = 0; ;cnt++)
 	{
-        sync_rc->post((void *)0xffffffff/*&msg_data*/, sizeof(msg_data), 1000);
+		for (u32 i = 0; i < pattr->num_mpu; i++)
+		{
+			pitem_mpu->data_mpu[i].acce.x = 1;
+			pitem_mpu->data_mpu[i].acce.y = 2;
+			pitem_mpu->data_mpu[i].acce.z = 3;
+			pitem_mpu->data_mpu[i].gyro.x = 4;
+			pitem_mpu->data_mpu[i].gyro.y = 5;
+			pitem_mpu->data_mpu[i].gyro.z = 6;
+		}
+
+		for (u32 i = 0; i < pattr->num_magn; i++)
+		{
+			pitem_magn->data_magn[i].x = 1;
+			pitem_magn->data_magn[i].y = 2;
+			pitem_magn->data_magn[i].z = 3;
+		}
+
+		for (u32 i = 0; i < pattr->num_attitude; i++)
+		{
+			pitem_atti->data_attitude[i].roll= 1;
+			pitem_atti->data_attitude[i].pitch= 2;
+			pitem_atti->data_attitude[i].yaw = 3;
+			pitem_atti->data_attitude[i].altitude = 4;
+		}
+
+		for (u32 i = 0; i < pattr->num_rc; i++)
+		{
+			pitem_rc->data_rc[i].throttle= 1;
+			pitem_rc->data_rc[i].roll= 2;
+			pitem_rc->data_rc[i].pitch= 3;
+			pitem_rc->data_rc[i].yaw = 4;
+			pitem_rc->data_rc[i].aux1 = 1;
+			pitem_rc->data_rc[i].aux2 = 2;
+			pitem_rc->data_rc[i].aux3 = 3;
+			pitem_rc->data_rc[i].aux4 = 4;
+			pitem_rc->data_rc[i].aux5 = 5;
+			pitem_rc->data_rc[i].aux5 = 6;
+		}
+		
+		sync_rc->post((void *)packet_addr, sizeof(void *), 1000);
         
-        INF("%s: task is active[%u]...\n", _name, cnt);
-        msleep(1);
-    }
-    #if 0
-    Mpu6000 *pmpu6000 = SystemUav::get_system_uav()->get_mpu6000();
+		INF("%s: task is active[%u]...\n", _name, cnt);
+		msleep(500);
+	}
+
+
+
+
+
+
+
+
+	
+	#if 0
+	Mpu6000 *pmpu6000 = SystemUav::get_system_uav()->get_mpu6000();
     Packet  *ppacket  = SystemUav::get_system_uav()->get_packet();
     packet_attribute_t *pattr = &(ppacket->m_attr);
 

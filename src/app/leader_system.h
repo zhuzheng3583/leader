@@ -23,7 +23,6 @@
 #include "timer.h"
 #include "pwm.h"
 #include "spi.h"
-
 #include "mpu6000.h"
 
 #include "demo_main.h"
@@ -34,9 +33,11 @@
 #include "calculate.h"
 #include "transmit.h"
 #include "terminal.h"
-
 #include "msgque.h"
 
+#include "packet.h"
+
+#include "niming.h"
 
 using namespace driver;
 using namespace os;
@@ -83,18 +84,22 @@ public:
     pwm                     *_pwm;
     spi                     *_spi;
 
-	mpu6000					*_mpu6000;
+    mpu6000					*_mpu6000;
 
-	msgque					*_sync_rc;
-	msgque					*_sync_ct;
+    msgque					*_sync_rc;
+    msgque					*_sync_ct;
     msgque					*_sync;
 
-	heartbeat               *_heartbeat;
-	receive					*_receive;
-	calculate				*_calculate;
-	transmit				*_transmit;
-	terminal				*_terminal;
+    heartbeat               *_heartbeat;
+    receive					*_receive;
+    calculate				*_calculate;
+    transmit				*_transmit;
+    terminal				*_terminal;
 
+    packet                  *_packet;
+
+    niming                  *_niming;
+    
 public:
     enum leader_system_mode    get_mode(void)		{ return _mode; }
     uart        *get_uart(void)		    	{ return _puart; }
@@ -116,6 +121,9 @@ public:
     msgque   	*get_sync_ct(void)			{ return _sync_ct; }
     msgque   	*get_sync(void)			    { return _sync; }
 
+    packet      *get_packet(void)           { return _packet; }
+    
+    niming      *get_niming(void)           { return _niming; }
 protected:
     static leader_system *s_pactive_instance;
 

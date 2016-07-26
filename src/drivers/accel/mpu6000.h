@@ -18,6 +18,8 @@
 #include "dma.h"
 #include "spi.h"
 
+#include "packet.h"
+
 #define REG_SAMPLE_RATE_DIV     0x19
 #define REG_CONFIG              0x1A
 
@@ -470,18 +472,18 @@ protected:
 	u32		_max_fifo;
 	u32		_chip_select;
 	spi		*_spi;
-	gpio	*_gpio;
+	gpio    	*_gpio;
 
 public:
     s32 probe(void);
     s32 remove(void);
-#if 0
+
 public:
     virtual s32 open(s32 flags);
     virtual s32 read(u8 *buf, u32 count);
     virtual s32 write(u8 *buf, u32 count);
     virtual s32 close(void);
-#endif
+
 public:
 	s32 reset_fifo(void);
 	s32 read_fifo(struct mpu_fifo_packet *data, u32 packet_cnt);

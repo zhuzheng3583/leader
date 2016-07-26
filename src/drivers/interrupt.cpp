@@ -179,6 +179,36 @@ void DMA1_Stream6_IRQHandler(void)
 #endif
 }
 
+void USART3_IRQHandler(void)
+{
+#if USE_UCOS3
+	OSIntEnter();
+#endif
+	interrupt::s_map[USART3_IRQn].handler->isr();
+#if USE_UCOS3
+	OSIntExit();
+#endif
+}
+void DMA1_Stream1_IRQHandler(void)
+{
+#if USE_UCOS3
+	OSIntEnter();
+#endif
+	interrupt::s_map[DMA1_Stream1_IRQn].handler->isr();
+#if USE_UCOS3
+	OSIntExit();
+#endif
+}
+void DMA1_Stream3_IRQHandler(void)
+{
+#if USE_UCOS3
+	OSIntEnter();
+#endif
+	interrupt::s_map[DMA1_Stream3_IRQn].handler->isr();
+#if USE_UCOS3
+	OSIntExit();
+#endif
+}
 
 
 void DMA2_Stream2_IRQHandler(void)

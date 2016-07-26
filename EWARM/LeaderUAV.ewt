@@ -3183,6 +3183,12 @@
       <file>
         <name>$PROJ_DIR$\..\src\app\aircraft\aircraft.h</name>
       </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\app\aircraft\packet.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\app\aircraft\packet.h</name>
+      </file>
     </group>
     <group>
       <name>bootloader</name>
@@ -4183,6 +4189,15 @@
         </group>
       </group>
     </group>
+  </group>
+  <group>
+    <name>protocols</name>
+    <file>
+      <name>$PROJ_DIR$\..\src\protocols\niming.cpp</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\protocols\niming.h</name>
+    </file>
   </group>
   <file>
     <name>$PROJ_DIR$\..\src\leader.cpp</name>
