@@ -62,7 +62,7 @@ static struct stm32_uart_hw_table uart_hw_table[] = {
 		.dma_rx_id = 44,
 	},
 	[3] = {
-		.GPIOx = GPIOC,
+		.GPIOx = GPIOD,//GPIOC,
 		.IRQn = USART3_IRQn,
 		.UART_Handle = {
 			.Instance = USART3,
@@ -76,7 +76,7 @@ static struct stm32_uart_hw_table uart_hw_table[] = {
 			},
 		},
 		.GPIO_Init = {
-			.Pin       = GPIO_PIN_10 | GPIO_PIN_11,
+			.Pin       = GPIO_PIN_8 | GPIO_PIN_9,//GPIO_PIN_10 | GPIO_PIN_11,
 			.Mode      = GPIO_MODE_AF_PP,
 			.Pull      = GPIO_NOPULL,
 			.Speed     = GPIO_SPEED_FREQ_HIGH,
@@ -131,6 +131,7 @@ s32 uart::probe(void)
   		__HAL_RCC_USART2_CLK_ENABLE();
 		break;
 	case 3:
+        __HAL_RCC_GPIOD_CLK_ENABLE();
 		__HAL_RCC_GPIOC_CLK_ENABLE();
   		__HAL_RCC_USART3_CLK_ENABLE();
 		break;
@@ -343,7 +344,7 @@ s32 uart::write(u8 *buf, u32 count)
 
 s32 uart::self_test(void)
 {
-#if 0
+#if 1
 	u8 wbuf[16] = "hello world!";
 	u8 rbuf[16] = { 0 };
 

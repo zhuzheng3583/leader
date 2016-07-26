@@ -57,7 +57,7 @@ BOOL packet::create(const packet_attribute_t* pattr)
 	DBG("Memory address: 0x%08x, memory_size: %d, packet_size%d.\n", pmemory, memory_size, packet_size);
 	_pheader = (packet_header_t *)pmemory;
 	packet::init(&_attr, _pheader);
-	
+
 	return true;
 }
 
@@ -166,9 +166,9 @@ u32 packet::calc_total_size(const packet_attribute_t* pattr)
 {
 	u32 packet_total_size = 0;
 	item_index_t item_index[ITEM_COUNT];
-	
+
 	packet_total_size = packet::init_item_index(pattr, item_index);
-	
+
 	return packet_total_size;
 }
 
@@ -183,7 +183,7 @@ u32 packet::calc_checksum(const packet_header_t* ppacket)
 	return checksum;
 }
 
-/*! 
+/*!
  * 根据PA数据包的属性结构，初始化该包的包头索引数组
  * @param[out] pInfoTable 初始化后的包头索引数组
  * @param[in]  pAttr      PA数据包的属性结构
@@ -202,57 +202,57 @@ u32 packet::init_item_index(const packet_attribute_t*	pattr,
 	offset = sizeof(packet_header_t);
 	pindex[ID_ITEM_ACCE].magic = ITEM_ID_TO_MAGIC(ID_ITEM_ACCE);
 	pindex[ID_ITEM_ACCE].size = sizeof(item_acce_t)  \
-    		+ sizeof(data_acce_t) * pattr->num_acce;
+    	+ sizeof(data_acce_t) * pattr->num_acce;
 	pindex[ID_ITEM_ACCE].offset = offset;
-    	offset += pindex[ID_ITEM_ACCE].size;
+    offset += pindex[ID_ITEM_ACCE].size;
 
-    	pindex[ID_ITEM_GYRO].magic = ITEM_ID_TO_MAGIC(ID_ITEM_GYRO);
-    	pindex[ID_ITEM_GYRO].size = sizeof(item_gyro_t)  \
-        	+ sizeof(data_gyro_t) * pattr->num_gyro,
-    	pindex[ID_ITEM_GYRO].offset = offset;
-    	offset += pindex[ID_ITEM_GYRO].size;
+    pindex[ID_ITEM_GYRO].magic = ITEM_ID_TO_MAGIC(ID_ITEM_GYRO);
+    pindex[ID_ITEM_GYRO].size = sizeof(item_gyro_t)  \
+        + sizeof(data_gyro_t) * pattr->num_gyro,
+    pindex[ID_ITEM_GYRO].offset = offset;
+    offset += pindex[ID_ITEM_GYRO].size;
 
-    	pindex[ID_ITEM_MPU].magic = ITEM_ID_TO_MAGIC(ID_ITEM_MPU);
-    	pindex[ID_ITEM_MPU].size = sizeof(item_mpu_t)        \
-        	+ sizeof(data_mpu_t) * pattr->num_mpu,
-    	pindex[ID_ITEM_MPU].offset = offset;
-    	offset += pindex[ID_ITEM_MPU].size;
+    pindex[ID_ITEM_MPU].magic = ITEM_ID_TO_MAGIC(ID_ITEM_MPU);
+    pindex[ID_ITEM_MPU].size = sizeof(item_mpu_t)        \
+        + sizeof(data_mpu_t) * pattr->num_mpu,
+    pindex[ID_ITEM_MPU].offset = offset;
+    offset += pindex[ID_ITEM_MPU].size;
 
-    	pindex[ID_ITEM_MAGN].magic = ITEM_ID_TO_MAGIC(ID_ITEM_MAGN);
-    	pindex[ID_ITEM_MAGN].size = sizeof(item_magn_t)  \
-        	+ sizeof(data_magn_t) * pattr->num_magn,
-    	pindex[ID_ITEM_MAGN].offset = offset;
-    	offset += pindex[ID_ITEM_MAGN].size;
+    pindex[ID_ITEM_MAGN].magic = ITEM_ID_TO_MAGIC(ID_ITEM_MAGN);
+    pindex[ID_ITEM_MAGN].size = sizeof(item_magn_t)  \
+        + sizeof(data_magn_t) * pattr->num_magn,
+    pindex[ID_ITEM_MAGN].offset = offset;
+    offset += pindex[ID_ITEM_MAGN].size;
 
-    	pindex[ID_ITEM_BARO].magic = ITEM_ID_TO_MAGIC(ID_ITEM_BARO);
-    	pindex[ID_ITEM_BARO].size = sizeof(item_baro_t)  \
-        	+ sizeof(data_baro_t) * pattr->num_baro,
-    	pindex[ID_ITEM_BARO].offset = offset;
-    	offset += pindex[ID_ITEM_BARO].size;
+    pindex[ID_ITEM_BARO].magic = ITEM_ID_TO_MAGIC(ID_ITEM_BARO);
+    pindex[ID_ITEM_BARO].size = sizeof(item_baro_t)  \
+        + sizeof(data_baro_t) * pattr->num_baro,
+    pindex[ID_ITEM_BARO].offset = offset;
+    offset += pindex[ID_ITEM_BARO].size;
 
-    	pindex[ID_ITEM_GPS].magic = ITEM_ID_TO_MAGIC(ID_ITEM_GPS);
-    	pindex[ID_ITEM_GPS].size = sizeof(item_gps_t)        \
-        	+ sizeof(data_gps_t) * pattr->num_gps,
-    	pindex[ID_ITEM_GPS].offset = offset;
-    	offset += pindex[ID_ITEM_GPS].size;
+    pindex[ID_ITEM_GPS].magic = ITEM_ID_TO_MAGIC(ID_ITEM_GPS);
+    pindex[ID_ITEM_GPS].size = sizeof(item_gps_t)        \
+        + sizeof(data_gps_t) * pattr->num_gps,
+    pindex[ID_ITEM_GPS].offset = offset;
+    offset += pindex[ID_ITEM_GPS].size;
 
    	pindex[ID_ITEM_ATTITUDE].magic = ITEM_ID_TO_MAGIC(ID_ITEM_ATTITUDE);
-    	pindex[ID_ITEM_ATTITUDE].size = sizeof(item_attitude_t)  \
-        	+ sizeof(data_attitude_t) * pattr->num_attitude,
-    	pindex[ID_ITEM_ATTITUDE].offset = offset;
-    	offset += pindex[ID_ITEM_ATTITUDE].size;
+    pindex[ID_ITEM_ATTITUDE].size = sizeof(item_attitude_t)  \
+        + sizeof(data_attitude_t) * pattr->num_attitude,
+    pindex[ID_ITEM_ATTITUDE].offset = offset;
+    offset += pindex[ID_ITEM_ATTITUDE].size;
 
    	pindex[ID_ITEM_RC].magic = ITEM_ID_TO_MAGIC(ID_ITEM_RC);
-    	pindex[ID_ITEM_RC].size = sizeof(item_rc_t)  \
-        	+ sizeof(data_rc_t) * pattr->num_rc,
-    	pindex[ID_ITEM_RC].offset = offset;
-    	offset += pindex[ID_ITEM_RC].size;
+    pindex[ID_ITEM_RC].size = sizeof(item_rc_t)  \
+       	+ sizeof(data_rc_t) * pattr->num_rc,
+    pindex[ID_ITEM_RC].offset = offset;
+    offset += pindex[ID_ITEM_RC].size;
 
 	/**
      *  @brief packet tail
      */
 	offset += sizeof(packet_tail_t);
-	
+
 	//packet total size
 	packet_total_size = offset;
 
@@ -277,16 +277,16 @@ BOOL packet::init(const packet_attribute_t *pattr, packet_header_t *ppacket)
     	ppacket->configkey    = 0;
     	ppacket->timestamp    = 0;
     	ppacket->item_count   = item_count;
-        
+
     /**
      *  @brief init item_index_table
      */
 	packet_total_size = packet::init_item_index(pattr,
 		ppacket->item_index_table);
-    
+
 	ppacket->size = packet_total_size;
 
-		
+
 	/**
      *  @brief init item data
      */
@@ -298,7 +298,7 @@ BOOL packet::init(const packet_attribute_t *pattr, packet_header_t *ppacket)
     	item_gps_t  *pgps   = (item_gps_t *)packet::get_item_data(ID_ITEM_GPS);
     	item_attitude_t *pattitude = (item_attitude_t *)packet::get_item_data(ID_ITEM_ATTITUDE);
 	item_rc_t *prc = (item_rc_t *)packet::get_item_data(ID_ITEM_RC);
-	
+
     	if (pacc) {
 		pacc->num   		= pattr->num_acce;
         	pacc->timestamp 	= 0;

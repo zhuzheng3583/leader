@@ -93,6 +93,7 @@ s32 leader_system::init(void)
 
 	_puart3 = new uart("uart-3", 3);
 	_puart3->probe();
+    //_puart3->self_test();
 	_niming = new niming;
 	_niming->attach(_puart3);
 	
