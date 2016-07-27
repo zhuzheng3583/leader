@@ -32,7 +32,8 @@ calculate::~calculate(void)
 void calculate::run(void *parg)
 {
 	calculate *p = (calculate *)parg;
-	
+
+    u32 cnt = 0;
 	msgque *sync_rc = leader_system::get_instance()->get_sync_rc();
 	msgque *sync_ct = leader_system::get_instance()->get_sync_ct();
 
@@ -45,29 +46,19 @@ void calculate::run(void *parg)
 	item_gps_t  *pitem_gps  = NULL;
 	item_attitude_t *pitem_attitude = NULL;
 	item_rc_t *pitem_rc = NULL;
-	for (u32 cnt = 0;  ;cnt++)
+	for ( ;  ;)
 	{
-		// 等待rece任务发送的消息队列，获取数据包缓冲区首地址
-		//msgque_pend(calc.syncq_rece, &msg_pend, &msg_size, -1);
-		//INF("%s[%d]: pend: msg[0x%08x], size[%d].\n",
-		//	calc.ptask->taskname, cnt, msg_pend, msg_size);
-		/* TODO:开始进行各个传感器的数据融合 */
-
-
-		// 发送消息队列给tran任务，将数据缓冲区首地址推向tran任务
-		//msgque_post(calc.syncq_tran, msg_pend, msg_size, -1);
-		//INF("%s[%d]: post: msg[0x%08x], size[%d].\n",
-		//	calc.ptask->taskname, cnt, msg_pend, msg_size);
-
+        // 等待rece任务发送的消息队列，获取数据包缓冲区首地址
 		sync_rc->pend(&packet_addr, NULL, 1000);
 		ppacket = (packet *)packet_addr;
-        
+
 		pitem_mpu  = (item_mpu_t *)(ppacket->get_item_data(ID_ITEM_MPU));
-		
+        core::mdelay(1);
+
+        // 发送消息队列给tran任务，将数据缓冲区首地址推向tran任务
 		sync_ct->post((void *)packet_addr, sizeof(void *), 1000);
-		
-		INF("%s: task is active[%u]...\n", _name, cnt);
-		msleep(1);
+
+		//DBG("%s: task is active[%u]...\n", _name, cnt++);
 	}
 
 }

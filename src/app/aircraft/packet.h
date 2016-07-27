@@ -141,7 +141,7 @@ typedef struct data_rc{
     s16 aux5;
     s16 aux6;
 }data_rc_t;
-                
+
 
 /**
  *  @struct item_acce
@@ -176,7 +176,7 @@ typedef struct item_mpu
 	u32 num;                    // 原始采样点个数
 	u32 timestamp;
 
-	f32 mpu_temperature;
+	f32 temperature;
 	data_mpu_t *data_mpu;
 } item_mpu_t;
 
@@ -393,7 +393,7 @@ public:
      * @return     包的实际总大小
      */
     u32 calc_total_size(const packet_attribute_t* pattr);
-    
+
 
     /**
      *  @brief 以下API必须在create/attach之后调用
@@ -460,7 +460,7 @@ public:
 
 protected:
     u32 packet::init_item_index(const packet_attribute_t* pattr, item_index_t pindex[ITEM_COUNT]);
-    
+
     BOOL packet::init(const packet_attribute_t *pattr, packet_header_t *ppacket);
 
 

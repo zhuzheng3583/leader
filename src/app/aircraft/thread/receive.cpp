@@ -32,9 +32,12 @@ void receive::run(void *parg)
 {
   	receive *p = (receive *)parg;
 
+    u32 cnt = 0;
+
 	msgque *sync_rc = leader_system::get_instance()->get_sync_rc();
 
 	mpu6000 *mpu6000 = leader_system::get_instance()->get_mpu6000();
+    mpu6000->open(NULL);
 
 	packet *ppacket  = leader_system::get_instance()->get_packet();
 	u32 packet_addr = (u32)ppacket;
@@ -45,18 +48,11 @@ void receive::run(void *parg)
 	item_gps_t  *pitem_gps  = (item_gps_t *)(ppacket->get_item_data(ID_ITEM_GPS));
 	item_attitude_t *pitem_atti = (item_attitude_t *)(ppacket->get_item_data(ID_ITEM_ATTITUDE));
 	item_rc_t *pitem_rc = (item_rc_t *)ppacket->get_item_data(ID_ITEM_RC);
-	
-	for (u32 cnt = 0; ;cnt++)
+
+	for ( ; ;)
 	{
-		for (u32 i = 0; i < pattr->num_mpu; i++)
-		{
-			pitem_mpu->data_mpu[i].acce.x = 1;
-			pitem_mpu->data_mpu[i].acce.y = 2;
-			pitem_mpu->data_mpu[i].acce.z = 3;
-			pitem_mpu->data_mpu[i].gyro.x = 4;
-			pitem_mpu->data_mpu[i].gyro.y = 5;
-			pitem_mpu->data_mpu[i].gyro.z = 6;
-		}
+        mpu6000->read((u8 *)(pitem_mpu->data_mpu), pattr->num_mpu * sizeof(data_mpu_t));
+        //mpu6000->get_temperature(&(pitem_mpu->temperature));
 
 		for (u32 i = 0; i < pattr->num_magn; i++)
 		{
@@ -86,11 +82,12 @@ void receive::run(void *parg)
 			pitem_rc->data_rc[i].aux5 = 5;
 			pitem_rc->data_rc[i].aux5 = 6;
 		}
-		
+
+        core::mdelay(1);
 		sync_rc->post((void *)packet_addr, sizeof(void *), 1000);
-        
-		INF("%s: task is active[%u]...\n", _name, cnt);
-		msleep(500);
+
+		//DBG("%s: task is active[%u]...\n", _name, cnt++);
+
 	}
 
 
@@ -100,7 +97,7 @@ void receive::run(void *parg)
 
 
 
-	
+
 	#if 0
 	Mpu6000 *pmpu6000 = SystemUav::get_system_uav()->get_mpu6000();
     Packet  *ppacket  = SystemUav::get_system_uav()->get_packet();

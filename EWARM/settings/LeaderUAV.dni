@@ -13,7 +13,7 @@ CStepIntDis=_ 0
 stlinkserialNo=2798FD0D
 stlinkfoundProbes=
 [DebugChecksum]
-Checksum=-1337502198
+Checksum=-1819012213
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0

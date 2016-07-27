@@ -124,7 +124,7 @@ void SysTick_Handler(void)
 	HAL_SYSTICK_IRQHandler();
 #endif
 #endif
-    
+
 #if USE_UCOS3
 	OSTimeTick();       					// 调用ucos的时钟服务程序
 	OSIntExit();        					// 触发任务切换软中断
@@ -133,6 +133,13 @@ void SysTick_Handler(void)
 #else
 void SysTick_Handler(void)
 {
+#if defined(USE_HAL_DRIVER)
+    HAL_IncTick();
+#if (USE_STM32F4_DEMO)
+    /* Call user callback */
+    HAL_SYSTICK_IRQHandler();
+#endif
+#endif
     osSystickHandler();
 }
 #endif

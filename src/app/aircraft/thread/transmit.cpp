@@ -34,11 +34,12 @@ void transmit::run(void *parg)
 {
 	transmit *p = (transmit *)parg;
 
+    u32 cnt = 0;
 	u32 msg_data = 0;
 	u32 msg_size = 0;
 	msgque *sync_ct = leader_system::get_instance()->get_sync_ct();
 	niming *niming = leader_system::get_instance()->get_niming();
-	
+
 	u32 packet_addr = 0;
 	packet *ppacket  = NULL;
 	packet_attribute_t *pattr = NULL;
@@ -48,13 +49,13 @@ void transmit::run(void *parg)
 	item_gps_t  *pitem_gps  = NULL;
 	item_attitude_t *pitem_attitude = NULL;
 	item_rc_t *pitem_rc = NULL;
-	for (u32 cnt = 0; ; cnt++)
+	for ( ; ;)
 	{
 		// 等待calc任务发送的消息队列，获取数据包缓冲区首地址
 		sync_ct->pend(&packet_addr, NULL, 1000);
 		ppacket = (packet *)packet_addr;
 		pattr = ppacket->get_attribute();
-		
+
 		/* TODO:发起DMA传输，将各个传感器数据分通道发送至上位机 */
 		pitem_mpu  = (item_mpu_t *)(ppacket->get_item_data(ID_ITEM_MPU));
 		pitem_magn  = (item_magn_t *)(ppacket->get_item_data(ID_ITEM_MAGN));
@@ -74,8 +75,8 @@ void transmit::run(void *parg)
 			niming->report_rc(&pitem_rc->data_rc[i]);
 		}
 		//msleep(20);
-		INF("%s: task is active[%u]...\n", _name, cnt);
-		msleep(10);
+		//DBG("%s: task is active[%u]...\n", _name, cnt++);
+		//msleep(10);
 	}
 }
 
