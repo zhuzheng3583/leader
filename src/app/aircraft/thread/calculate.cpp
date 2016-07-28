@@ -53,7 +53,7 @@ void calculate::run(void *parg)
 		ppacket = (packet *)packet_addr;
 
 		pitem_mpu  = (item_mpu_t *)(ppacket->get_item_data(ID_ITEM_MPU));
-        core::mdelay(1);
+        core::mdelay(100);
 
         // 发送消息队列给tran任务，将数据缓冲区首地址推向tran任务
 		sync_ct->post((void *)packet_addr, sizeof(void *), 1000);

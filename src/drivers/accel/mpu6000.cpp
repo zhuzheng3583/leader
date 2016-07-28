@@ -59,7 +59,7 @@ s32 mpu6000::probe(void)
     }
     reg_write_byte(MPUREG_PWR_MGMT1, 0X01);     //设置CLKSEL,PLL X轴为参考
     reg_write_byte(MPUREG_PWR_MGMT2, 0X00);     // 加速度与陀螺仪都工作
-    set_sample_rate(200);                        //设置采样率
+    set_sample_rate(1000);                        //设置采样率
 
 #if 0 //test
     s16 gyro[3] = { 0 };
@@ -91,6 +91,7 @@ s32 mpu6000::read(u8 *buf, u32 count)
 		data = &((data_mpu_t *)buf)[i];
 		mpu6000::get_gyro_raw((s16 *)(&(data->gyro)));
 		mpu6000::get_accel_raw((s16 *)(&(data->acce)));
+        //core::udelay(200);
 	}
 
 	return (num * sizeof(data_mpu_t));
