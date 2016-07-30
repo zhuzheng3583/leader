@@ -65,28 +65,30 @@ public:
 	gpio *_gpio_cs;
 
 	struct prom_s _prom; 				//用于存放PROM中的8组校准数据
-	
-    s32 _temperature, _pressure;	
+
+    s32 _temperature, _pressure;
     f32 _altitude;
+
 public:
     s32 probe(spi *pspi, gpio *gpio_cs);
     s32 remove(void);
 
 public:
+    virtual s32 open(s32 flags);
+    virtual s32 read(u8 *buf, u32 count);
+    virtual s32 close(void);
+
+public:
 	void init(void);
-    s32 measure(void);
-    
+    s32 measure(data_baro_t *data);
+
     void reset(void);
 	void read_prom(void);
     s32 crc4(u16 *prom);
-    
-	u32 read_raw(u8 cmd_osr);
-    
-	s32 get_temperature(void);
-	s32 get_pressure(void);
-    f32 get_altitude(void);
-    
-	s32 cmd_write_byte(u8 cmd);
+
+	s32 read_raw(u8 cmd_osr);
+
+	s32 cmd_write_byte(u8 cmd, s32 ms);
 	s32 reg_read_byte(u8 reg);
 	s32 reg_write_byte(u8 reg, u8 data);
 	s32 reg_read(u8 reg, u8 len, u8 *buf);

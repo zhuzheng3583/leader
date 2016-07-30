@@ -73,14 +73,14 @@ public:
     i2c                     *_i2c2;
 
     spi                     *_spi1;
-    
+
     gpio                    *_mpu6000_gpio_cs;
     gpio                    *_ms5611_gpio_cs;
     mpu6000					*_mpu6000;
     ms5611					*_ms5611;
-    
+
     flash                   *_pflash;
-      
+
     usb_dev                 *_usb_dev;
     sensorhub               *_sensorhub;
 
@@ -89,8 +89,8 @@ public:
 
     timer                   *_timer;
     pwm                     *_pwm;
-   
-    
+
+
     msgque					*_sync_rc;
     msgque					*_sync_ct;
     msgque					*_sync;
@@ -104,7 +104,7 @@ public:
     packet                  *_packet;
 
     niming                  *_niming;
-    
+
 public:
     enum leader_system_mode    get_mode(void)		{ return _mode; }
     uart        *get_uart1(void)		    { return _puart1; }
@@ -120,13 +120,14 @@ public:
     sensorhub   *get_sensorhub(void)        { return _sensorhub; }
 
     mpu6000   	*get_mpu6000(void)        	{ return _mpu6000; }
+	ms5611		*get_ms5611(void)        	{ return _ms5611; }
 
     msgque   	*get_sync_rc(void)			{ return _sync_rc; }
     msgque   	*get_sync_ct(void)			{ return _sync_ct; }
     msgque   	*get_sync(void)			    { return _sync; }
 
     packet      *get_packet(void)           { return _packet; }
-    
+
     niming      *get_niming(void)           { return _niming; }
 protected:
     static leader_system *s_pactive_instance;

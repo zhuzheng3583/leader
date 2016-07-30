@@ -38,6 +38,9 @@ void receive::run(void *parg)
 
 	mpu6000 *mpu6000 = leader_system::get_instance()->get_mpu6000();
     mpu6000->open(NULL);
+	ms5611 *ms5611 = leader_system::get_instance()->get_ms5611();
+    ms5611->open(NULL);
+
 
 	packet *ppacket  = leader_system::get_instance()->get_packet();
 	u32 packet_addr = (u32)ppacket;
@@ -53,6 +56,20 @@ void receive::run(void *parg)
 	{
         mpu6000->read((u8 *)(pitem_mpu->data_mpu), pattr->num_mpu * sizeof(data_mpu_t));
         //mpu6000->get_temperature(&(pitem_mpu->temperature));
+#if 0
+        ms5611->read((u8 *)(pitem_baro->data_baro), pattr->num_baro * sizeof(data_baro_t));
+		for (u32 i = 0; i < pattr->num_baro; i++)
+		{
+            DBG("%s: temp=%d, pres=%d, alt=%f.\n",
+                _name,
+                pitem_baro->data_baro[i].temperature,
+                pitem_baro->data_baro[i].pressure,
+                pitem_baro->data_baro[i].altitude
+                );
+		}
+#endif
+
+
 
 		for (u32 i = 0; i < pattr->num_magn; i++)
 		{

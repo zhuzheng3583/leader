@@ -16,10 +16,10 @@ packet::packet(void) :
     _pheader(NULL)
 {
 	_attr.revision = PACKET_REVISION;
-	_attr.num_acce = 20;
-	_attr.num_gyro = 20;
-	_attr.num_mpu	= 20;
-	_attr.num_magn = 20;
+	_attr.num_acce = 10;
+	_attr.num_gyro = 10;
+	_attr.num_mpu	= 10;
+	_attr.num_magn = 10;
 	_attr.num_baro = 10;
 	_attr.num_gps	= 2;
 	_attr.num_attitude = 1;

@@ -102,7 +102,9 @@ typedef struct data_mpu
  */
 typedef struct data_baro
 {
-	s16 pressure;
+	f32 altitude;
+	s32 pressure;
+    s32 temperature;
 } data_baro_t;
 
 /**
