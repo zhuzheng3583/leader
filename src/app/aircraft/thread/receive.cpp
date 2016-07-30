@@ -56,7 +56,7 @@ void receive::run(void *parg)
 	{
         mpu6000->read((u8 *)(pitem_mpu->data_mpu), pattr->num_mpu * sizeof(data_mpu_t));
         //mpu6000->get_temperature(&(pitem_mpu->temperature));
-#if 0
+#if 1
         ms5611->read((u8 *)(pitem_baro->data_baro), pattr->num_baro * sizeof(data_baro_t));
 		for (u32 i = 0; i < pattr->num_baro; i++)
 		{
