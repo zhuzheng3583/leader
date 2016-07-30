@@ -24,20 +24,20 @@ mpu6000::~mpu6000(void)
 }
 
 
-s32 mpu6000::probe(void)
+s32 mpu6000::probe(spi *pspi, gpio *gpio_cs)
 {
+    ASSERT((pspi != NULL) && (gpio_cs != NULL));
+    
 	if (device::probe() < 0) {
 		ERR("%s: failed to probe.\n", _name);
 		goto fail0;
 	}
 
-	_gpio = new gpio("gpio-34", 34);
-	_gpio->probe();
-	_gpio->set_direction_output();
-    _gpio->set_value(true);
-
-    _spi = new spi("spi-1", 1);
-    _spi->probe();
+    _gpio_cs = gpio_cs;
+    _spi = pspi;
+    
+	_gpio_cs->set_direction_output();
+    _gpio_cs->set_value(true);
 
     reg_write_byte(MPUREG_PWR_MGMT1, 0X80); 	// ¸´Î»MPU6050
     core::mdelay(100);
@@ -321,7 +321,7 @@ s32 mpu6000::reg_read(u8 reg, u8 len, u8 *buf)
 {
     s32 ret = 0;
     reg = READ_CMD | reg;
-    _gpio->set_value(false);
+    _gpio_cs->set_value(false);
     //core::mdelay(10);
     struct spi_msg msgs[] = {
         [0] = {
@@ -344,13 +344,13 @@ s32 mpu6000::reg_read(u8 reg, u8 len, u8 *buf)
         goto fail1;
     }
     //core::mdelay(10);
-    _gpio->set_value(true);
+    _gpio_cs->set_value(true);
 
     return 0;
 
 fail1:
 fail0:
-    _gpio->set_value(true);
+    _gpio_cs->set_value(true);
     return -1;
 }
 
@@ -358,7 +358,7 @@ s32 mpu6000::reg_write(u8 reg, u8 len, u8 *buf)
 {
     s32 ret = 0;
     reg = WRITE_CMD & reg;
-    _gpio->set_value(false);
+    _gpio_cs->set_value(false);
     //core::mdelay(10);
     struct spi_msg msgs[] = {
         [0] = {
@@ -381,13 +381,13 @@ s32 mpu6000::reg_write(u8 reg, u8 len, u8 *buf)
         goto fail1;
     }
     //core::mdelay(10);
-    _gpio->set_value(true);
+    _gpio_cs->set_value(true);
 
     return 0;
 
 fail1:
 fail0:
-    _gpio->set_value(true);
+    _gpio_cs->set_value(true);
     return -1;
 }
 

@@ -24,6 +24,7 @@
 #include "pwm.h"
 #include "spi.h"
 #include "mpu6000.h"
+#include "ms5611.h"
 
 #include "demo_main.h"
 
@@ -64,16 +65,22 @@ public:
 
 public:
     enum leader_system_mode _mode;
-    uart                    *_puart;
     uart                    *_puart1;
     uart                    *_puart2;
     uart                    *_puart3;
 
-    flash                   *_pflash;
-
     i2c                     *_i2c1;
     i2c                     *_i2c2;
 
+    spi                     *_spi1;
+    
+    gpio                    *_mpu6000_gpio_cs;
+    gpio                    *_ms5611_gpio_cs;
+    mpu6000					*_mpu6000;
+    ms5611					*_ms5611;
+    
+    flash                   *_pflash;
+      
     usb_dev                 *_usb_dev;
     sensorhub               *_sensorhub;
 
@@ -82,10 +89,8 @@ public:
 
     timer                   *_timer;
     pwm                     *_pwm;
-    spi                     *_spi;
-
-    mpu6000					*_mpu6000;
-
+   
+    
     msgque					*_sync_rc;
     msgque					*_sync_ct;
     msgque					*_sync;
@@ -102,7 +107,6 @@ public:
     
 public:
     enum leader_system_mode    get_mode(void)		{ return _mode; }
-    uart        *get_uart(void)		    	{ return _puart; }
     uart        *get_uart1(void)		    { return _puart1; }
     uart        *get_uart2(void)		    { return _puart2; }
     uart        *get_uart3(void)		    { return _puart3; }

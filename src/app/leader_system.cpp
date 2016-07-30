@@ -86,21 +86,29 @@ s32 leader_system::init(void)
 	ret = interrupt::irq_init();
 	kernel::init();
 
-	_puart = new uart("uart-2", 2);
-	_puart->probe();
-	_puart->open(NULL);
-	//_puart->self_test();
+	_puart2 = new uart("uart-2", 2);
+	_puart2->probe();
+	_puart2->open(NULL);
+	//_puart2->self_test();
 
 	_puart3 = new uart("uart-3", 3);
 	_puart3->probe();
     //_puart3->self_test();
 	_niming = new niming;
 	_niming->attach(_puart3);
-	
+    
+    _spi1 = new spi("spi-1", 1);
+    _spi1->probe();
+    
+    _mpu6000_gpio_cs = new gpio("mpu6000_gpio_cs-34", 34);
+	_mpu6000_gpio_cs->probe();
 	_mpu6000 = new mpu6000("mpu6000", -1);
-	_mpu6000->probe();
+	_mpu6000->probe(_spi1, _mpu6000_gpio_cs);
 
-
+    _ms5611_gpio_cs = new gpio("ms5611_gpio_cs-55", 55);
+	_ms5611_gpio_cs->probe();
+    _ms5611 = new ms5611("ms5611", -1);
+    _ms5611->probe(_spi1, _ms5611_gpio_cs);
 #if 0
 
 	_pflash = new flash("flash", -1);
@@ -153,8 +161,8 @@ s32 leader_system::init(void)
 	pgpio->probe();
 	pgpio->set_direction_output();
 	pgpio->set_value(1);
-	_spi = new spi("spi-1", 1);
-	_spi->probe();
+	_spi1 = new spi("spi-1", 1);
+	_spi1->probe();
 
 
   	u8 dev_id = 0;

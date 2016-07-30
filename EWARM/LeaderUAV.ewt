@@ -3277,6 +3277,18 @@
         <name>$PROJ_DIR$\..\src\drivers\accel\mpu6000.h</name>
       </file>
     </group>
+    <group>
+      <name>baro</name>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\baro\ms5611.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\baro\ms5611.h</name>
+      </file>
+    </group>
+    <group>
+      <name>magn</name>
+    </group>
     <file>
       <name>$PROJ_DIR$\..\src\drivers\core.cpp</name>
     </file>

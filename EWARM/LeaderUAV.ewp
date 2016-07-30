@@ -2278,6 +2278,7 @@
           <state>$PROJ_DIR$\..\src\app\aircraft\thread</state>
           <state>$PROJ_DIR$\..\src\drivers</state>
           <state>$PROJ_DIR$\..\src\drivers\accel</state>
+          <state>$PROJ_DIR$\..\src\drivers\baro</state>
           <state>$PROJ_DIR$\..\src\dsp</state>
           <state>$PROJ_DIR$\..\src\os</state>
           <state>$PROJ_DIR$\..\src\protocols</state>
@@ -3079,6 +3080,18 @@
       <file>
         <name>$PROJ_DIR$\..\src\drivers\accel\mpu6000.h</name>
       </file>
+    </group>
+    <group>
+      <name>baro</name>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\baro\ms5611.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\baro\ms5611.h</name>
+      </file>
+    </group>
+    <group>
+      <name>magn</name>
     </group>
     <file>
       <name>$PROJ_DIR$\..\src\drivers\core.cpp</name>

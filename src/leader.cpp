@@ -27,7 +27,7 @@ int	print(s32 level, const char* fmt, ...)
 	s32	count = 0;
 	u8 str[FMT_MAX_CNT];
 	
-	uart* puart = leader_system::get_instance()->get_uart();
+	uart* puart2 = leader_system::get_instance()->get_uart2();
 
 	va_list ap;
 	va_start(ap, fmt);
@@ -35,7 +35,7 @@ int	print(s32 level, const char* fmt, ...)
 	count = vsnprintf((char *)str, FMT_MAX_CNT, fmt, ap);
 	str[count-1] = '\r';
 	str[count-0] = '\n';
-	count = puart->write(str, count+1);
+	count = puart2->write(str, count+1);
 
 	va_end(ap);
 

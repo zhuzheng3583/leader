@@ -472,10 +472,10 @@ protected:
 	u32		_max_fifo;
 	u32		_chip_select;
 	spi		*_spi;
-	gpio    	*_gpio;
+	gpio    *_gpio_cs;
 
 public:
-    s32 probe(void);
+    s32 probe(spi *pspi, gpio *gpio_cs);
     s32 remove(void);
 
 public:
