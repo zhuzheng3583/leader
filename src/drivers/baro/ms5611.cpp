@@ -1,13 +1,14 @@
 /*******************************Copyright (c)***************************
 **
-** Porject name:	LeaderUAV-Plus
+** Porject name:	leader
 ** Created by:		zhuzheng<happyzhull@163.com>
-** Created date:	2015/08/28
+** Created date:	2016/07/30
 ** Modified by:
 ** Modified date:
 ** Descriptions:
 **
 ***********************************************************************/
+
 #include "ms5611.h"
 #include <math.h>
 
@@ -82,7 +83,7 @@ void ms5611::init(void)
 
 void ms5611::reset(void)
 {
-    ms5611::cmd_write_byte(ADDR_RESET_CMD, 10);
+    ms5611::write_cmd8(ADDR_RESET_CMD, 10);
 }
 
 
@@ -153,25 +154,25 @@ void ms5611::read_prom(void)
 {
 	/* read and convert PROM words */
     u8 buf[2] = { 0 };
-    ms5611::reg_read(ADDR_PROM_SETUP, 2, buf);
+    ms5611::read_reg(ADDR_PROM_SETUP, buf, 2);
     _prom.factory_setup = buf[0] << 8 | buf[1];
-    ms5611::reg_read(ADDR_PROM_C1, 2, buf);
+    ms5611::read_reg(ADDR_PROM_C1, buf, 2);
     _prom.c1_pres_sens = buf[0] << 8 | buf[1];
-    ms5611::reg_read(ADDR_PROM_C2, 2, buf);
+    ms5611::read_reg(ADDR_PROM_C2, buf, 2);
     _prom.c2_pres_offset = buf[0] << 8 | buf[1];
-    ms5611::reg_read(ADDR_PROM_C3, 2, buf);
+    ms5611::read_reg(ADDR_PROM_C3, buf, 2);
     _prom.c3_temp_coeff_pres_sens = buf[0] << 8 | buf[1];
-    ms5611::reg_read(ADDR_PROM_C4, 2, buf);
+    ms5611::read_reg(ADDR_PROM_C4, buf, 2);
     _prom.c4_temp_coeff_pres_offset = buf[0] << 8 | buf[1];
-    ms5611::reg_read(ADDR_PROM_C5, 2, buf);
+    ms5611::read_reg(ADDR_PROM_C5, buf, 2);
     _prom.c5_reference_temp = buf[0] << 8 | buf[1];
-    ms5611::reg_read(ADDR_PROM_C6, 2, buf);
+    ms5611::read_reg(ADDR_PROM_C6, buf, 2);
     _prom.c6_temp_coeff_temp = buf[0] << 8 | buf[1];
-    ms5611::reg_read(ADDR_PROM_CRC, 2, buf);
+    ms5611::read_reg(ADDR_PROM_CRC, buf, 2);
     _prom.serial_and_crc = buf[0] << 8 | buf[1];
 
     u16 tmp = 0;
-    ms5611::reg_read(ADDR_RESET_CMD, 2, (u8 *)&tmp);
+    ms5611::read_reg(ADDR_RESET_CMD, (u8 *)&tmp, 2);
 	/* calculate CRC and return success/failure accordingly */
 	s32 ret = ms5611::crc4((u16 *)&_prom);
     if (ret != 0) {
@@ -188,13 +189,13 @@ s32 ms5611::read_raw(u8 cmd_osr)
         u32 raw;
     };
 
-    ms5611::cmd_write_byte(cmd_osr, 10);
+    ms5611::write_cmd8(cmd_osr, 10);
 
     union cvt data;
     u8 buf[3] = { 0 };
     /* read the most recent measurement */
     //core::mdelay(10);
-    s32 ret = ms5611::reg_read(ADDR_DATA, sizeof(buf), buf);
+    s32 ret = ms5611::read_reg(ADDR_DATA, buf, sizeof(buf));
     if (ret == 0) {
         /* fetch the raw value */
         data.byte[0] = buf[2];
@@ -253,7 +254,7 @@ s32 ms5611::crc4(u16 *prom)
 }
 
 
-s32 ms5611::cmd_write_byte(u8 cmd, s32 ms)
+s32 ms5611::write_cmd8(u8 cmd, s32 ms)
 {
     s32 ret = 0;
     //cmd = cmd & SPI_WRITE_CMD /*WRITE_CMD*/;
@@ -284,11 +285,11 @@ fail0:
 }
 
 
-s32 ms5611::reg_read_byte(u8 reg)
+s32 ms5611::read_reg8(u8 reg)
 {
     s32 ret = 0;
     u8 data = 0;
-    ms5611::reg_read(reg, 1, &data);
+    ms5611::read_reg(reg, &data, 1);
     if (ret < 0) {
         return -1;
     }
@@ -297,10 +298,10 @@ s32 ms5611::reg_read_byte(u8 reg)
 }
 
 
-s32 ms5611::reg_write_byte(u8 reg, u8 data)
+s32 ms5611::write_reg8(u8 reg, u8 data)
 {
     s32 ret = 0;
-    ret = ms5611::reg_write(reg, 1, &data);
+    ret = ms5611::write_reg(reg, &data, 1);
     if (ret < 0) {
         return -1;
     }
@@ -308,7 +309,7 @@ s32 ms5611::reg_write_byte(u8 reg, u8 data)
     return 0;
 }
 
-s32 ms5611::reg_read(u8 reg, u8 len, u8 *buf)
+s32 ms5611::read_reg(u8 reg, u8 *buf, u8 len)
 {
     s32 ret = 0;
     //reg = reg | READ_CMD/*SPI_READ_CMD*/ ;
@@ -343,7 +344,7 @@ fail0:
     return -1;
 }
 
-s32 ms5611::reg_write(u8 reg, u8 len, u8 *buf)
+s32 ms5611::write_reg(u8 reg, u8 *buf, u8 len)
 {
     s32 ret = 0;
    //reg = reg & WRITE_CMD /*SPI_WRITE_CMD*/ ;

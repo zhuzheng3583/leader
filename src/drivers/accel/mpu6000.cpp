@@ -27,7 +27,7 @@ mpu6000::~mpu6000(void)
 s32 mpu6000::probe(spi *pspi, gpio *gpio_cs)
 {
     ASSERT((pspi != NULL) && (gpio_cs != NULL));
-    
+
 	if (device::probe() < 0) {
 		ERR("%s: failed to probe.\n", _name);
 		goto fail0;
@@ -35,30 +35,30 @@ s32 mpu6000::probe(spi *pspi, gpio *gpio_cs)
 
     _gpio_cs = gpio_cs;
     _spi = pspi;
-    
+
 	_gpio_cs->set_direction_output();
     _gpio_cs->set_value(true);
 
-    reg_write_byte(MPUREG_PWR_MGMT1, 0X80); 	// 复位MPU6050
+    write_reg8(MPUREG_PWR_MGMT1, 0X80); 	// 复位MPU6050
     core::mdelay(100);
-    reg_write_byte(MPUREG_PWR_MGMT1, 0X00);  	// 唤醒MPU6050
+    write_reg8(MPUREG_PWR_MGMT1, 0X00);  	// 唤醒MPU6050
 
     set_gyro_fsr(2000);                         //陀螺仪传感器,±2000dps
     set_accel_fsr(2);                           //加速度传感器,±2g
     set_sample_rate(50);                        //设置采样率50Hz
-    reg_write_byte(MPUREG_INT_ENABLE, 0X00);    //关闭所有中断
-    reg_write_byte(MPUREG_USER_CTRL, 0X00);     //I2C主模式关闭
-    reg_write_byte(MPUREG_FIFO_ENABLE, 0X00);   //关闭FIFO
-    reg_write_byte(MPUREG_INT_PIN_CFG, 0X80);   //INT引脚低电平有效
-    u8 who_am_i = reg_read_byte(MPUREG_DEVICE_ID);
+    write_reg8(MPUREG_INT_ENABLE, 0X00);    //关闭所有中断
+    write_reg8(MPUREG_USER_CTRL, 0X00);     //I2C主模式关闭
+    write_reg8(MPUREG_FIFO_ENABLE, 0X00);   //关闭FIFO
+    write_reg8(MPUREG_INT_PIN_CFG, 0X80);   //INT引脚低电平有效
+    u8 who_am_i = read_reg8(MPUREG_DEVICE_ID);
     core::mdelay(1000);
     if(who_am_i != MPU_I2C_SLAVE_ADDR) {
         // 器件ID不正确
         ERR("Failed to read mpu6000 ID...\n");
         return -1;
     }
-    reg_write_byte(MPUREG_PWR_MGMT1, 0X01);     //设置CLKSEL,PLL X轴为参考
-    reg_write_byte(MPUREG_PWR_MGMT2, 0X00);     // 加速度与陀螺仪都工作
+    write_reg8(MPUREG_PWR_MGMT1, 0X01);     //设置CLKSEL,PLL X轴为参考
+    write_reg8(MPUREG_PWR_MGMT2, 0X00);     // 加速度与陀螺仪都工作
     set_sample_rate(1000);                        //设置采样率
 
 #if 0 //test
@@ -134,7 +134,7 @@ s32 mpu6000::set_gyro_fsr(u16 fsr)
         return -1;
     }
 
-    ret = reg_write_byte(MPUREG_GYRO_CONFIG, data);
+    ret = write_reg8(MPUREG_GYRO_CONFIG, data);
     if (ret) {
         return -1;
     }
@@ -169,7 +169,7 @@ s32 mpu6000::set_accel_fsr(u8 fsr)
         return -1;
     }
 
-    ret = reg_write_byte(MPUREG_ACCEL_CONFIG, data);
+    ret = write_reg8(MPUREG_ACCEL_CONFIG, data);
     if (ret) {
         return -1;
     }
@@ -228,7 +228,7 @@ s32 mpu6000::set_sample_rate(u16 rate)
     }
 
     data = 1000 / rate - 1;
-    ret = reg_write_byte(MPUREG_SAMPLE_RATE_DIV, data);
+    ret = write_reg8(MPUREG_SAMPLE_RATE_DIV, data);
     if (ret) {
         return -1;
     }
@@ -246,7 +246,7 @@ s32 mpu6000::set_sample_rate(u16 rate)
 s32 mpu6000::get_gyro_raw(s16 *gyro)
 {
     u8 tmp[6];
-	if (mpu6000::reg_read(MPUREG_GYRO_XOUTH, 6, tmp))
+	if (mpu6000::read_reg(MPUREG_GYRO_XOUTH, tmp, 6))
         return -1;
     gyro[0] = (tmp[0] << 8) | tmp[1];
     gyro[1] = (tmp[2] << 8) | tmp[3];
@@ -264,7 +264,7 @@ s32 mpu6000::get_gyro_raw(s16 *gyro)
 s32 mpu6000::get_accel_raw(s16 *accel)
 {
     u8 tmp[6];
-	if (mpu6000::reg_read(MPUREG_ACCEL_XOUTH, 6, tmp))
+	if (mpu6000::read_reg(MPUREG_ACCEL_XOUTH, tmp, 6))
         return -1;
 
     accel[0] = (tmp[0] << 8) | tmp[1];
@@ -283,7 +283,7 @@ s32 mpu6000::get_temperature(f32 *temperature)
 {
     u8 tmp[2];
     s16 raw;
-	if (mpu6000::reg_read(MPUREG_TEMP_OUTH, 2, tmp))
+	if (mpu6000::read_reg(MPUREG_TEMP_OUTH, tmp, 2))
         return -1;
     raw = (tmp[0]<<8) | tmp[1];
     //data[0] = (long)((35 + ((raw - (float)st.hw->temp_offset) / st.hw->temp_sens)) * 65536L);
@@ -293,11 +293,11 @@ s32 mpu6000::get_temperature(f32 *temperature)
 
 
 
-s32 mpu6000::reg_read_byte(u8 reg)
+s32 mpu6000::read_reg8(u8 reg)
 {
     s32 ret = 0;
     u8 data = 0;
-    mpu6000::reg_read(reg, 1, &data);
+    mpu6000::read_reg(reg, &data, 1);
     if (ret < 0) {
         return -1;
     }
@@ -306,10 +306,10 @@ s32 mpu6000::reg_read_byte(u8 reg)
 }
 
 
-s32 mpu6000::reg_write_byte(u8 reg, u8 data)
+s32 mpu6000::write_reg8(u8 reg, u8 data)
 {
     s32 ret = 0;
-    ret = mpu6000::reg_write(reg, 1, &data);
+    ret = mpu6000::write_reg(reg, &data, 1);
     if (ret < 0) {
         return -1;
     }
@@ -317,7 +317,7 @@ s32 mpu6000::reg_write_byte(u8 reg, u8 data)
     return 0;
 }
 
-s32 mpu6000::reg_read(u8 reg, u8 len, u8 *buf)
+s32 mpu6000::read_reg(u8 reg, u8 *buf, u8 len)
 {
     s32 ret = 0;
     reg = READ_CMD | reg;
@@ -354,7 +354,7 @@ fail0:
     return -1;
 }
 
-s32 mpu6000::reg_write(u8 reg, u8 len, u8 *buf)
+s32 mpu6000::write_reg(u8 reg, u8 *buf, u8 len)
 {
     s32 ret = 0;
     reg = WRITE_CMD & reg;

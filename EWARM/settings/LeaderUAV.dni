@@ -13,7 +13,7 @@ CStepIntDis=_ 0
 stlinkserialNo=2798FD0D
 stlinkfoundProbes=
 [DebugChecksum]
-Checksum=-2021360721
+Checksum=-1915996093
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -40,6 +40,9 @@ ITMportsEnable=0
 ITMportsTermIO=0
 ITMportsLogFile=0
 ITMlogFile=$PROJ_DIR$\ITM.log
+[SfrWindow]
+Show=1 1
+Sort=4 0
 [struct_types]
 Fmt0=item_index_t-magic	4	0
 Fmt1=packet_header_t-checksum	4	0
@@ -106,6 +109,23 @@ ShowTimeLog=1
 SumEnabled=0
 ShowTimeSum=1
 SumSortOrder=0
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""
+[DriverProfiling]
+Enabled=0
+Mode=3
+Graph=0
+Symbiont=0
+Exclusions=
+[CallStackLog]
+Enabled=0
+[CallStackStripe]
+ShowTiming=1
 [Disassemble mode]
 mode=0
 [Breakpoints2]
@@ -120,26 +140,11 @@ Bp7=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\platform\Middlewares\Third_Party\FreeRTO
 Bp8=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\thread.cpp}.50.5" 0 0 1 "" 0 "" 0
 Bp9=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\msgque.cpp}.73.2" 0 0 1 "" 0 "" 0
 Bp10=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\leader_system.cpp}.105.2" 0 0 1 "" 0 "" 0
-Count=11
-[Log file]
-LoggingEnabled=_ 0
-LogFile=_ ""
-Category=_ 0
-[TermIOLog]
-LoggingEnabled=_ 0
-LogFile=_ ""
+Bp11=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\leader_system.cpp}.175.2" 0 0 1 "" 0 "" 0
+Bp12=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\user\stm32f4xx_it.c}.80.3" 0 0 1 "" 0 "" 0
+Count=13
 [Aliases]
 A0=_ "E:\code\SKYVIEW_H_SUB\LeaderUAV\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
 A1=_ "E:\code\leader\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
 Count=2
 SuppressDialog=0
-[DriverProfiling]
-Enabled=0
-Mode=3
-Graph=0
-Symbiont=0
-Exclusions=
-[CallStackLog]
-Enabled=0
-[CallStackStripe]
-ShowTiming=1

@@ -1,53 +1,89 @@
-/****************************************************************************
- *
- *   Copyright (c) 2015 PX4 Development Team. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- * 3. Neither the name PX4 nor the names of its contributors may be
- *    used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
- * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- ****************************************************************************/
-
-/**
- * @file hmc5883.h
- *
- * Shared defines for the hmc5883 driver.
- */
-
+/*******************************Copyright (c)***************************
+**
+** Porject name:	leader
+** Created by:		zhuzheng<happyzhull@163.com>
+** Created date:	2016/07/31
+** Modified by:
+** Modified date:
+** Descriptions:
+**
+***********************************************************************/
 #pragma once
+#include "leader_type.h"
+#include "leader_misc.h"
 
-#define ADDR_ID_A			0x0a
-#define ADDR_ID_B			0x0b
-#define ADDR_ID_C			0x0c
+#include "core.h"
+#include "interrupt.h"
+#include "device.h"
+#include "dma.h"
+#include "i2c.h"
 
+#include "packet.h"
+
+#define ADDR_CONFIG_A 	0x00 	// r/w
+#define ADDR_CONFIG_B 	0x01 	// r/w
+#define ADDR_MODE 		0x02 	// r/w
+#define ADDR_DATA_X_MSB 	0x03	// r
+#define ADDR_DATA_X_LSB 	0x04	// r
+#define ADDR_DATA_Z_MSB 	0x05	// r
+#define ADDR_DATA_Z_LSB 	0x06	// r
+#define ADDR_DATA_Y_MSB 	0x07	// r
+#define ADDR_DATA_Y_LSB 	0x08	// r
+#define ADDR_STATUS 		0x09	// r
+
+#define ADDR_ID_A	0x0A	// r
+#define ADDR_ID_B	0x0B	// r
+#define ADDR_ID_C	0x0C	// r
 #define ID_A_WHO_AM_I			'H'
 #define ID_B_WHO_AM_I			'4'
 #define ID_C_WHO_AM_I			'3'
 
-/* interface factories */
-extern device::Device *HMC5883_SPI_interface(int bus) weak_function;
-extern device::Device *HMC5883_I2C_interface(int bus) weak_function;
-typedef device::Device *(*HMC5883_constructor)(int);
+
+#define SLAVE_ADDRESS 0x3C
+
+
+/**
+ * Calibration PROM as reported by the device.
+ */
+#pragma pack(push,1)
+struct prom_s {
+	u16 factory_setup;
+	u16 c1_pres_sens;
+	u16 c2_pres_offset;
+	u16 c3_temp_coeff_pres_sens;
+	u16 c4_temp_coeff_pres_offset;
+	u16 c5_reference_temp;
+	u16 c6_temp_coeff_temp;
+	u16 serial_and_crc;
+};
+#pragma pack(pop)
+
+
+namespace driver {
+
+class hmc5883 : public device, public interrupt
+{
+public:
+    hmc5883(PCSTR name, s32 id);
+    ~hmc5883(void);
+
+public:
+	u8 _slave_addr;
+	i2c *_i2c;
+
+public:
+    s32 probe(i2c *pi2c, u8 slave_addr);
+    s32 remove(void);
+
+
+public:
+	void init(void);
+	s32 read_raw(void);
+
+	s32 read_reg8(u8 reg);
+	s32 write_reg8(u8 reg, u8 data);
+	s32 read_reg(u8 reg, u8 len, u8 *buf);
+	s32 write_reg(u8 reg, u8 len, u8 *buf);
+};
+}
+

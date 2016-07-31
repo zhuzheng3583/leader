@@ -504,10 +504,10 @@ public:
 	s8 	dmp_get_data(f32 *pitch, f32 *roll, f32 *yaw);
 
 
-	inline s32 reg_read_byte(u8 reg);
-	inline s32 reg_write_byte(u8 reg, u8 data);
-	s32 reg_read(u8 reg, u8 len, u8 *buf);
-	s32 reg_write(u8 reg, u8 len, u8 *buf);
+	inline s32 read_reg8(u8 reg);
+	inline s32 write_reg8(u8 reg, u8 data);
+	s32 read_reg(u8 reg, u8 *buf, u8 len);
+	s32 write_reg(u8 reg, u8 *buf, u8 len);
 
 public:
 	s32 self_test(void);

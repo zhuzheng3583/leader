@@ -64,7 +64,7 @@
 	#define inline							__inline
 #endif
 
-#define USE_UCOS3                           1
+#define USE_UCOS3                           0
 #define USE_STM32F4_DEMO                    0
 
 //			 ¿‡       ∂‘œÛ      ºÃ≥–

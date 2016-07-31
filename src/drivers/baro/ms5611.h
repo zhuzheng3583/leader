@@ -1,13 +1,14 @@
 /*******************************Copyright (c)***************************
 **
-** Porject name:	LeaderUAV-Plus
-** Created by:	zhuzheng<happyzhull@163.com>
-** Created date:	2015/08/28
+** Porject name:	leader
+** Created by:		zhuzheng<happyzhull@163.com>
+** Created date:	2016/07/30
 ** Modified by:
 ** Modified date:
 ** Descriptions:
 **
 ***********************************************************************/
+
 #pragma once
 #include "leader_type.h"
 #include "leader_misc.h"
@@ -88,11 +89,11 @@ public:
 
 	s32 read_raw(u8 cmd_osr);
 
-	s32 cmd_write_byte(u8 cmd, s32 ms);
-	s32 reg_read_byte(u8 reg);
-	s32 reg_write_byte(u8 reg, u8 data);
-	s32 reg_read(u8 reg, u8 len, u8 *buf);
-	s32 reg_write(u8 reg, u8 len, u8 *buf);
+	s32 write_cmd8(u8 cmd, s32 ms);
+	s32 read_reg8(u8 reg);
+	s32 write_reg8(u8 reg, u8 data);
+	s32 read_reg(u8 reg, u8 *buf, u8 len);
+	s32 write_reg(u8 reg, u8 *buf, u8 len);
 };
 }
 

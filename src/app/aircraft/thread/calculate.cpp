@@ -54,6 +54,14 @@ void calculate::run(void *parg)
 
 		pitem_mpu  = (item_mpu_t *)(ppacket->get_item_data(ID_ITEM_MPU));
         core::mdelay(100);
+        pitem_mpu->num
+        pitem_mpu->data_mpu[0].acce.x
+            pitem_mpu->data_mpu[0].acce.y
+            pitem_mpu->data_mpu[0].acce.z
+            pitem_mpu->data_mpu[0].gyro.z
+
+        pitem_baro = (item_baro_t *)(ppacket->get_item_data(ID_ITEM_BARO));
+        pitem_baro->data_baro[0].altitude
 
         // 发送消息队列给tran任务，将数据缓冲区首地址推向tran任务
 		sync_ct->post((void *)packet_addr, sizeof(void *), 1000);

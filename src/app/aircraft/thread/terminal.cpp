@@ -33,8 +33,9 @@ void terminal::run(void *parg)
 	for (u32 cnt = 0; ;cnt++)
 	{
 		/* TODO:÷’∂ÀΩªª• */
-		INF("%s: task is active[%u]...\n", _name, cnt);
-		msleep(200);
+        msleep(100);
+		//DBG("%s: task is active[%u]...\n", _name, cnt);
+		
 	}
 }
 

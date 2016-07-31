@@ -96,10 +96,10 @@ s32 leader_system::init(void)
     //_puart3->self_test();
 	_niming = new niming;
 	_niming->attach(_puart3);
-    
+
     _spi1 = new spi("spi-1", 1);
     _spi1->probe();
-    
+
     _mpu6000_gpio_cs = new gpio("mpu6000_gpio_cs-34", 34);
 	_mpu6000_gpio_cs->probe();
 	_mpu6000 = new mpu6000("mpu6000", -1);
@@ -126,16 +126,10 @@ s32 leader_system::init(void)
 	_sensorhub->probe(_usb_dev);
 	//_sensorhub->self_test();
 
-	_led = new gpio("gpio-79", 79);
-	_led->probe();
-	_led->set_direction_output();
-	//_led->self_test();
-
 	_gpio_irq = new gpio("gpio-0", 0);
 	_gpio_irq->probe();
 	_gpio_irq->set_gpio_to_irq();
 	//while(1);
-
 
 	_timer = new timer("timer-2", 2);
 	_timer->probe();
@@ -157,53 +151,31 @@ s32 leader_system::init(void)
 	_pwm->start(PWM_CHANNEL_4);
 
 
-	gpio *pgpio = new gpio("gpio-67", 67);
-	pgpio->probe();
-	pgpio->set_direction_output();
-	pgpio->set_value(1);
-	_spi1 = new spi("spi-1", 1);
-	_spi1->probe();
-
-
-  	u8 dev_id = 0;
-	u8 addr = 0;//L3GD20_WHO_AM_I_ADDR;
-	if(sizeof(dev_id) > 0x01) {
-		addr |= (u8)(READWRITE_CMD | MULTIPLEBYTE_CMD);
-  	} else {
-		addr |= (u8)READWRITE_CMD;
-  	}
-
-	pgpio->set_value(0);
-	_spi->tx(&addr, sizeof(addr));
-	_spi->rx(&dev_id, sizeof(dev_id));
-	INF("dev_id = 0x%02x.\n", dev_id);
-	pgpio->set_value(1);
-
     while(1);
 #endif
 
     _packet = new packet;
     _packet->create(NULL);
-    
+
     _sync_rc = new msgque;
-    _sync_rc->create("sync_rc", 1);
     _sync_ct = new msgque;
-    _sync_ct->create("sync_ct", 1);
     _sync = new msgque;
+    _sync_rc->create("sync_rc", 1);
+    _sync_ct->create("sync_ct", 1);
     _sync->create("sync", 1);
-    
+
     _heartbeat = new heartbeat;
+    _terminal = new terminal;
     _receive = new receive;
     _calculate = new calculate;
     _transmit = new transmit;
-    //_terminal = new terminal;
 
 	_heartbeat->create(NULL);
+    _terminal->create(NULL);
 	_receive->create(NULL);
     _calculate->create(NULL);
 	_transmit->create(NULL);
-	//_terminal->create(NULL);
-
+	
 	if(ret < 0) {
 		INF("Failed to leader_system::init");
 		CAPTURE_ERR();
