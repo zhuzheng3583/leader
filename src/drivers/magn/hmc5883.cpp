@@ -52,7 +52,7 @@ s32 hmc5883::init(void)
 	u8 id_a = hmc5883::read_reg8(ADDR_ID_A);
 	u8 id_b = hmc5883::read_reg8(ADDR_ID_B);
 	u8 id_c = hmc5883::read_reg8(ADDR_ID_C);
-    if ((id_a != ID_A_WHO_AM_I) || (id_b != ID_A_WHO_AM_I) || (id_c != ID_A_WHO_AM_I)) {
+    if ((id_a != ID_A_WHO_AM_I) || (id_b != ID_B_WHO_AM_I) || (id_c != ID_C_WHO_AM_I)) {
         return -1;
     }
 

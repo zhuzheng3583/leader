@@ -47,9 +47,12 @@
 #define ADDR_ID_C	0x0C	// r
 
 //三个识别寄存器的默认值
-#define ID_A_WHO_AM_I			'H' //0x48
-#define ID_B_WHO_AM_I			'4' //0x34
-#define ID_C_WHO_AM_I			'3' //0x33
+//0x48
+#define ID_A_WHO_AM_I			'H' 
+//0x34
+#define ID_B_WHO_AM_I			'4' 
+//0x33
+#define ID_C_WHO_AM_I			'3' 
 
 
 #define HMC5883_SLAVE_ADDRESS 0x3C //写地址,读地址+1
