@@ -35,12 +35,13 @@ struct stm32_i2c_hw_table
 
 static struct stm32_i2c_hw_table i2c_hw_table[] = {
 	[0] = { NULL },
-	[1] = {
+    [1] = {
 		.GPIOx = GPIOB,
 		.IRQn = (IRQn_Type)NULL,
 		.I2C_Handle = {
 			.Instance = I2C1,
 			.Init = {
+                .ClockSpeed = 400000,
 				.OwnAddress1 =  0xff,//_slave_addr
 				.AddressingMode = I2C_ADDRESSINGMODE_7BIT,
 				.DualAddressMode = I2C_DUALADDRESS_DISABLE,
@@ -59,6 +60,32 @@ static struct stm32_i2c_hw_table i2c_hw_table[] = {
 		.dma_tx_id = 6,
 		.dma_rx_id = 7,
 	},
+    [2] = {
+        .GPIOx = GPIOB,
+        .IRQn = (IRQn_Type)NULL,
+        .I2C_Handle = {
+            .Instance = I2C2,
+            .Init = {
+                .ClockSpeed = 400000,
+                .OwnAddress1 =  0xff,//_slave_addr
+                .AddressingMode = I2C_ADDRESSINGMODE_7BIT,
+                .DualAddressMode = I2C_DUALADDRESS_DISABLE,
+                .OwnAddress2 = 0,
+                .GeneralCallMode = I2C_GENERALCALL_DISABLE,
+                .NoStretchMode = I2C_NOSTRETCH_DISABLE,
+            },
+        },
+        .GPIO_Init = {
+            .Pin = (GPIO_PIN_10 | GPIO_PIN_11),
+            .Mode = GPIO_MODE_AF_OD, //GPIO_MODE_AF_PP, //
+            .Pull = GPIO_PULLUP, //GPIO_PULLDOWN, //
+            .Speed = GPIO_SPEED_FREQ_HIGH,
+            .Alternate = GPIO_AF4_I2C2,
+        },
+        .dma_tx_id = 6,
+        .dma_rx_id = 7,
+    },
+
 };
 
 //id = [1,2]
@@ -106,6 +133,10 @@ s32 i2c::probe(void)
 	  	__HAL_RCC_I2C1_CLK_ENABLE();
 		break;
 	case 2:
+        /* Enable SCK SDA and GPIO clocks */
+	  	__HAL_RCC_GPIOB_CLK_ENABLE();
+	  	/* Enable the I2C clock */
+	  	__HAL_RCC_I2C2_CLK_ENABLE();
 		break;
 	default:
 		break;
@@ -190,7 +221,8 @@ s32 i2c::remove(void)
 	  	__HAL_RCC_I2C1_RELEASE_RESET();
 		break;
 	case 2:
-
+	  	__HAL_RCC_I2C2_FORCE_RESET();
+	  	__HAL_RCC_I2C2_RELEASE_RESET();
 		break;
 	default:
 		break;

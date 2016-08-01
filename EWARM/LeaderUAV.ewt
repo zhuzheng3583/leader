@@ -3288,6 +3288,12 @@
     </group>
     <group>
       <name>magn</name>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\magn\hmc5883.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\magn\hmc5883.h</name>
+      </file>
     </group>
     <file>
       <name>$PROJ_DIR$\..\src\drivers\core.cpp</name>

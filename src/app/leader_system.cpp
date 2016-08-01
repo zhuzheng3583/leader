@@ -109,6 +109,11 @@ s32 leader_system::init(void)
 	_ms5611_gpio_cs->probe();
     _ms5611 = new ms5611("ms5611", -1);
     _ms5611->probe(_spi1, _ms5611_gpio_cs);
+
+    _i2c2 = new i2c("i2c-2", 2);
+    _i2c2->probe();
+    _hmc5883 = new hmc5883("hmc5883", -1);
+    _hmc5883->probe(_i2c2, HMC5883_SLAVE_ADDRESS);
 #if 0
 
 	_pflash = new flash("flash", -1);
@@ -175,7 +180,7 @@ s32 leader_system::init(void)
 	_receive->create(NULL);
     _calculate->create(NULL);
 	_transmit->create(NULL);
-	
+
 	if(ret < 0) {
 		INF("Failed to leader_system::init");
 		CAPTURE_ERR();

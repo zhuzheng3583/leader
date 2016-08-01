@@ -23,8 +23,10 @@
 #include "timer.h"
 #include "pwm.h"
 #include "spi.h"
+
 #include "mpu6000.h"
 #include "ms5611.h"
+#include "hmc5883.h"
 
 #include "demo_main.h"
 
@@ -78,6 +80,7 @@ public:
     gpio                    *_ms5611_gpio_cs;
     mpu6000					*_mpu6000;
     ms5611					*_ms5611;
+	hmc5883					*_hmc5883;
 
     flash                   *_pflash;
 
@@ -121,6 +124,7 @@ public:
 
     mpu6000   	*get_mpu6000(void)        	{ return _mpu6000; }
 	ms5611		*get_ms5611(void)        	{ return _ms5611; }
+	hmc5883		*get_hmc5883(void)        	{ return _hmc5883; }
 
     msgque   	*get_sync_rc(void)			{ return _sync_rc; }
     msgque   	*get_sync_ct(void)			{ return _sync_ct; }

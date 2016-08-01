@@ -2279,6 +2279,7 @@
           <state>$PROJ_DIR$\..\src\drivers</state>
           <state>$PROJ_DIR$\..\src\drivers\accel</state>
           <state>$PROJ_DIR$\..\src\drivers\baro</state>
+          <state>$PROJ_DIR$\..\src\drivers\magn</state>
           <state>$PROJ_DIR$\..\src\dsp</state>
           <state>$PROJ_DIR$\..\src\os</state>
           <state>$PROJ_DIR$\..\src\protocols</state>
@@ -3092,6 +3093,12 @@
     </group>
     <group>
       <name>magn</name>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\magn\hmc5883.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\magn\hmc5883.h</name>
+      </file>
     </group>
     <file>
       <name>$PROJ_DIR$\..\src\drivers\core.cpp</name>

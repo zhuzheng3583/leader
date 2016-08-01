@@ -25,7 +25,7 @@ if not "%~1" == "" goto debugFile
 
 @echo on 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.3\common\bin\cspybat" -f "E:\code\SKYVIEW_H_SUB\LeaderUAV\STM32Cube_FW_F4_V1.11.0\Projects\STM32F4-Discovery\Examples\I2C\I2C_TwoBoards_ComPolling\EWARM\settings\Project.STM32F4-Discovery.general.xcl" --backend -f "E:\code\SKYVIEW_H_SUB\LeaderUAV\STM32Cube_FW_F4_V1.11.0\Projects\STM32F4-Discovery\Examples\I2C\I2C_TwoBoards_ComPolling\EWARM\settings\Project.STM32F4-Discovery.driver.xcl" 
+"C:\Program Files\IAR Systems\Embedded Workbench 7.3\common\bin\cspybat" -f "E:\code\LeaderUAV\STM32Cube_FW_F4_V1.11.0\Projects\STM32F4-Discovery\Examples\I2C\I2C_TwoBoards_ComPolling\EWARM\settings\Project.STM32F4-Discovery.general.xcl" --backend -f "E:\code\LeaderUAV\STM32Cube_FW_F4_V1.11.0\Projects\STM32F4-Discovery\Examples\I2C\I2C_TwoBoards_ComPolling\EWARM\settings\Project.STM32F4-Discovery.driver.xcl" 
 
 @echo off 
 goto end 
@@ -34,7 +34,7 @@ goto end
 
 @echo on 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.3\common\bin\cspybat" -f "E:\code\SKYVIEW_H_SUB\LeaderUAV\STM32Cube_FW_F4_V1.11.0\Projects\STM32F4-Discovery\Examples\I2C\I2C_TwoBoards_ComPolling\EWARM\settings\Project.STM32F4-Discovery.general.xcl" "--debug_file=%~1" --backend -f "E:\code\SKYVIEW_H_SUB\LeaderUAV\STM32Cube_FW_F4_V1.11.0\Projects\STM32F4-Discovery\Examples\I2C\I2C_TwoBoards_ComPolling\EWARM\settings\Project.STM32F4-Discovery.driver.xcl" 
+"C:\Program Files\IAR Systems\Embedded Workbench 7.3\common\bin\cspybat" -f "E:\code\LeaderUAV\STM32Cube_FW_F4_V1.11.0\Projects\STM32F4-Discovery\Examples\I2C\I2C_TwoBoards_ComPolling\EWARM\settings\Project.STM32F4-Discovery.general.xcl" "--debug_file=%~1" --backend -f "E:\code\LeaderUAV\STM32Cube_FW_F4_V1.11.0\Projects\STM32F4-Discovery\Examples\I2C\I2C_TwoBoards_ComPolling\EWARM\settings\Project.STM32F4-Discovery.driver.xcl" 
 
 @echo off 
 :end
