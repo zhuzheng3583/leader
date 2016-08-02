@@ -3287,6 +3287,15 @@
       </file>
     </group>
     <group>
+      <name>gps</name>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\gps\gps.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\gps\gps.h</name>
+      </file>
+    </group>
+    <group>
       <name>magn</name>
       <file>
         <name>$PROJ_DIR$\..\src\drivers\magn\hmc5883.cpp</name>

@@ -146,6 +146,36 @@ static struct stm32_dma_hw_table dma_hw_table[] = {
             },
         },
     },
+    [108] = {
+        .DMAx = DMA2,
+        .IRQn = DMA2_Stream5_IRQn,
+        .DMA_Handle = {
+        .Instance = DMA2_Stream5,
+            .Init = {
+                .Channel        = DMA_CHANNEL_4,
+                .Mode           = DMA_NORMAL,
+                .FIFOMode       = DMA_FIFOMODE_DISABLE,
+                .FIFOThreshold  = DMA_FIFO_THRESHOLD_FULL,
+                .MemBurst       = DMA_MBURST_INC4,
+                .PeriphBurst    = DMA_PBURST_INC4,
+            },
+        },
+    },
+    [124] = {
+        .DMAx = DMA2,
+        .IRQn = DMA2_Stream7_IRQn,
+        .DMA_Handle = {
+        .Instance = DMA2_Stream7,
+            .Init = {
+                .Channel        = DMA_CHANNEL_4,
+                .Mode           = DMA_NORMAL,
+                .FIFOMode       = DMA_FIFOMODE_DISABLE,
+                .FIFOThreshold  = DMA_FIFO_THRESHOLD_FULL,
+                .MemBurst       = DMA_MBURST_INC4,
+                .PeriphBurst    = DMA_PBURST_INC4,
+            },
+        },
+    },
 };
 
 dma::dma(PCSTR name, s32 id) :

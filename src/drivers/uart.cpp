@@ -37,6 +37,30 @@ struct stm32_uart_hw_table
 
 static struct stm32_uart_hw_table uart_hw_table[] = {
 	[0] = { NULL },
+	[1] = {
+		.GPIOx = GPIOB,
+		.IRQn = USART1_IRQn,
+		.UART_Handle = {
+			.Instance = USART1,
+			.Init = {
+				.BaudRate   = 115200,
+				.WordLength = UART_WORDLENGTH_8B,
+				.StopBits   = UART_STOPBITS_1,
+				.Parity     = UART_PARITY_NONE,
+				.HwFlowCtl  = UART_HWCONTROL_NONE,
+				.Mode       = UART_MODE_TX_RX,
+			},
+		},
+		.GPIO_Init = {
+			.Pin       = GPIO_PIN_6 | GPIO_PIN_7,
+			.Mode      = GPIO_MODE_AF_PP,
+			.Pull      = GPIO_NOPULL,
+			.Speed     = GPIO_SPEED_FREQ_HIGH,
+			.Alternate = GPIO_AF7_USART1,
+		},
+		.dma_tx_id = 124,
+		.dma_rx_id = 108,
+	},
 	[2] = {
 		.GPIOx = GPIOA,
 		.IRQn = USART2_IRQn,
@@ -123,7 +147,7 @@ s32 uart::probe(void)
 	case 1:
 		/* 1- Enable USARTx peripherals and GPIO Clocks */
 		//__HAL_RCC_GPIOE_CLK_ENABLE();
-		__HAL_RCC_GPIOC_CLK_ENABLE();
+		__HAL_RCC_GPIOB_CLK_ENABLE();
 		__HAL_RCC_USART1_CLK_ENABLE();
 		break;
 	case 2:

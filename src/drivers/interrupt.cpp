@@ -110,27 +110,6 @@ extern "C" {
   * @param  None
   * @retval None
   */
-#if 0
-void SysTick_Handler(void)
-{
-#if USE_UCOS3
-	OSIntEnter();							// 进入中断
-#endif
-
-#if defined(USE_HAL_DRIVER)
-    HAL_IncTick();
-#if (USE_STM32F4_DEMO)
-	/* Call user callback */
-	HAL_SYSTICK_IRQHandler();
-#endif
-#endif
-
-#if USE_UCOS3
-	OSTimeTick();       					// 调用ucos的时钟服务程序
-	OSIntExit();        					// 触发任务切换软中断
-#endif
-}
-#else
 void SysTick_Handler(void)
 {
 #if defined(USE_HAL_DRIVER)
@@ -142,101 +121,54 @@ void SysTick_Handler(void)
 #endif
     osSystickHandler();
 }
-#endif
 
 void USART1_IRQHandler(void)
 {
-#if USE_UCOS3
-	OSIntEnter();		//进入中断
-#endif
 	interrupt::s_map[USART1_IRQn].handler->isr();
-#if USE_UCOS3
-	OSIntExit();        //触发任务切换软中断
-#endif
+}
+void DMA2_Stream5_IRQHandler(void)
+{
+	interrupt::s_map[DMA2_Stream5_IRQn].handler->isr();
+}
+void DMA2_Stream7_IRQHandler(void)
+{
+	interrupt::s_map[DMA2_Stream7_IRQn].handler->isr();
 }
 
 void USART2_IRQHandler(void)
 {
-#if USE_UCOS3
-	OSIntEnter();
-#endif
 	interrupt::s_map[USART2_IRQn].handler->isr();
-#if USE_UCOS3
-	OSIntExit();
-#endif
 }
 void DMA1_Stream5_IRQHandler(void)
 {
-#if USE_UCOS3
-	OSIntEnter();
-#endif
 	interrupt::s_map[DMA1_Stream5_IRQn].handler->isr();
-#if USE_UCOS3
-	OSIntExit();
-#endif
 }
 void DMA1_Stream6_IRQHandler(void)
 {
-#if USE_UCOS3
-	OSIntEnter();
-#endif
 	interrupt::s_map[DMA1_Stream6_IRQn].handler->isr();
-#if USE_UCOS3
-	OSIntExit();
-#endif
 }
 
 void USART3_IRQHandler(void)
 {
-#if USE_UCOS3
-	OSIntEnter();
-#endif
 	interrupt::s_map[USART3_IRQn].handler->isr();
-#if USE_UCOS3
-	OSIntExit();
-#endif
 }
 void DMA1_Stream1_IRQHandler(void)
 {
-#if USE_UCOS3
-	OSIntEnter();
-#endif
 	interrupt::s_map[DMA1_Stream1_IRQn].handler->isr();
-#if USE_UCOS3
-	OSIntExit();
-#endif
 }
 void DMA1_Stream3_IRQHandler(void)
 {
-#if USE_UCOS3
-	OSIntEnter();
-#endif
 	interrupt::s_map[DMA1_Stream3_IRQn].handler->isr();
-#if USE_UCOS3
-	OSIntExit();
-#endif
 }
 
 
 void DMA2_Stream2_IRQHandler(void)
 {
-#if USE_UCOS3
-	OSIntEnter();
-#endif
 	interrupt::s_map[DMA2_Stream2_IRQn].handler->isr();
-#if USE_UCOS3
-	OSIntExit();
-#endif
 }
 void DMA2_Stream3_IRQHandler(void)
 {
-#if USE_UCOS3
-	OSIntEnter();
-#endif
 	interrupt::s_map[DMA2_Stream3_IRQn].handler->isr();
-#if USE_UCOS3
-	OSIntExit();
-#endif
 }
 
 

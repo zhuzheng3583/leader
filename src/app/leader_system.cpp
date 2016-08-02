@@ -97,6 +97,11 @@ s32 leader_system::init(void)
 	_niming = new niming;
 	_niming->attach(_puart3);
 
+    _puart1 = new uart("uart-1", 1);
+	_puart1->probe();
+    gps *pgps = new gps("gps", -1);
+    pgps->probe(_puart1);
+    
     _spi1 = new spi("spi-1", 1);
     _spi1->probe();
 
@@ -114,6 +119,8 @@ s32 leader_system::init(void)
     _i2c2->probe();
     _hmc5883 = new hmc5883("hmc5883", -1);
     _hmc5883->probe(_i2c2, HMC5883_SLAVE_ADDRESS);
+    
+
 #if 0
 
 	_pflash = new flash("flash", -1);

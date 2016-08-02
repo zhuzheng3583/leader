@@ -27,6 +27,7 @@
 #include "mpu6000.h"
 #include "ms5611.h"
 #include "hmc5883.h"
+#include "gps.h"
 
 #include "demo_main.h"
 

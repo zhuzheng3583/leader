@@ -2280,6 +2280,7 @@
           <state>$PROJ_DIR$\..\src\drivers\accel</state>
           <state>$PROJ_DIR$\..\src\drivers\baro</state>
           <state>$PROJ_DIR$\..\src\drivers\magn</state>
+          <state>$PROJ_DIR$\..\src\drivers\gps</state>
           <state>$PROJ_DIR$\..\src\dsp</state>
           <state>$PROJ_DIR$\..\src\os</state>
           <state>$PROJ_DIR$\..\src\protocols</state>
@@ -3089,6 +3090,15 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\src\drivers\baro\ms5611.h</name>
+      </file>
+    </group>
+    <group>
+      <name>gps</name>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\gps\gps.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\gps\gps.h</name>
       </file>
     </group>
     <group>
