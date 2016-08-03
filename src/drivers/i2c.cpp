@@ -276,21 +276,21 @@ s32 i2c::transfer(struct i2c_msg *msgs, int num)
 			status = HAL_I2C_Mem_Read_DMA(hi2c, addr, (u16)reg, addr_len, buf, len);
 			//pend eventrx
 			s32 ret = 0;
-			wait_condition_ms(_eventrx == 1, I2C_DMA_TIMEOUT_MS, &ret);
+			wait_condition_ms(_flag_rx == 1, I2C_DMA_TIMEOUT_MS, &ret);
 			if (ret < 0) {
 				return -1;
 			} else {
-				_eventrx = 0;
+				_flag_rx = 0;
 			}
 		} else {
 			status = HAL_I2C_Mem_Write_DMA(hi2c, addr, (u16)reg, addr_len, buf, len);
 			//pend eventtx
 			s32 ret = 0;
-			wait_condition_ms(_eventtx == 1, I2C_DMA_TIMEOUT_MS, &ret);
+			wait_condition_ms(_flag_tx == 1, I2C_DMA_TIMEOUT_MS, &ret);
 			if (ret < 0) {
 				return -1;
 			} else {
-				_eventtx = 0;
+				_flag_tx = 0;
 			}
 		}
 #elif (I2C_MODE == I2C_IT_MODE)
@@ -316,21 +316,21 @@ s32 i2c::transfer(struct i2c_msg *msgs, int num)
 			status = HAL_I2C_Master_Receive_DMA(hi2c, addr, buf, len);
 			//pend eventrx
             s32 ret = 0;
-			wait_condition_ms(_eventrx == 1, I2C_DMA_TIMEOUT_MS, &ret);
+			wait_condition_ms(_flag_rx == 1, I2C_DMA_TIMEOUT_MS, &ret);
 			if (ret < 0) {
 				return -1;
 			} else {
-				_eventrx = 0;
+				_flag_rx = 0;
 			}
 		} else {
 			status = HAL_I2C_Master_Transmit_DMA(hi2c, addr, buf, len);
 			//pend eventtx
 			s32 ret = 0;
-			wait_condition_ms(_eventtx == 1, I2C_DMA_TIMEOUT_MS, &ret);
+			wait_condition_ms(_flag_tx == 1, I2C_DMA_TIMEOUT_MS, &ret);
 			if (ret < 0) {
 				return -1;
 			} else {
-				_eventtx = 0;
+				_flag_tx = 0;
 			}
 		}
 #elif (I2C_MODE == I2C_IT_MODE)
@@ -455,7 +455,7 @@ void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
 	}
 
 	if (pi2c != NULL) {
-		pi2c->_eventtx = 1;
+		pi2c->_flag_tx = 1;
 	}
 }
 
@@ -470,7 +470,7 @@ void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
 	}
 
 	if (pi2c != NULL) {
-		pi2c->_eventrx = 1;
+		pi2c->_flag_rx = 1;
 	}
 }
 
@@ -485,7 +485,7 @@ void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c)
 	}
 
 	if (pi2c != NULL) {
-		pi2c->_eventtx = 1;
+		pi2c->_flag_tx = 1;
 	}
 }
 
@@ -500,7 +500,7 @@ void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c)
 	}
 
 	if (pi2c != NULL) {
-		pi2c->_eventrx = 1;
+		pi2c->_flag_rx = 1;
 	}
 }
 

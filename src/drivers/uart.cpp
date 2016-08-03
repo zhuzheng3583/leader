@@ -115,8 +115,8 @@ static struct stm32_uart_hw_table uart_hw_table[] = {
 uart::uart(PCSTR name, s32 id) :
 	device(name, id),
 	_baudrate(115200),
-	_eventtx(0),
-	_eventrx(0)
+	_flag_tx(0),
+	_flag_rx(0)
 {
 	// For stm32_cube_lib C callback
 	uart_hw_table[_id].puart = this;
@@ -129,16 +129,11 @@ uart::~uart(void)
 
 s32 uart::probe(void)
 {
-	if (device::probe() < 0) {
-		//ERR("%s: failed to probe.\n", _name);
-		goto fail0;
-	}
-
 	UART_HandleTypeDef *huart = &uart_hw_table[_id].UART_Handle;
 	if(HAL_UART_GetState(huart) != HAL_UART_STATE_RESET)
 	{
 		//ERR("%s: failed HAL_UART_GetState.\n", _name);
-		goto fail1;
+		goto fail0;
 	}
 
 	//void HAL_UART_MspInit(UART_HandleTypeDef *huart)
@@ -174,7 +169,7 @@ s32 uart::probe(void)
 
 	/* 3- Configure the UART peripheral*/
   	if(HAL_UART_Init(huart) != HAL_OK) {
-		goto fail2;
+		goto fail1;
   	}
 	_handle = (u32)huart;
 
@@ -205,10 +200,8 @@ s32 uart::probe(void)
 	INF("%s: probe success.\n", _name);
 	return 0;
 
-fail2:
-	HAL_GPIO_DeInit(GPIOx, GPIO_Init->Pin);
 fail1:
-	device::remove();
+	HAL_GPIO_DeInit(GPIOx, GPIO_Init->Pin);
 fail0:
 	return -1;
 }
@@ -216,9 +209,6 @@ fail0:
 s32 uart::remove(void)
 {
 	UART_HandleTypeDef *huart = (UART_HandleTypeDef *)_handle;
-	if (device::remove() < 0) {
-		goto fail0;
-	}
 #if (UART_MODE == UART_IT_MODE || UART_MODE == UART_DMA_MODE)
 	interrupt::disable_irq(_irq);
 #endif
@@ -231,7 +221,7 @@ s32 uart::remove(void)
 	_dmarx = NULL;
 #endif
 	if(HAL_UART_DeInit(huart)!= HAL_OK) {
-    		goto fail1;
+        goto fail0;
 	}
 
 	//void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
@@ -262,34 +252,11 @@ s32 uart::remove(void)
 	_handle = NULL;
 	return 0;
 
-fail1:
 fail0:
     return -1;
 }
 
-s32 uart::open(s32 flags)
-{
-	if (device::open(flags) < 0) {
-		//ERR("%s: failed to open.\n", _name);
-		CAPTURE_ERR();
-        return -1;
-	}
-
-	return 0;
-}
-
-s32 uart::close(void)
-{
-	if (device::close() < 0) {
-        //ERR("%s: failed to close.\n", _name);
-        CAPTURE_ERR();
-		return -1;
-	}
-
-	return 0;
-}
-
-s32 uart::read(u8 *buf, u32 count)
+s32 uart::recv(u8 *buf, u32 count)
 {
     u32 readcnt = 0;
 
@@ -301,25 +268,25 @@ s32 uart::read(u8 *buf, u32 count)
 	if(HAL_UART_Receive_IT((UART_HandleTypeDef*)_handle, (uint8_t*)buf, count) != HAL_OK) {
 		//CAPTURE_ERR();
 	}
-	//pend rx_event
+	//pend _flag_rx
 	s32 ret = 0;
-	wait_condition_ms(_eventrx == 1, UART_IT_TIMEOUT_MS, &ret);
+	wait_condition_ms(_flag_rx == 1, UART_IT_TIMEOUT_MS, &ret);
 	if (ret < 0) {
 		return -1;
 	} else {
-		_eventrx = 0;
+		_flag_rx = 0;
 	}
 #elif (UART_MODE == UART_DMA_MODE)
 	if(HAL_UART_Receive_DMA((UART_HandleTypeDef*)_handle, (uint8_t*)buf, count) != HAL_OK) {
 		//CAPTURE_ERR();
 	}
-	//pend rx_event
+	//pend _flag_rx
 	s32 ret = 0;
-	wait_condition_ms(_eventrx == 1, UART_DMA_TIMEOUT_MS, &ret);
+	wait_condition_ms(_flag_rx == 1, UART_DMA_TIMEOUT_MS, &ret);
 	if (ret < 0) {
 		return -1;
 	} else {
-		_eventrx = 0;
+		_flag_rx = 0;
 	}
 
 #endif
@@ -328,7 +295,7 @@ s32 uart::read(u8 *buf, u32 count)
 	return readcnt;
 }
 
-s32 uart::write(u8 *buf, u32 count)
+s32 uart::send(u8 *buf, u32 count)
 {
     u32 writecnt = 0;
 
@@ -342,11 +309,11 @@ s32 uart::write(u8 *buf, u32 count)
 	}
 	//pend tx_event
 	s32 ret = 0;
-	wait_condition_ms(_eventtx == 1, UART_IT_TIMEOUT_MS, &ret);
+	wait_condition_ms(_flag_tx == 1, UART_IT_TIMEOUT_MS, &ret);
 	if (ret < 0) {
 		return -1;
 	} else {
-		_eventtx = 0;
+		_flag_tx = 0;
 	}
 #elif (UART_MODE == UART_DMA_MODE)
 	if(HAL_UART_Transmit_DMA((UART_HandleTypeDef*)_handle, (uint8_t*)buf, count) != HAL_OK) {
@@ -354,11 +321,11 @@ s32 uart::write(u8 *buf, u32 count)
 	}
 	//pend tx_event
 	s32 ret = 0;
-	wait_condition_ms(_eventtx == 1, UART_DMA_TIMEOUT_MS, &ret);
+	wait_condition_ms(_flag_tx == 1, UART_DMA_TIMEOUT_MS, &ret);
 	if (ret < 0) {
 		return -1;
 	} else {
-		_eventtx = 0;
+		_flag_tx = 0;
 	}
 #endif
 
@@ -390,11 +357,34 @@ s32 uart::self_test(void)
 #endif
 }
 
+s32 uart::open(s32 flags)
+{
+
+	return 0;
+}
+
+s32 uart::close(void)
+{
+
+	return 0;
+}
+
+s32 uart::read(u8 *buf, u32 count)
+{
+	return recv(buf, count);
+}
+
+s32 uart::write(u8 *buf, u32 count)
+{
+	return send(buf, count);
+}
+
+
+
 void uart::isr(void)
 {
 	HAL_UART_IRQHandler((UART_HandleTypeDef *)_handle);
 }
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -412,7 +402,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 	}
 
 	if (puart != NULL) {
-		puart->_eventtx = 1;
+		puart->_flag_tx = 1;
 	}
 }
 
@@ -427,7 +417,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	}
 
 	if (puart != NULL) {
-		puart->_eventrx = 1;
+		puart->_flag_rx = 1;
 	}
 }
 

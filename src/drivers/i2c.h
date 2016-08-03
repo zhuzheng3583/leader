@@ -48,8 +48,8 @@ public:
     s32 _dma_tx_id;
     s32 _dma_rx_id;
 
-    s32 _eventtx;
-    s32 _eventrx;
+    s32 _flag_tx;
+    s32 _flag_rx;
     
 public:
     s32 probe(void);

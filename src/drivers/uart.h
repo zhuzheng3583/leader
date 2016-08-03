@@ -33,24 +33,29 @@ public:
     s32 _dma_tx_id;
     s32 _dma_rx_id;
     
-    s32 _eventtx;
-    s32 _eventrx;
+    s32 _flag_tx;
+    s32 _flag_rx;
     
 public:
     s32 probe(void);
     s32 remove(void);
 
-    void    set_baudrate(u32 baudrate)	{ _baudrate = baudrate; }
-    u32     get_baudrate(void)			{ return _baudrate; }
+    void set_baudrate(u32 baudrate)	{ _baudrate = baudrate; }
+    u32 get_baudrate(void)			{ return _baudrate; }
 
-public:
+    s32 recv(u8 *buf, u32 count);
+    s32 send(u8 *buf, u32 count);
+
     s32 self_test(void);
+
     
 public:
     virtual s32 open(s32 flags);
     virtual s32 read(u8 *buf, u32 count);
     virtual s32 write(u8 *buf, u32 count);
     virtual s32 close(void);
+
+    
 public:
     virtual void isr(void); 
 };
