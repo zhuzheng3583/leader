@@ -30,8 +30,8 @@ struct stm32_uart_hw_table
 	UART_HandleTypeDef	UART_Handle;
 	GPIO_InitTypeDef  	GPIO_Init;
 
-	s32                 dma_tx_id;
-	s32             	dma_rx_id;
+	s32             		dma_tx_id;
+	s32             		dma_rx_id;
 	uart 				*puart;
 };
 
@@ -376,7 +376,7 @@ s32 uart::self_test(void)
     while (1) {
       uart::read(rbuf, ARRAYSIZE(rbuf));
       INF("%s", rbuf);
-
+      
       //uart::write(rbuf, ARRAYSIZE(wbuf));
     }
 #else

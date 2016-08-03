@@ -125,10 +125,10 @@ u8 ublox_cfg_ack_check(void)
 			rval = 2;						//没有找到同步字符
 		else if(USART3_RX_BUF[i+3] == 0X00)
 			rval = 3;//接收到NACK应答
-		else 
+		else
 			rval = 0;	   						//接收到ACK应答
 	}
-	else 
+	else
 	rval = 1;								//接收超时错误
 	USART3_RX_ST A= 0;							//清除接收
 	return rval;
@@ -298,13 +298,7 @@ s32 gps::probe(uart *puart)
     _uart = puart;
 
     u8 buf[] = {
-        "$GPGSV,4,2,15,09,02,038,,12,07,237,24,13,44,186,32,15,16,211,21*71     \
-        $GPGSV,4,3,15,19,16,161,24,20,20,269,,25,05,271,,29,29,314,29*73      \
-        $GPGSV,4,4,15,30,14,098,,42,46,140,,50,46,140,*49                     \
-        $GLGSV,2,1,06,68,42,021,,70,15,239,27,82,14,151,24,83,70,150,29*6A    \
-        $GLGSV,2,2,06,84,50,331,17,,,,24*5B                                   \
-        $GNGLL,3106.06238,N,12115.08433,E,111807.00,A,A*78                    \
-        $GNRMC,111808.00,A,3106.06235,N,12115.08438,E,0.204,,310716,,,A*6C    \
+        "$GNRMC,111808.00,A,3106.06235,N,12115.08438,E,0.204,,310716,,,A*6C    \
         $GNVTG,,T,,M,0.204,N,0.378,K,A*37                                     \
         $GNGGA,111808.00,3106.06235,N,12115.08438,E,1,09,1.15,63.4,M,9.4,M,,*44   \
         $GNGSA,A,3,13,06,19,15,05,29,12,02,,,,,1.93,1.15,1.55*14                  \
@@ -317,11 +311,11 @@ s32 gps::probe(uart *puart)
         $GLGSV,2,2,06,84,50,331,17,,,,24*5B                                       \
         $GNGLL,3106.06235,N,12115.08438,E,111808.00,A,A*71"
     };
-    
+
     nmea_msg gpsx;
     memset(&gpsx, 0, sizeof(nmea_msg));
     gps::parse(&gpsx, buf);
-    
+
     gps::init();
 
     return 0;
@@ -396,7 +390,7 @@ u32 gps::NMEA_Pow(u8 m, u8 n)
 	u32 result = 1;
 	while(n--)
 		result *= m;
-	
+
 	return result;
 }
 //str转换为数字,以','或者'*'结束
@@ -417,7 +411,7 @@ int gps::str2num(u8 *buf, u8*dx)
 			p++;
 		}
 		if(*p == ',' || (*p=='*'))		//遇到结束了
-			break;			
+			break;
 		if(*p == '.') {				//遇到小数点了
 			mask|=0X01;
 			p++;
@@ -430,21 +424,21 @@ int gps::str2num(u8 *buf, u8*dx)
 		}
 		if(mask & 0X01)
 			flen++;
-		else 
+		else
 			ilen++;
 		p++;
 	}
 	if(mask & 0X02)			//去掉负号
-		buf++;	
+		buf++;
 	for(i=0; i < ilen; i++) {	//得到整数部分数据
-	
+
 		ires += NMEA_Pow(10, ilen - 1 - i) * (buf[i] - '0');
 	}
 	if(flen > 5)			//最多取5位小数
-		flen = 5;			
+		flen = 5;
 	*dx = flen;	 		//小数点位数
 	for(i=0; i < flen; i++) {	//得到小数部分数据
-	
+
 		fres += NMEA_Pow(10, flen-1-i) * (buf[ilen + 1 + i] - '0');
 	}
 	res=ires*NMEA_Pow(10,flen)+fres;
@@ -472,22 +466,22 @@ void gps::GPGSV_parse(nmea_msg *gpsx, u8 *buf)
 			posx = comma_pos(p1,4+j*4);
 			if(posx != 0XFF)
 				gpsx->slmsg[slx].num = str2num(p1+posx, &dx);	//得到卫星编号
-			else 
+			else
 				break;
 			posx = comma_pos(p1,5+j*4);
 			if(posx != 0XFF)
 				gpsx->slmsg[slx].eledeg = str2num(p1+posx, &dx);//得到卫星仰角
-			else 
+			else
 				break;
 			posx = comma_pos(p1,6+j*4);
 			if(posx != 0XFF)
 				gpsx->slmsg[slx].azideg = str2num(p1+posx, &dx);//得到卫星方位角
-			else 
+			else
 				break;
 			posx = comma_pos(p1, 7+j*4);
 			if(posx != 0XFF)
 				gpsx->slmsg[slx].sn = str2num(p1+posx, &dx);	//得到卫星信噪比
-			else 
+			else
 				break;
 			slx++;
 		}
@@ -529,7 +523,7 @@ void gps::GPGSA_parse(nmea_msg *gpsx, u8 *buf)
 		posx=comma_pos(p1, 3+i);
 		if(posx != 0XFF)
 			gpsx->possl[i] = str2num(p1+posx, &dx);
-		else 
+		else
 			break;
 	}
 	posx=comma_pos(p1, 15);								//得到PDOP位置精度因子
@@ -612,7 +606,7 @@ void gps::GPVTG_parse(nmea_msg *gpsx, u8 *buf)
 void gps::parse(nmea_msg *gpsx, u8 *buf)
 {
 	GPGSV_parse(gpsx, buf);	//GPGSV解析
-	GPGGA_parse(gpsx, buf);	//GPGGA解析
+	//GPGGA_parse(gpsx, buf);	//GPGGA解析
 	GPGSA_parse(gpsx, buf);	//GPGSA解析
 	GPRMC_parse(gpsx, buf);	//GPRMC解析
 	GPVTG_parse(gpsx, buf);	//GPVTG解析
