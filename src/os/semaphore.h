@@ -13,6 +13,7 @@
 #include "leader_misc.h"
 
 #include "os/kernel.h"
+#include "cmsis_os.h"
 
 namespace os {
 

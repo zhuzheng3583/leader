@@ -38,6 +38,8 @@
 #include "transmit.h"
 #include "terminal.h"
 #include "msgque.h"
+#include "semaphore.h"
+
 
 #include "packet.h"
 

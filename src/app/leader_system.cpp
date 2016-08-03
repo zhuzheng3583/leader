@@ -89,8 +89,8 @@ s32 leader_system::init(void)
 	_puart2 = new uart("uart-2", 2);
 	_puart2->probe();
 	_puart2->open(NULL);
-	//_puart2->self_test();
-
+	_puart2->self_test();
+	
 	_puart3 = new uart("uart-3", 3);
 	_puart3->probe();
     //_puart3->self_test();
@@ -100,7 +100,7 @@ s32 leader_system::init(void)
     _puart1 = new uart("uart-1", 1);
 	_puart1->probe();
     _puart1->open(NULL);
-    _puart1->self_test();
+   // _puart1->self_test();
     gps *pgps = new gps("gps", -1);
     pgps->probe(_puart1);
     
