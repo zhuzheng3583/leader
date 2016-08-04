@@ -8,7 +8,6 @@
 ** Descriptions:
 **
 ***********************************************************************/
-
 #include "calculate.h"
 
 #include "leader_system.h"

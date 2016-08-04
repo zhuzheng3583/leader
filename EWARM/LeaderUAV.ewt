@@ -3159,6 +3159,12 @@
           <name>$PROJ_DIR$\..\src\app\aircraft\thread\heartbeat.h</name>
         </file>
         <file>
+          <name>$PROJ_DIR$\..\src\app\aircraft\thread\logger.cpp</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\app\aircraft\thread\logger.h</name>
+        </file>
+        <file>
           <name>$PROJ_DIR$\..\src\app\aircraft\thread\receive.cpp</name>
         </file>
         <file>
@@ -3182,6 +3188,12 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\src\app\aircraft\aircraft.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\app\aircraft\circbuf.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\app\aircraft\circbuf.h</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\src\app\aircraft\packet.cpp</name>

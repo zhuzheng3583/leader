@@ -32,11 +32,13 @@
 #include "demo_main.h"
 
 #include "kernel.h"
+#include "logger.h"
 #include "heartbeat.h"
 #include "receive.h"
 #include "calculate.h"
 #include "transmit.h"
 #include "terminal.h"
+
 #include "msgque.h"
 #include "semaphore.h"
 
@@ -101,6 +103,7 @@ public:
     msgque					*_sync_ct;
     msgque					*_sync;
 
+    logger                  *_logger;
     heartbeat               *_heartbeat;
     receive					*_receive;
     calculate				*_calculate;
@@ -129,6 +132,7 @@ public:
 	ms5611		*get_ms5611(void)        	{ return _ms5611; }
 	hmc5883		*get_hmc5883(void)        	{ return _hmc5883; }
 
+    logger		*get_logger(void)        	{ return _logger; }
     msgque   	*get_sync_rc(void)			{ return _sync_rc; }
     msgque   	*get_sync_ct(void)			{ return _sync_ct; }
     msgque   	*get_sync(void)			    { return _sync; }

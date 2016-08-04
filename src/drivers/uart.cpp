@@ -289,7 +289,7 @@ s32 uart::recv(u8 *buf, u32 count)
 		readcnt = count - _dmarx->get_leftover_count();
 	} else {
 		_flag_rx = 0;
-        readcnt = count;
+		readcnt = count;
 	}
     
 #endif
@@ -331,7 +331,7 @@ s32 uart::send(u8 *buf, u32 count)
 		writecnt = count - _dmatx->get_leftover_count();
 	} else {
 		_flag_tx = 0;
-        writecnt = count;
+        	writecnt = count;
 	}
     
 #endif

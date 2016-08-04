@@ -8,103 +8,103 @@
 ** Descriptions:
 **
 ***********************************************************************/
-
 #include "logger.h"
-
-#include "system_uav.h"
+#include "leader_system.h"
 
 #include <string.h>
 
-#define LOG_BUFFER_SIZE (8 * 1024)
+#define LOG_BUFFER_SIZE (4 * 1024)
 
 using namespace driver;
 using namespace os;
 
 namespace app {
 
-Logger::Logger(Fops *pfile, uint32_t bufsize)
+logger::logger(void)
 {
-	m_param.name = "logger";
-	m_param.priority = 10;
-	m_param.stackbase = NULL;
-	m_param.stacksize = 512;
-	m_param.run = Task::func;
-	m_param.parg = this;
+	_params.name = "logger";
+	_params.priority = 0;
+	_params.stacksize = 512;
+	_params.func = (void *)thread::func;
+	_params.parg = this;
 
-	m_level = -1; //
-	m_log_buf_threshold = 128;
+	_level = -1;
+	_buf_threshold = 128;
 
-    Logger::attach(pfile);
-    if (bufsize == NULL) {
-        m_log_buf_size = LOG_BUFFER_SIZE;
-    } else {
-        m_log_buf_size = bufsize;
-    }
-	m_pcircbuf = new Circbuf(m_log_buf_size);
+	_buf_size = LOG_BUFFER_SIZE;
+	_pcircbuf = new circbuf(_buf_size);
 }
 
-Logger::~Logger(void)
+logger::~logger(void)
 {
-	m_level = -2;
-	delete m_pcircbuf;
-	m_pcircbuf = NULL;
-	Logger::detach();
-
+	_level = -2;
+	delete _pcircbuf;
+	_pcircbuf = NULL;
 }
 
-BOOL Logger::create(struct task_param *pparam)
+void logger::attach(device *pdev)	
+{
+	_pdev = pdev; 
+}
+
+void logger::detach(void)			
+{ 
+	_pdev = NULL; 
+}
+
+BOOL logger::create(struct thread_params *pparams)
 {
     BOOL b = false;
-    m_pmutex = new Mutex;
-    b = m_pmutex->create("log_mutex");
+    _pmutex = new mutex;
+    b = _pmutex->create("log_mutex");
     if (b < 0) {
         goto err;
     }
 
-    return Task::create(pparam);
+    return thread::create(pparams);
 
 err:
-    delete m_pmutex;
+    delete _pmutex;
     return false;
 }
 
-BOOL Logger::t_delete(void)
+BOOL logger::t_delete(void)
 {
-    delete m_pmutex;
-    return Task::t_delete();
+    delete _pmutex;
+    return thread::t_delete();
 }
 
-
-int32_t Logger::vprintf(PCSTR fmt, va_list ap)
+s32 logger::vprintf(PCSTR fmt, va_list ap)
 {
-	uint8_t str[FMT_MAX_CNT];
-	int32_t count = 0;
+	u8 str[FMT_MAX_CNT];
+	s32 count = 0;
 
-	//if (m_pmutex != NULL) { m_pmutex->pend(WAIT_FOREVER); }
+	//if (_pmutex != NULL) { _pmutex->pend(WAIT_FOREVER); }
 	// count = snprintf(str, FMT_MAX_CNT, fmt, ap);
 	// count = sprintf(str, fmt, ap);
 	count = vsnprintf((char *)str, FMT_MAX_CNT, fmt, ap);
 	str[count-1] = '\r';
 	str[count-0] = '\n';
-	count = m_pcircbuf->mem_producer((uint8_t *)str, count+1);
-    //if (m_pmutex != NULL) { m_pmutex->post(WAIT_FOREVER); }
+	count = _pcircbuf->mem_producer((u8 *)str, count+1);
+    //if (_pmutex != NULL) { _pmutex->post(WAIT_FOREVER); }
 
 	return count;
 }
 
-void Logger::flush(void)
+void logger::flush(void)
 {
 	//INIT_CRITICAL_SECTION();
 	//ENTER_CRITICAL_SECTION();
 	//Interrupt::disable_all_irq();
-	if (m_pcircbuf->get_used_size() > m_log_buf_threshold) {
-		m_pcircbuf->dev_consumer_to_empty(m_pfile);
+	if (_pcircbuf->get_used_size() > _buf_threshold) {
+		//_pcircbuf->dev_consumer_to_empty(_pdev);
+		_pcircbuf->dev_consumer(_pdev, _pcircbuf->get_used_size());
 	}
     //Interrupt::enable_all_irq();
 	//EXIT_CRITICAL_SECTION();
 }
 
-int32_t Logger::self_test(void)
+int32_t logger::self_test(void)
 {
     INF("self test: check circbuf.\n");
     uint32_t testcnt = 500;
@@ -112,7 +112,7 @@ int32_t Logger::self_test(void)
     for (uint32_t n = 0; n < testcnt; n++)
     {
         INF("%u.\n", n);
-        Logger::flush();
+        logger::flush();
     }
 
     for (uint32_t n = 0; n < testcnt; n++)
@@ -122,18 +122,18 @@ int32_t Logger::self_test(void)
         INF("%u.\n", n);
         DBG("%u.\n", n);
 		//INF("xxx111111111111111111111122222222222222222222222222xxx.\n");
-        Logger::flush();
+        logger::flush();
     }
 
     return true;
 }
 
 
-void Logger::run(void *parg)
+void logger::run(void *parg)
 {
 	for ( ; ; )
 	{
-		Logger::flush();
+		logger::flush();
 		msleep(300);
 	}
 

@@ -86,10 +86,17 @@ s32 leader_system::init(void)
 	ret = interrupt::irq_init();
 	kernel::init();
 
+	
+	_logger = new logger;
+	
 	_puart2 = new uart("uart-2", 2);
 	_puart2->probe();
 	_puart2->open(NULL);
-	_puart2->self_test();
+	//_puart2->self_test();
+
+	_logger->attach(_puart2);
+	_logger->self_test();
+	//在此之前不能使用log输出
 	
 	_puart3 = new uart("uart-3", 3);
 	_puart3->probe();

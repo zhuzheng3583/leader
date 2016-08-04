@@ -10,13 +10,11 @@
 ***********************************************************************/
 
 #pragma once
-#include "type_leader.h"
-#include "misc_leader.h"
-#include "task.h"
+#include "leader_type.h"
+#include "leader_misc.h"
 
-#include "fops.h"
+#include "thread.h"
 #include "circbuf.h"
-
 #include "mutex.h"
 
 #define FMT_MAX_CNT							256
@@ -26,42 +24,42 @@ using namespace os;
 
 namespace app {
 
-class Logger : public Task
+class logger : public thread
 {
 public:
-	Logger(Fops *pfile, uint32_t bufsize);
-	~Logger(void);
+	logger(void);
+	~logger(void);
 
 public:
-	Circbuf *m_pcircbuf;
-	Fops	*m_pfile;
+	circbuf *_pcircbuf;
+	device  *_pdev;
 
-	uint32_t 	m_log_buf_size;
-	uint32_t	m_log_buf_threshold;
-	int32_t		m_level;
+	u32 _buf_size;
+	u32 _buf_threshold;
+	s32 _level;
 
-	Mutex	*m_pmutex;
+	mutex *_pmutex;
 
 public:
-	BOOL create(struct task_param *pparam);
+	BOOL create(struct thread_params *pparams);
 	BOOL t_delete(void);
 
-	void attach(Fops *pfile)	{ m_pfile = pfile; }
-	void detach(void)			{ m_pfile = NULL; }
+	void attach(device *pdev);
+	void detach(void)	;
 
-	int32_t vprintf(PCSTR fmt, va_list ap);
+	s32 vprintf(PCSTR fmt, va_list ap);
 
 	void flush(void);
 
-	int32_t no_os_self_test(void);	// 检查环形缓冲区是否工作正常,及时刷缓冲区
-	int32_t self_test(void);		// 通过任务调度刷新缓冲区
+	s32 no_os_self_test(void);	// 检查环形缓冲区是否工作正常,及时刷缓冲区
+	s32 self_test(void);		// 通过任务调度刷新缓冲区
 
 public:
-	void set_log_buf_threshold(int32_t threshold)	{ m_log_buf_threshold = threshold; }
-	int32_t get_log_buf_threshold(void)				{ return m_log_buf_threshold; }
+	void set_buf_threshold(s32 threshold)	{ _buf_threshold = threshold; }
+	s32 get_buf_threshold(void)			{ return _buf_threshold; }
 
-	void set_log_level(int32_t level)				{ m_level = level; }
-	int32_t get_log_level(void) 					{ return m_level; }
+	void set_level(int32_t level)			{ _level = level; }
+	s32 get_level(void) 				    { return _level; }
 
 
 public:
