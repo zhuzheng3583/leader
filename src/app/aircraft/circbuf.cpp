@@ -47,7 +47,7 @@ s32 circbuf::mem_producer(u8 *pmem, s32 count)
 	//int n = CIRC_SPACE_TO_END(_head, _tail, _size);	// bytes to end of the buffer
     int end = (_size) - 1 - (_head);
     int n = (end + (_tail)) & ((_size)-1);
-    n <= end ? n : end+1;
+    n = (n <= end ? n : end+1);
           
     if (n < count) {
 		// message goes over end of the buffer
@@ -76,7 +76,7 @@ s32 circbuf::mem_consumer(u8 *pmem, s32 count)
 	//int n = CIRC_CNT_TO_END(_head, _tail, _size);	// bytes to end of the buffer
     int end = (_size) - (_tail);
     int n = ((_head) + end) & ((_size)-1);
-    n < end ? n : end;
+    n = (n < end ? n : end);
 	if (n < count) {
 		// message goes over end of the buffer
 		memcpy(pmem, &(_pbuf[_tail]), n);
@@ -104,7 +104,7 @@ s32 circbuf::dev_consumer(device *dev, s32 count)
 	//int n = CIRC_CNT_TO_END(_head, _tail, _size);	// bytes to end of the buffer
     int end = (_size) - (_tail);
     int n = ((_head) + end) & ((_size)-1);
-    n < end ? n : end;
+    n = (n < end ? n : end);
 	if (n < count) {
 		// message goes over end of the buffer
 		dev->write(&(_pbuf[_tail]), n);
@@ -132,7 +132,7 @@ s32 circbuf::dev_producer(device *dev, s32 count)
 	//int n = CIRC_SPACE_TO_END(_head, _tail, _size);	// bytes to end of the buffer
     int end = (_size) - 1 - (_head);
     int n = (end + (_tail)) & ((_size)-1);
-    n <= end ? n : end+1;
+    n = (n <= end ? n : end+1);
 	if (n < count) {
 		// message goes over end of the buffer
 		dev->read(&(_pbuf[_head]), n);

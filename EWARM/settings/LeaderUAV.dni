@@ -13,7 +13,7 @@ CStepIntDis=_ 0
 stlinkserialNo=2798FD0D
 stlinkfoundProbes=
 [DebugChecksum]
-Checksum=-1937188164
+Checksum=18246285
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -139,16 +139,15 @@ Bp6=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\platform\Middlewares\Third_Party\FreeRTO
 Bp7=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\platform\Middlewares\Third_Party\FreeRTOS\Source\portable\IAR\ARM_CM4F\port.c}.265.2" 0 0 1 "" 0 "" 0
 Bp8=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\thread.cpp}.50.5" 0 0 1 "" 0 "" 0
 Bp9=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\msgque.cpp}.73.2" 0 0 1 "" 0 "" 0
-Bp10=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\leader_system.cpp}.187.1" 0 0 1 "" 0 "" 0
-Bp11=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\magn\hmc5883.cpp}.56.9" 0 0 1 "" 0 "" 0
-Bp12=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.614.1" 0 0 1 "" 0 "" 0
-Bp13=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.317.5" 0 0 1 "" 0 "" 0
-Bp14=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.517.2" 0 0 1 "" 0 "" 0
-Bp15=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.463.3" 0 0 1 "" 0 "" 0
-Bp16=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart.cpp}.406.8" 0 0 1 "" 0 "" 0
-Bp17=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\leader_system.cpp}.95.2" 0 0 1 "" 0 "" 0
-Bp18=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart.cpp}.282.2" 0 0 1 "" 0 "" 0
-Count=19
+Bp10=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\magn\hmc5883.cpp}.56.9" 0 0 1 "" 0 "" 0
+Bp11=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.614.1" 0 0 1 "" 0 "" 0
+Bp12=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.317.5" 0 0 1 "" 0 "" 0
+Bp13=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.517.2" 0 0 1 "" 0 "" 0
+Bp14=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.463.3" 0 0 1 "" 0 "" 0
+Bp15=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart.cpp}.406.11" 0 0 1 "" 0 "" 0
+Bp16=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart.cpp}.303.9" 0 0 1 "" 0 "" 0
+Bp17=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\circbuf.cpp}.105.9" 0 0 1 "" 0 "" 0
+Count=18
 [Aliases]
 A0=_ "E:\code\SKYVIEW_H_SUB\LeaderUAV\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
 A1=_ "E:\code\leader\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""

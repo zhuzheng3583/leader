@@ -40,7 +40,7 @@ int	print(s32 level, const char* fmt, ...)
 #else
 	logger *plogger = leader_system::get_instance()->get_logger();
 	count = plogger->vprintf(fmt, ap);
-	plogger->flush();
+	//plogger->flush();
 #endif
 	va_end(ap);
 
