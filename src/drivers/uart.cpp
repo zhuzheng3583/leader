@@ -342,6 +342,7 @@ s32 uart::send(u8 *buf, u32 count)
 
 s32 uart::self_test(void)
 {
+	uart::open(NULL);
 #if 1
 	u8 wbuf[16] = "hello world!";
 	u8 rbuf[16] = { 0 };
@@ -363,6 +364,7 @@ s32 uart::self_test(void)
 	}
 	core::mdelay(100);
 #endif
+	uart::close();
 }
 
 s32 uart::open(s32 flags)

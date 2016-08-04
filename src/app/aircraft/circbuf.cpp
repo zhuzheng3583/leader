@@ -13,6 +13,7 @@
 #include <string.h>
 
 #define 	POWEROF2(n) 	(((n) & ((n) - 1)) == 0)
+
 namespace driver {
 
 circbuf::circbuf(s32 size)

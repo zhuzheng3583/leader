@@ -91,11 +91,10 @@ s32 leader_system::init(void)
 	
 	_puart2 = new uart("uart-2", 2);
 	_puart2->probe();
-	_puart2->open(NULL);
 	//_puart2->self_test();
 
 	_logger->attach(_puart2);
-	_logger->self_test();
+	//_logger->self_test();
 	//在此之前不能使用log输出
 	
 	_puart3 = new uart("uart-3", 3);
@@ -109,7 +108,7 @@ s32 leader_system::init(void)
     _puart1->open(NULL);
    // _puart1->self_test();
     gps *pgps = new gps("gps", -1);
-    pgps->probe(_puart1);
+    //pgps->probe(_puart1);
     
     _spi1 = new spi("spi-1", 1);
     _spi1->probe();
@@ -191,10 +190,11 @@ s32 leader_system::init(void)
     _calculate = new calculate;
     _transmit = new transmit;
 
+	_logger->create(NULL);
 	_heartbeat->create(NULL);
-    _terminal->create(NULL);
+	_terminal->create(NULL);
 	_receive->create(NULL);
-    _calculate->create(NULL);
+	_calculate->create(NULL);
 	_transmit->create(NULL);
 
 	if(ret < 0) {
