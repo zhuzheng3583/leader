@@ -264,6 +264,7 @@ s32 uart::recv(u8 *buf, u32 count)
 	if(HAL_UART_Receive((UART_HandleTypeDef*)_handle, (uint8_t*)buf, count, UART_POLLING_TIMEOUT_MS) != HAL_OK) {
     		//CAPTURE_ERR();
 	}
+    readcnt = count;
 #elif (UART_MODE == UART_IT_MODE)
 	if(HAL_UART_Receive_IT((UART_HandleTypeDef*)_handle, (uint8_t*)buf, count) != HAL_OK) {
 		//CAPTURE_ERR();
@@ -276,6 +277,7 @@ s32 uart::recv(u8 *buf, u32 count)
 	} else {
 		_flag_rx = 0;
 	}
+    readcnt = count;
 #elif (UART_MODE == UART_DMA_MODE)
 	if(HAL_UART_Receive_DMA((UART_HandleTypeDef*)_handle, (uint8_t*)buf, count) != HAL_OK) {
 		//CAPTURE_ERR();
@@ -284,14 +286,15 @@ s32 uart::recv(u8 *buf, u32 count)
 	s32 ret = 0;
 	wait_condition_ms(_flag_rx == 1, UART_DMA_TIMEOUT_MS, &ret);
 	if (ret < 0) {
-		return -1;
+		readcnt = count - _dmarx->get_leftover_count();
 	} else {
 		_flag_rx = 0;
+        readcnt = count;
 	}
-
+    
 #endif
 
-	readcnt = count;
+
 	return readcnt;
 }
 
@@ -303,6 +306,7 @@ s32 uart::send(u8 *buf, u32 count)
 	if(HAL_UART_Transmit((UART_HandleTypeDef*)_handle, (uint8_t*)buf, count, UART_POLLING_TIMEOUT_MS) != HAL_OK) {
         //CAPTURE_ERR();
 	}
+    writecnt = count;
 #elif (UART_MODE == UART_IT_MODE)
 	if(HAL_UART_Transmit_IT((UART_HandleTypeDef*)_handle, (uint8_t*)buf, count) != HAL_OK) {
 		//CAPTURE_ERR();
@@ -315,6 +319,7 @@ s32 uart::send(u8 *buf, u32 count)
 	} else {
 		_flag_tx = 0;
 	}
+    writecnt = count;
 #elif (UART_MODE == UART_DMA_MODE)
 	if(HAL_UART_Transmit_DMA((UART_HandleTypeDef*)_handle, (uint8_t*)buf, count) != HAL_OK) {
 		//CAPTURE_ERR();
@@ -323,13 +328,15 @@ s32 uart::send(u8 *buf, u32 count)
 	s32 ret = 0;
 	wait_condition_ms(_flag_tx == 1, UART_DMA_TIMEOUT_MS, &ret);
 	if (ret < 0) {
-		return -1;
+		writecnt = count - _dmatx->get_leftover_count();
 	} else {
 		_flag_tx = 0;
+        writecnt = count;
 	}
+    
 #endif
 
-	writecnt = count;
+
 	return writecnt;
 }
 
@@ -345,6 +352,7 @@ s32 uart::self_test(void)
       //INF("%s", rbuf);
 
       uart::write(rbuf, ARRAYSIZE(wbuf));
+      core::mdelay(500);
     }
 #else
 	u32 n = 0;

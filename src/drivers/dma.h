@@ -1,5 +1,5 @@
 /*******************************Copyright (c)***************************
-** 
+**
 ** Porject name:	leader
 ** Created by:	zhuzheng<happyzhull@163.com>
 ** Created date:	2016/07/11
@@ -54,14 +54,14 @@ public:
     s32 probe(void);
     s32 remove(void);
 
-public:
-    s32 config(enum dma_dir mode, enum dma_align align, enum dma_pri priority, 
+    s32 config(enum dma_dir mode, enum dma_align align, enum dma_pri priority,
         s32 en_src_step, s32 en_dst_step);
     s32 async_copy(void *psrc_addr, void *pdst_addr, u32 size);
     s32 wait_complete(s32 timeoutms);
-    
+
+	s32 get_leftover_count(void);
 public:
-    virtual void isr(void); 
+    virtual void isr(void);
 };
 
 }

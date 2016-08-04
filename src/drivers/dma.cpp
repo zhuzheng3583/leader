@@ -374,6 +374,13 @@ s32 dma::wait_complete(s32 timeoutms)
 	return 0;
 }
 
+s32 dma::get_leftover_count(void)
+{
+    DMA_HandleTypeDef *p = (DMA_HandleTypeDef *)_handle;
+    return (s32)(p->Instance->NDTR);
+}
+
+
 void dma::isr(void)
 {
 	HAL_DMA_IRQHandler((DMA_HandleTypeDef *)_handle);
