@@ -91,27 +91,27 @@ s32 usb_dev::close(void)
 	return 0;
 }
 
-s32 usb_dev::read(u8 *buf, u32 count)
+s32 usb_dev::read(u8 *buf, u32 size)
 {
     u32 readcnt = 0;
 
-	readcnt = count;
+	readcnt = size;
 
 	return readcnt;
 }
 
-s32 usb_dev::write(u8 *buf, u32 count)
+s32 usb_dev::write(u8 *buf, u32 size)
 {
 	USBD_HandleTypeDef *hUSBDDevice = (USBD_HandleTypeDef *)_handle;
 	
 	u32 writecnt = 0;
-	if (count % _epin_size) {
+	if (size % _epin_size) {
 		return -1;
 	}
 
-	USBD_CUSTOM_HID_SendReport(hUSBDDevice, buf, count); 
+	USBD_CUSTOM_HID_SendReport(hUSBDDevice, buf, size); 
 
-	writecnt = count;
+	writecnt = size;
 	return writecnt;
 }
 

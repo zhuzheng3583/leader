@@ -98,13 +98,13 @@ s32 device::close(void)
 	return 0;
 }
 
-s32 device::read(u8 *buf, u32 count)
+s32 device::read(u8 *buf, u32 size)
 {
 	WRN("Called to device base class, Please check...\n");
 	return 0;
 }
 
-s32 device::write(u8 *buf, u32 count)
+s32 device::write(u8 *buf, u32 size)
 {
 	WRN("Called to device base class, Please check...\n");
 	return 0;

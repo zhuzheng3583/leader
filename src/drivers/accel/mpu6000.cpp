@@ -37,7 +37,7 @@ s32 mpu6000::probe(spi *pspi, gpio *gpio_cs)
     _spi = pspi;
 
 	_gpio_cs->set_direction_output();
-    _gpio_cs->set_value(true);
+	_gpio_cs->set_value(true);
 
     write_reg8(MPUREG_PWR_MGMT1, 0X80); 	// ¸´Î»MPU6050
     core::mdelay(100);
@@ -83,10 +83,10 @@ s32 mpu6000::open(s32 flags)
 	return 0;
 }
 
-s32 mpu6000::read(u8 *buf, u32 count)
+s32 mpu6000::read(u8 *buf, u32 size)
 {
 	data_mpu_t *data = NULL;
-	u32 num = count / sizeof(data_mpu_t);
+	u32 num = size / sizeof(data_mpu_t);
 	for (u32 i = 0; i < num; i++) {
 		data = &((data_mpu_t *)buf)[i];
 		mpu6000::get_gyro_raw((s16 *)(&(data->gyro)));
@@ -97,7 +97,7 @@ s32 mpu6000::read(u8 *buf, u32 count)
 	return (num * sizeof(data_mpu_t));
 }
 
-s32 mpu6000::write(u8 *buf, u32 count)
+s32 mpu6000::write(u8 *buf, u32 size)
 {
 
 }

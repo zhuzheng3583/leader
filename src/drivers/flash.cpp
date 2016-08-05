@@ -119,7 +119,7 @@ s32 flash::erase(u32 start_sector, u32 num_sectors)
 	return 0;
 }
 
-s32 flash::read(u8 *buf, u32 count)
+s32 flash::read(u8 *buf, u32 size)
 {
 	s32 ret = 0;
 	u32 start_addr = 0;
@@ -133,11 +133,11 @@ s32 flash::read(u8 *buf, u32 count)
 	HAL_FLASH_Unlock();
 
 	start_addr = OFFSET_TO_ADDR_FLASH_SECTOR(_offset);
-	end_addr = start_addr + count;
+	end_addr = start_addr + size;
 	ASSERT((start_addr >= FLASH_BASE) && (end_addr <= FLASH_END));
 
 	cur_addr = start_addr;
-    for (readcnt = 0; readcnt < count; ) {
+    for (readcnt = 0; readcnt < size; ) {
 		data[readcnt++] = *(volatile u8*)cur_addr++;
 		_offset++;
     }
@@ -149,7 +149,7 @@ s32 flash::read(u8 *buf, u32 count)
 	return readcnt;
 }
 
-s32 flash::write(u8 *buf, u32 count)
+s32 flash::write(u8 *buf, u32 size)
 {
 	s32 ret = 0;
 	u32 start_addr = 0;
@@ -163,7 +163,7 @@ s32 flash::write(u8 *buf, u32 count)
 	HAL_FLASH_Unlock();
 
 	start_addr = OFFSET_TO_ADDR_FLASH_SECTOR(_offset);
-	end_addr = start_addr + count;
+	end_addr = start_addr + size;
 	ASSERT((start_addr >= FLASH_BASE) && (end_addr <= FLASH_END));
 
 	if((get_sector(start_addr) < 0) && (get_sector_num(start_addr, end_addr) < 0)) {
@@ -178,7 +178,7 @@ s32 flash::write(u8 *buf, u32 count)
 	}
 
 	cur_addr = start_addr;
-    for (writecnt = 0; writecnt < count; ) {
+    for (writecnt = 0; writecnt < size; ) {
 	    	if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, cur_addr, *((u32 *)(data + writecnt))) == HAL_OK) {
 			_offset += 4;
 			cur_addr += 4;

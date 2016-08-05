@@ -67,8 +67,8 @@ public:
 
 public:
     virtual s32 open(s32 flags);
-    virtual s32 read(u8 *buf, u32 count);
-    virtual s32 write(u8 *buf, u32 count);
+    virtual s32 read(u8 *buf, u32 size);
+    virtual s32 write(u8 *buf, u32 size);
     virtual s32 close(void);
 
     virtual s32 seek(s32 offset, enum seek_mode mode);
