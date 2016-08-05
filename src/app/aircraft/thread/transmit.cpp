@@ -74,6 +74,7 @@ void transmit::run(void *parg)
 		for (u32 i = 0; i < pattr->num_rc; i++) {
 			niming->report_rc(&pitem_rc->data_rc[i]);
 		}
+        msleep(0);
 		//msleep(20);
 		//DBG("%s: task is active[%u]...\n", _name, cnt++);
 		//msleep(10);

@@ -1,5 +1,5 @@
 /*******************************Copyright (c)***************************
-** 
+**
 ** Porject name:	leader
 ** Created by:		zhuzheng<happyzhull@163.com>
 ** Created date:	2016/04/11
@@ -26,21 +26,22 @@ extern "C" {
 int	print(s32 level, const char* fmt, ...)
 {
 	s32	count = 0;
-	
+
 	va_list ap;
 	va_start(ap, fmt);
 
 #if 0
-	u8 str[FMT_MAX_CNT];
+	static u8 str[FMT_MAX_CNT];
 	uart* puart2 = leader_system::get_instance()->get_uart2();
 	count = vsnprintf((char *)str, FMT_MAX_CNT, fmt, ap);
 	str[count-1] = '\r';
 	str[count-0] = '\n';
 	count = puart2->write(str, count+1);
 #else
-	logger *plogger = leader_system::get_instance()->get_logger();
+    logger *plogger = leader_system::get_instance()->get_logger();
 	count = plogger->vprintf(fmt, ap);
 	//plogger->flush();
+    //core::mdelay(10);
 #endif
 	va_end(ap);
 

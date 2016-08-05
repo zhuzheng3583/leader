@@ -31,11 +31,12 @@ heartbeat::~heartbeat(void)
 void heartbeat::run(void *parg)
 {
   	heartbeat *p = (heartbeat *)parg;
-	for (u32 cnt = 0; ;cnt++)
+    u32 cnt = 0;
+	for (cnt = 0; ;cnt++)
 	{
 		INF("%s: LEADER_UAV_HEART_BEAT[%u sec]...\n", _name, cnt);
 		// 获取CPU使用率
-		msleep(1000);
+        msleep(1000);
 	}
 }
 

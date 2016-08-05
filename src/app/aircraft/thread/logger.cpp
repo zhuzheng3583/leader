@@ -23,13 +23,14 @@ namespace app {
 logger::logger(void)
 {
 	_params.name = "logger";
-	_params.priority = 0;
+	_params.priority = osPriorityAboveNormal;
 	_params.stacksize = 512;
 	_params.func = (void *)thread::func;
 	_params.parg = this;
 
 	_level = -1;
 	_buf_threshold = 128;
+    _task_created = false;
 
 	_buf_size = LOG_BUFFER_SIZE;
 	_pcircbuf = new circbuf(_buf_size);
@@ -51,7 +52,7 @@ void logger::detach(void)
 {
 	_pdev = NULL;
 }
-
+#if 1
 BOOL logger::create(struct thread_params *pparams)
 {
     BOOL b = false;
@@ -61,6 +62,7 @@ BOOL logger::create(struct thread_params *pparams)
         goto err;
     }
 
+    _task_created = true;
     return thread::create(pparams);
 
 err:
@@ -70,46 +72,45 @@ err:
 
 BOOL logger::t_delete(void)
 {
+    _task_created = false;
     delete _pmutex;
     return thread::t_delete();
 }
-
+#endif
 s32 logger::vprintf(PCSTR fmt, va_list ap)
 {
-	u8 str[FMT_MAX_CNT];
+	static u8 str[FMT_MAX_CNT];
 	s32 count = 0;
 
-	//if (_pmutex != NULL) { _pmutex->pend(WAIT_FOREVER); }
-	// count = snprintf(str, FMT_MAX_CNT, fmt, ap);
+    if (_task_created == true) { taskENTER_CRITICAL(); }
+    //taskDISABLE_INTERRUPTS();
+	//ENTER_CRITICAL_SECTION();
+	//Interrupt::disable_all_irq();
+	//if (_task_created == true) { _pmutex->pend(1000); }
+	//count = snprintf((char *)str, FMT_MAX_CNT, fmt, ap);
 	// count = sprintf(str, fmt, ap);
 	count = vsnprintf((char *)str, FMT_MAX_CNT, fmt, ap);
 	str[count-1] = '\r';
 	str[count-0] = '\n';
 	count = _pcircbuf->mem_producer((u8 *)str, count+1);
-    //if (_pmutex != NULL) { _pmutex->post(WAIT_FOREVER); }
-
+    //if (_task_created == true) { _pmutex->post(1000); }
+    //Interrupt::enable_all_irq();
+	//EXIT_CRITICAL_SECTION();
+    //taskENABLE_INTERRUPTS();
+    if (_task_created == true) { taskEXIT_CRITICAL(); }
 	return count;
 }
 
+
 void logger::flush(void)
 {
-	//INIT_CRITICAL_SECTION();
-	//ENTER_CRITICAL_SECTION();
-	//Interrupt::disable_all_irq();
-	//if (_pcircbuf->get_used_size() > _buf_threshold) {
-		//_pcircbuf->dev_consumer_to_empty(_pdev);
-		//_pcircbuf->dev_consumer(_pdev, _pcircbuf->get_used_size());
-	//}
-    //Interrupt::enable_all_irq();
-	//EXIT_CRITICAL_SECTION();
-  
     _pcircbuf->dev_consumer(_pdev, _pcircbuf->get_used_size());
 }
 
 int32_t logger::self_test(void)
 {
     INF("self test: check circbuf.\n");
-    uint32_t testcnt = 500;
+    u32 testcnt = 500;
 
     for (u32 n = 0; n < testcnt; n++)
     {
@@ -144,8 +145,9 @@ void logger::run(void *parg)
 	for ( ; ; )
 	{
 		logger::flush();
-		msleep(300);
+        msleep(100);
 	}
+
 
 }
 

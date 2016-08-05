@@ -86,9 +86,9 @@ s32 leader_system::init(void)
 	ret = interrupt::irq_init();
 	kernel::init();
 
-	
+
 	_logger = new logger;
-	
+
 	_puart2 = new uart("uart-2", 2);
 	_puart2->probe();
 	//_puart2->self_test();
@@ -96,7 +96,7 @@ s32 leader_system::init(void)
 	_logger->attach(_puart2);
 	//_logger->self_test();
 	//在此之前不能使用log输出
-	
+
 	_puart3 = new uart("uart-3", 3);
 	_puart3->probe();
     //_puart3->self_test();
@@ -109,7 +109,7 @@ s32 leader_system::init(void)
    // _puart1->self_test();
     gps *pgps = new gps("gps", -1);
     //pgps->probe(_puart1);
-    
+
     _spi1 = new spi("spi-1", 1);
     _spi1->probe();
 
@@ -127,7 +127,7 @@ s32 leader_system::init(void)
     _i2c2->probe();
     _hmc5883 = new hmc5883("hmc5883", -1);
     _hmc5883->probe(_i2c2, HMC5883_SLAVE_ADDRESS);
-    
+
 
 #if 0
 

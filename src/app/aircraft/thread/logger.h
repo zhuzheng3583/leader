@@ -37,7 +37,8 @@ public:
 	u32 _buf_size;
 	u32 _buf_threshold;
 	s32 _level;
-
+    s32 _task_created;
+    
 	mutex *_pmutex;
 
 public:

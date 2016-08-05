@@ -38,9 +38,9 @@ s32 hmc5883::probe(i2c *pi2c, u8 slave_addr)
 
     hmc5883::init();
 
-    while(1) {
-        hmc5883::read_raw();
-    }
+    //while(1) {
+      //  hmc5883::read_raw();
+    //}
     return 0;
 
 fail0:

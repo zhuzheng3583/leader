@@ -58,7 +58,7 @@ void receive::run(void *parg)
         //mpu6000->get_temperature(&(pitem_mpu->temperature));
 #if 1
         ms5611->read((u8 *)(pitem_baro->data_baro), pattr->num_baro * sizeof(data_baro_t));
-		for (u32 i = 0; i < pattr->num_baro; i++)
+		for (u32 i = 0; /*i < pattr->num_baro*/ i < 1; i++)
 		{
             DBG("%s: temp=%d, pres=%d, alt=%f.\n",
                 _name,
@@ -100,7 +100,7 @@ void receive::run(void *parg)
 			pitem_rc->data_rc[i].aux5 = 6;
 		}
 
-        core::mdelay(1);
+        msleep(0);
 		sync_rc->post((void *)packet_addr, sizeof(void *), 1000);
 
 		//DBG("%s: task is active[%u]...\n", _name, cnt++);

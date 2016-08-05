@@ -197,7 +197,7 @@ s32 uart::probe(void)
 	interrupt::enable_irq(_irq);
 #endif
 
-	INF("%s: probe success.\n", _name);
+	//INF("%s: probe success.\n", _name);
 	return 0;
 
 fail1:
