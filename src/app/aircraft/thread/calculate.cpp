@@ -57,7 +57,7 @@ void calculate::run(void *parg)
         // 发送消息队列给tran任务，将数据缓冲区首地址推向tran任务
 		sync_ct->post((void *)packet_addr, sizeof(void *), 1000);
         msleep(0);
-		//DBG("%s: task is active[%u]...\n", _name, cnt++);
+		//DBG("%s: task is active[%u]...\n", _os_name, cnt++);
 	}
 
 }

@@ -1,5 +1,5 @@
 /*******************************Copyright (c)***************************
-** 
+**
 ** Porject name:	LeaderUAV-Plus
 ** Created by:		zhuzheng<happyzhull@163.com>
 ** Created date:	2015/08/28
@@ -40,28 +40,28 @@ BOOL thread::create(struct thread_params *pparams)
         _params.stacksize = OS_CFG_STK_SIZE_MIN;
     }
 #endif
-    
-	_name   = _params.name;
+
+	_os_name   = _params.name;
 
 	/* Thread definition */
 	//osThreadDef(LED3, LED_Thread1, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
     osThreadDef_t params;
     memset(&params, 0, sizeof(params));
-    params.name 		= (char *)(_params.name),      		//< Thread name 
+    params.name 		= (char *)(_params.name),      		//< Thread name
     params.pthread 	    = (os_pthread)(_params.func),     	//< start address of thread function
     params.tpriority 	= (osPriority)(_params.priority), 	//< initial thread priority
     params.instances 	= (uint32_t)(0),    				//< maximum number of instances of that thread function
     params.stacksize 	= (uint32_t)(_params.stacksize), 	//< stack size requirements in bytes; 0 is default stack size
 
 	/* Start thread */
-	_handle = (HANDLE)osThreadCreate(&params, (void *)(_params.parg));
-    if (_handle == NULL) {
-		ERR("%s: _handle = %d.\n", _name, _handle);
+	_os_handle = (HANDLE)osThreadCreate(&params, (void *)(_params.parg));
+    if (_os_handle == NULL) {
+		ERR("%s: _handle = %d.\n", _os_name, _os_handle);
 		kernel::on_error(ERR_OPERATION_FAILED, this);
 		return false;
     }
 
-    DBG("%s: thread create success.\n", _name);
+    DBG("%s: thread create success.\n", _os_name);
     return true;
 }
 
@@ -69,9 +69,9 @@ BOOL thread::t_delete(void)
 {
 	osStatus status = osOK;
 
-	status = osThreadTerminate (osThreadId(_handle));
+	status = osThreadTerminate (osThreadId(_os_handle));
 	if (status != osOK) {
-		ERR("%s: status = %d.\n", _name, status);
+		ERR("%s: status = %d.\n", _os_name, status);
 		kernel::on_error(ERR_OPERATION_FAILED, this);
 		return false;
 	}
@@ -100,7 +100,7 @@ void thread::msleep(s32 timeoutms)
 	}
 	status = osDelay (millisec);
 	if (status != osOK) {
-		ERR("%s: status = %d.\n", _name, status);
+		ERR("%s: status = %d.\n", _os_name, status);
 		kernel::on_error(ERR_OPERATION_FAILED, this);
 		return;
 	}

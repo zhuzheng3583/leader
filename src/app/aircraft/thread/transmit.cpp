@@ -76,7 +76,7 @@ void transmit::run(void *parg)
 		}
         msleep(0);
 		//msleep(20);
-		//DBG("%s: task is active[%u]...\n", _name, cnt++);
+		//DBG("%s: task is active[%u]...\n", _os_name, cnt++);
 		//msleep(10);
 	}
 }

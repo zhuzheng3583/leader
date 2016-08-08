@@ -1,5 +1,5 @@
 /*******************************Copyright (c)***************************
-** 
+**
 ** Porject name:	LeaderUAV-Plus
 ** Created by:		zhuzheng<happyzhull@163.com>
 ** Created date:	2015/08/28
@@ -48,17 +48,17 @@ enum wait_mode
 class os_object
 {
 protected:
-	HANDLE _handle;
-	PCSTR  _name;
+	HANDLE _os_handle;
+	PCSTR  _os_name;
 
 public:
-	os_object(void) : _handle(NULL), _name("DEF_OS_OBJECT")
+	os_object(void) : _os_handle(NULL), _os_name("DEF_OS_OBJECT")
 	{
 
 	}
 
-	HANDLE get_handle(void) const	{ return _handle; }
-	PCSTR get_name(void) const		{ return _name; }
+	HANDLE get_handle(void) const	{ return _os_handle; }
+	PCSTR get_name(void) const		{ return _os_name; }
 };
 
 class kernel

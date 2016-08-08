@@ -39,6 +39,7 @@ s32 mpu6000::probe(spi *pspi, gpio *gpio_cs)
 	_gpio_cs->set_direction_output();
 	_gpio_cs->set_value(true);
 
+    core::mdelay(2000);
     write_reg8(MPUREG_PWR_MGMT1, 0X80); 	// 复位MPU6050
     core::mdelay(100);
     write_reg8(MPUREG_PWR_MGMT1, 0X00);  	// 唤醒MPU6050
@@ -59,7 +60,7 @@ s32 mpu6000::probe(spi *pspi, gpio *gpio_cs)
     }
     write_reg8(MPUREG_PWR_MGMT1, 0X01);     //设置CLKSEL,PLL X轴为参考
     write_reg8(MPUREG_PWR_MGMT2, 0X00);     // 加速度与陀螺仪都工作
-    set_sample_rate(1000);                        //设置采样率
+    set_sample_rate(200);                        //设置采样率
 
 #if 0 //test
     s16 gyro[3] = { 0 };

@@ -1,5 +1,5 @@
 /*******************************Copyright (c)***************************
-** 
+**
 ** Porject name:	LeaderUAV-Plus
 ** Created by:		zhuzheng<happyzhull@163.com>
 ** Created date:	2015/08/28
@@ -25,13 +25,13 @@ event::~event(void)
 
 }
 
-BOOL event::create(PCSTR name)
+BOOL event::create(PCSTR os_name)
 {
 	s32 error = OS_ERR_NONE;;
 
-    _name = name;
-	_handle = (HANDLE)malloc(sizeof(OS_FLAG_GRP));
-    if (_handle == NULL) {
+    _os_name = os_name;
+	_os_handle = (HANDLE)malloc(sizeof(OS_FLAG_GRP));
+    if (_os_handle == NULL) {
         goto fail0;
     }
 
@@ -39,8 +39,8 @@ BOOL event::create(PCSTR name)
 	OS_CRITICAL_ENTER();	//进入临界区
 	//函数原型: void OSFlagCreate(OS_FLAG_GRP  *p_grp, CPU_CHAR *p_name, OS_FLAGS flags OS_ERR *p_err)
 	OSFlagCreate(
-		(OS_FLAG_GRP *)_handle,
-		(CPU_CHAR *)_name,
+		(OS_FLAG_GRP *)_os_handle,
+		(CPU_CHAR *)_os_name,
 		(OS_FLAGS)0x00000000,
 		(OS_ERR *)&error
 		);
@@ -55,8 +55,8 @@ BOOL event::create(PCSTR name)
 	return true;
 
 fail1:
-	free((void *)_handle);
-	_handle = NULL;
+	free((void *)_os_handle);
+	_os_handle = NULL;
 fail0:
 	return false;
 }
@@ -69,7 +69,7 @@ BOOL event::e_delete(void)
 	//opt: OS_OPT_DEL_NO_PEND
 	//	   OS_OPT_DEL_ALWAYS
 	count = OSFlagDel(
-		(OS_FLAG_GRP *)_handle,
+		(OS_FLAG_GRP *)_os_handle,
 		(OS_OPT)OS_OPT_DEL_NO_PEND,
 		(OS_ERR *)&error
 		);
@@ -84,8 +84,8 @@ BOOL event::e_delete(void)
         return false;
     }
 
-	free((void *)_handle);
-	_handle = NULL;
+	free((void *)_os_handle);
+	_os_handle = NULL;
 
 	return true;
 }
@@ -101,7 +101,7 @@ BOOL event::pend(s32 timeoutms)
 	//opt: OS_OPT_PEND_BLOCKING
 	//	   OS_OPT_PEND_NON_BLOCKING
 	flags = OSFlagPend(
-		(OS_FLAG_GRP *)_handle,
+		(OS_FLAG_GRP *)_os_handle,
 		(OS_FLAGS)0x00000001,
 		(OS_TICK)tick,
 		(OS_OPT)OS_OPT_PEND_BLOCKING,	// 阻塞直到超时
@@ -132,7 +132,7 @@ BOOL event::post(s32 timeoutms)
 	//	   OS_OPT_POST_FLAG_CLR       cleared
 loopOSEventPost:
 	flags = OSFlagPost(
-		(OS_FLAG_GRP *)_handle,
+		(OS_FLAG_GRP *)_os_handle,
 		(OS_FLAGS)0x00000001,
 		(OS_OPT)OS_OPT_POST_FLAG_SET,
 		(OS_ERR *)&error

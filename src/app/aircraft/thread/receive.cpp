@@ -56,7 +56,7 @@ void receive::run(void *parg)
 	{
         mpu6000->read((u8 *)(pitem_mpu->data_mpu), pattr->num_mpu * sizeof(data_mpu_t));
         //mpu6000->get_temperature(&(pitem_mpu->temperature));
-#if 1
+#if 0
         ms5611->read((u8 *)(pitem_baro->data_baro), pattr->num_baro * sizeof(data_baro_t));
 		for (u32 i = 0; /*i < pattr->num_baro*/ i < 1; i++)
 		{
@@ -103,7 +103,7 @@ void receive::run(void *parg)
         msleep(0);
 		sync_rc->post((void *)packet_addr, sizeof(void *), 1000);
 
-		//DBG("%s: task is active[%u]...\n", _name, cnt++);
+		//DBG("%s: task is active[%u]...\n", _os_name, cnt++);
 
 	}
 

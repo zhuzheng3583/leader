@@ -34,7 +34,7 @@ void heartbeat::run(void *parg)
     u32 cnt = 0;
 	for (cnt = 0; ;cnt++)
 	{
-		INF("%s: LEADER_UAV_HEART_BEAT[%u sec]...\n", _name, cnt);
+		INF("%s: LEADER_UAV_HEART_BEAT[%u sec]...\n", _os_name, cnt);
 		// 获取CPU使用率
         msleep(1000);
 	}

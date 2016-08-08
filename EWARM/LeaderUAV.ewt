@@ -3283,6 +3283,9 @@
     <group>
       <name>accel</name>
       <file>
+        <name>$PROJ_DIR$\..\src\drivers\accel\accel.h</name>
+      </file>
+      <file>
         <name>$PROJ_DIR$\..\src\drivers\accel\mpu6000.cpp</name>
       </file>
       <file>
@@ -3292,6 +3295,9 @@
     <group>
       <name>baro</name>
       <file>
+        <name>$PROJ_DIR$\..\src\drivers\baro\baro.h</name>
+      </file>
+      <file>
         <name>$PROJ_DIR$\..\src\drivers\baro\ms5611.cpp</name>
       </file>
       <file>
@@ -3300,6 +3306,9 @@
     </group>
     <group>
       <name>gps</name>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\gps\drv_gps.h</name>
+      </file>
       <file>
         <name>$PROJ_DIR$\..\src\drivers\gps\gps.cpp</name>
       </file>
@@ -3314,6 +3323,9 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\src\drivers\magn\hmc5883.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\magn\magn.h</name>
       </file>
     </group>
     <file>
