@@ -123,20 +123,8 @@ s32 mpu6000::open(s32 flags)
 	return 0;
 }
 
-s32 mpu6000::read(u8 *buf, u32 size)
+s32 mpu6000::read_accel(u8 *buf, u32 size)
 {
-#if 0
-	data_mpu_t *data = NULL;
-	u32 num = size / sizeof(data_mpu_t);
-	for (u32 i = 0; i < num; i++) {
-		data = &((data_mpu_t *)buf)[i];
-		mpu6000::get_gyro_raw((s16 *)(&(data->gyro)));
-		mpu6000::get_accel_raw((s16 *)(&(data->acce)));
-        //core::udelay(200);
-	}
-
-	return (num * sizeof(data_mpu_t));
-#else
 	u32 count = size / sizeof(accel_report);
 
 	/* buffer must be large enough */
@@ -153,6 +141,7 @@ s32 mpu6000::read(u8 *buf, u32 size)
 	if (_accel_reports->empty())
 		return -EAGAIN;
 
+	//perf_count(_accel_reads);
 
 	/* copy reports out of our buffer to the caller */
 	accel_report *arp = reinterpret_cast<accel_report *>(buf);
@@ -165,8 +154,55 @@ s32 mpu6000::read(u8 *buf, u32 size)
 	}
 
 	/* return the number of bytes transferred */
-	return (transferred * sizeof(accel_report));
-    #endif
+	return (transferred * sizeof(accel_report));	
+}
+
+s32 mpu6000::read_gyro(u8 *buf, u32 size)
+{
+	unsigned count = size / sizeof(gyro_report);
+
+	/* buffer must be large enough */
+	if (count < 1)
+		return -ENOSPC;
+
+	/* if automatic measurement is not enabled, get a fresh measurement into the buffer */
+	//if (_call_interval == 0) {
+	//	_gyro_reports->flush();
+	//	measure();
+	//}
+
+	/* if no data, error (we could block here) */
+	if (_gyro_reports->empty())
+		return -EAGAIN;
+
+	//perf_count(_gyro_reads);
+
+	/* copy reports out of our buffer to the caller */
+	gyro_report *grp = reinterpret_cast<gyro_report *>(buf);
+	int transferred = 0;
+	while (count--) {
+		if (!_gyro_reports->get(grp))
+			break;
+		transferred++;
+		grp++;
+	}
+
+	/* return the number of bytes transferred */
+	return (transferred * sizeof(gyro_report));
+}
+
+s32 mpu6000::read(u8 *buf, u32 size)
+{
+	data_mpu_t *data = NULL;
+	u32 num = size / sizeof(data_mpu_t);
+	for (u32 i = 0; i < num; i++) {
+		data = &((data_mpu_t *)buf)[i];
+		mpu6000::get_gyro_raw((s16 *)(&(data->gyro)));
+		mpu6000::get_accel_raw((s16 *)(&(data->acce)));
+        //core::udelay(200);
+	}
+
+	return (num * sizeof(data_mpu_t));
 }
 
 s32 mpu6000::close(void)
@@ -204,7 +240,7 @@ void mpu6000::measure(void)
     struct mpu_report_reg report_reg;
 
 	struct mpu_report {
-        u8		status;
+        	u8		status;
 		s16		accel_x;
 		s16		accel_y;
 		s16		accel_z;
@@ -271,8 +307,8 @@ void mpu6000::measure(void)
 	/*
 	 * Report buffers.
 	 */
-	accel_report    arb;
-	gyro_report		grb;
+	accel_report	arb;
+	gyro_report	grb;
 
 	/*
 	 * Adjust and scale results to m/s^2.

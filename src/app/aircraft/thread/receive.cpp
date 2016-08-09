@@ -30,16 +30,15 @@ receive::~receive(void)
 
 void receive::run(void *parg)
 {
-  	receive *p = (receive *)parg;
+	receive *p = (receive *)parg;
 
-    u32 cnt = 0;
-
+	u32 cnt = 0;
 	msgque *sync_rc = leader_system::get_instance()->get_sync_rc();
 
 	mpu6000 *mpu6000 = leader_system::get_instance()->get_mpu6000();
-    mpu6000->open(NULL);
+	mpu6000->open(NULL);
 	ms5611 *ms5611 = leader_system::get_instance()->get_ms5611();
-    ms5611->open(NULL);
+	ms5611->open(NULL);
 
 
 	packet *ppacket  = leader_system::get_instance()->get_packet();
@@ -54,18 +53,22 @@ void receive::run(void *parg)
 
 	struct accel_report accel;
 	memset(&accel, 0, sizeof(accel));
-
+	struct gyro_report gyro;
+	memset(&gyro, 0, sizeof(gyro));
+	
 	for ( ; ;)
 	{
-        //mpu6000->read((u8 *)(pitem_mpu->data_mpu), pattr->num_mpu * sizeof(data_mpu_t));
-        //mpu6000->get_temperature(&(pitem_mpu->temperature));
-        mpu6000->read((u8 *)&accel, sizeof(accel_report));
-        DBG("%s: accel.x_raw=%d, accel.y_raw=%d, accel.z_raw=%d.\n",
-                _os_name,
-                accel.x_raw,
-                accel.y_raw,
-                accel.z_raw
-                );
+		//mpu6000->read((u8 *)(pitem_mpu->data_mpu), pattr->num_mpu * sizeof(data_mpu_t));
+		//mpu6000->get_temperature(&(pitem_mpu->temperature));
+		mpu6000->read_accel((u8 *)&accel, sizeof(accel_report));
+		mpu6000->read_gyro((u8 *)&gyro, sizeof(gyro_report));
+
+		DBG("%s: accel.x_raw=%d, accel.y_raw=%d, accel.z_raw=%d, "
+			"gyro.x_raw=%d, gyro.y_raw=%d, gyro.z_raw=%d.\n",
+			_os_name,
+			accel.x_raw, accel.y_raw, accel.z_raw,
+			gyro.x_raw, gyro.y_raw, gyro.z_raw
+			);
 #if 0
         ms5611->read((u8 *)(pitem_baro->data_baro), pattr->num_baro * sizeof(data_baro_t));
 		for (u32 i = 0; /*i < pattr->num_baro*/ i < 1; i++)

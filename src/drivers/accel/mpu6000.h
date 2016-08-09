@@ -520,6 +520,8 @@ public:
 
 public:
     virtual s32 open(s32 flags);
+    s32 read_accel(u8 *buf, u32 size);
+    s32 read_gyro(u8 *buf, u32 size);
     virtual s32 read(u8 *buf, u32 size);
     virtual s32 close(void);
 
