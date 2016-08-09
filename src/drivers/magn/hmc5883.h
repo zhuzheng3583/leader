@@ -19,6 +19,11 @@
 #include "i2c.h"
 
 #include "packet.h"
+#include "ringbuffer.h"
+#include "magn.h"
+
+
+#include "os/thread.h"
 
 //bit0-bit1 xyz是否使用偏压,默认为0正常配置
 //bit2-bit4 数据输出速率, 110为最大75HZ 100为15HZ 最小000 0.75HZ
@@ -30,12 +35,12 @@
 
 //bit0-bit1 模式设置 00为连续测量 01为单一测量
 #define ADDR_MODE 		0x02 	// r/w
-#define ADDR_DATA_X_MSB 	0x03	// r
-#define ADDR_DATA_X_LSB 	0x04	// r
-#define ADDR_DATA_Z_MSB 	0x05	// r
-#define ADDR_DATA_Z_LSB 	0x06	// r
-#define ADDR_DATA_Y_MSB 	0x07	// r
-#define ADDR_DATA_Y_LSB 	0x08	// r
+#define ADDR_DATA_OUT_X_MSB 	0x03	// r
+#define ADDR_DATA_OUT_X_LSB 	0x04	// r
+#define ADDR_DATA_OUT_Z_MSB 	0x05	// r
+#define ADDR_DATA_OUT_Z_LSB 	0x06	// r
+#define ADDR_DATA_OUT_Y_MSB 	0x07	// r
+#define ADDR_DATA_OUT_Y_LSB 	0x08	// r
 
 //bit1 数据更新时该位自动锁存,等待用户读取,读取到一半的时候防止数据改变
 //bit0 数据已经准备好等待读取了,DRDY引脚也能用
@@ -48,11 +53,11 @@
 
 //三个识别寄存器的默认值
 //0x48
-#define ID_A_WHO_AM_I			'H' 
+#define ID_A_WHO_AM_I			'H'
 //0x34
-#define ID_B_WHO_AM_I			'4' 
+#define ID_B_WHO_AM_I			'4'
 //0x33
-#define ID_C_WHO_AM_I			'3' 
+#define ID_C_WHO_AM_I			'3'
 
 
 #define HMC5883_SLAVE_ADDRESS 0x3C //写地址,读地址+1
@@ -64,27 +69,67 @@
 #define HMC_DEFAULT_MODE_VALUE          0x00     //连续测量模式
 
 
+/* Max measurement rate is 160Hz, however with 160 it will be set to 166 Hz, therefore workaround using 150 */
+#define HMC5883_CONVERSION_INTERVAL	(1000000 / 150)	/* microseconds */
+#define HMC5883_CONVERSION_INTERVAL_MS	(6)
+
+
+/* temperature on hmc5983 only */
+#define ADDR_TEMP_OUT_MSB		0x31
+#define ADDR_TEMP_OUT_LSB		0x32
+
+/* modes not changeable outside of driver */
+#define HMC5883L_MODE_NORMAL		(0 << 0)  /* default */
+#define HMC5883L_MODE_POSITIVE_BIAS	(1 << 0)  /* positive bias */
+#define HMC5883L_MODE_NEGATIVE_BIAS	(1 << 1)  /* negative bias */
+
+#define HMC5883L_AVERAGING_1		(0 << 5) /* conf a register */
+#define HMC5883L_AVERAGING_2		(1 << 5)
+#define HMC5883L_AVERAGING_4		(2 << 5)
+#define HMC5883L_AVERAGING_8		(3 << 5)
+
+#define MODE_REG_CONTINOUS_MODE		(0 << 0)
+#define MODE_REG_SINGLE_MODE		(1 << 0) /* default */
+
+#define STATUS_REG_DATA_OUT_LOCK	(1 << 1) /* page 16: set if data is only partially read, read device to reset */
+#define STATUS_REG_DATA_READY		(1 << 0) /* page 16: set if all axes have valid measurements */
+
+#define HMC5983_TEMP_SENSOR_ENABLE	(1 << 7)
+
+using namespace os;
+
 namespace driver {
 
-class hmc5883 : public device, public interrupt
+class hmc5883 : public device, public interrupt, public thread
 {
 public:
-    hmc5883(PCSTR name, s32 id);
+    hmc5883(PCSTR devname, s32 devid);
     ~hmc5883(void);
 
 public:
 	u8 _slave_addr;
 	i2c *_i2c;
-
+	unsigned		_measure_ticks;
+	ringbuffer		*_mag_reports;
+	mag_scale		_scale;
+	float 			_range_scale;
+	float 			_range_ga;
+	struct mag_report	_last_report;           /**< used for info() */
 public:
     s32 probe(i2c *pi2c, u8 slave_addr);
     s32 remove(void);
 
 public:
     s32 init(void);
-    //s32 reset(void);
-    //void measure(void);
-    
+    s32 reset(void);
+    void measure(void);
+
+public:
+    virtual s32 open(s32 flags);
+    virtual s32 read(u8 *buf, u32 size);
+    virtual s32 close(void);
+
+
 public:
 	s32 read_raw(void);
 
@@ -92,6 +137,9 @@ public:
 	s32 write_reg8(u8 reg, u8 data);
 	s32 read_reg(u8 reg, u8 *buf, u8 len);
 	s32 write_reg(u8 reg, u8 *buf, u8 len);
+
+public:
+	virtual void run(void *parg);
 };
 }
 

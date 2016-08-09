@@ -56,11 +56,6 @@ s32 mpu6000::probe(spi *pspi, gpio *gpio_cs)
 {
 	ASSERT((pspi != NULL) && (gpio_cs != NULL));
 
-	if (device::probe() < 0) {
-		ERR("%s: failed to probe.\n", _devname);
-		goto fail0;
-	}
-
     _gpio_cs = gpio_cs;
     _spi = pspi;
 
@@ -71,8 +66,9 @@ s32 mpu6000::probe(spi *pspi, gpio *gpio_cs)
 	ret = init();
 	if (ret) {
 		ERR("%s: failed to init.\n", _devname);
+        goto fail0;
 	}
-	
+
 #if 0 //test
     s16 gyro[3] = { 0 };
     s16 accel[3] = { 0 };
@@ -127,7 +123,7 @@ s32 mpu6000::read_accel(u8 *buf, u32 size)
 	}
 
 	/* return the number of bytes transferred */
-	return (transferred * sizeof(accel_report));	
+	return (transferred * sizeof(accel_report));
 }
 
 s32 mpu6000::read_gyro(u8 *buf, u32 size)
@@ -171,10 +167,8 @@ s32 mpu6000::close(void)
 
 void mpu6000::run(void *parg)
 {
-    u32 cnt = 0;
-	for (cnt = 0; ;cnt++)
+	for (;;)
 	{
-		//INF("%s: ...\n", _devname);
         mpu6000::measure();
         msleep(100);
 	}
@@ -402,10 +396,20 @@ s32 mpu6000::reset(void)
 }
 void mpu6000::measure(void)
 {
-    struct mpu_report_reg report_reg;
-
+#pragma pack(push, 1)
+	struct mpu_report_reg { /* Report conversation within the MPU6000 */
+		u8		status;
+		u8		accel_x[2];
+		u8		accel_y[2];
+		u8		accel_z[2];
+		u8		temp[2];
+		u8		gyro_x[2];
+		u8		gyro_y[2];
+		u8		gyro_z[2];
+	} report_reg;
+#pragma pack(pop)
 	struct mpu_report {
-        	u8		status;
+        u8		status;
 		s16		accel_x;
 		s16		accel_y;
 		s16		accel_z;

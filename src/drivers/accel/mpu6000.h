@@ -420,22 +420,6 @@ struct mpu6050_platform_data {
 using namespace os;
 
 namespace driver {
-#pragma pack(push, 1)
-	/**
-	 * Report conversation within the MPU6000
-	 */
-	struct mpu_report_reg {
-		u8		status;
-		u8		accel_x[2];
-		u8		accel_y[2];
-		u8		accel_z[2];
-		u8		temp[2];
-		u8		gyro_x[2];
-		u8		gyro_y[2];
-		u8		gyro_z[2];
-	};
-#pragma pack(pop)
-
 
 class mpu6000 : public device, public interrupt, public thread
 {
@@ -462,12 +446,12 @@ protected:
 	// last temperature reading for print_info()
 	f32			_last_temperature;
 
-public:	
+public:
     s32 init(void);
     s32 reset(void);
     void measure(void);
     s16 s16_from_bytes(u8 bytes[]);
-    
+
 public:
     s32 probe(spi *pspi, gpio *gpio_cs);
     s32 remove(void);
