@@ -12,9 +12,37 @@
 
 namespace driver {
 
-mpu6000::mpu6000(PCSTR name, s32 id) :
-    device(name, id)
+mpu6000::mpu6000(PCSTR devname, s32 devid) :
+    device(devname, devid),
+    _accel_reports(NULL),
+    _accel_range_scale(0.0f),
+    _accel_range_m_s2(0.0f),
+    _gyro_reports(NULL),
+    _gyro_range_scale(0.0f),
+    _gyro_range_rad_s(0.0f)
+
 {
+    // default accel scale factors
+	_accel_scale.x_offset = 0;
+	_accel_scale.x_scale  = 1.0f;
+	_accel_scale.y_offset = 0;
+	_accel_scale.y_scale  = 1.0f;
+	_accel_scale.z_offset = 0;
+	_accel_scale.z_scale  = 1.0f;
+
+	// default gyro scale factors
+	_gyro_scale.x_offset = 0;
+	_gyro_scale.x_scale  = 1.0f;
+	_gyro_scale.y_offset = 0;
+	_gyro_scale.y_scale  = 1.0f;
+	_gyro_scale.z_offset = 0;
+	_gyro_scale.z_scale  = 1.0f;
+
+	_params.name = "mpu6000_thread";
+	_params.priority = 0;
+	_params.stacksize = 2048;
+	_params.func = (void *)thread::func;
+	_params.parg = (thread *)this;
 
 }
 
@@ -29,7 +57,7 @@ s32 mpu6000::probe(spi *pspi, gpio *gpio_cs)
     ASSERT((pspi != NULL) && (gpio_cs != NULL));
 
 	if (device::probe() < 0) {
-		ERR("%s: failed to probe.\n", _name);
+		ERR("%s: failed to probe.\n", _devname);
 		goto fail0;
 	}
 
@@ -39,6 +67,7 @@ s32 mpu6000::probe(spi *pspi, gpio *gpio_cs)
 	_gpio_cs->set_direction_output();
 	_gpio_cs->set_value(true);
 
+	//等待上电稳定
     core::mdelay(2000);
     write_reg8(MPUREG_PWR_MGMT1, 0X80); 	// 复位MPU6050
     core::mdelay(100);
@@ -73,6 +102,16 @@ s32 mpu6000::probe(spi *pspi, gpio *gpio_cs)
             accel[0], accel[1], accel[2],gyro[0], gyro[1], gyro[2]);
     }
 #endif
+
+        /* allocate basic report buffers */
+	_accel_reports = new ringbuffer(2, sizeof(accel_report));
+	if (_accel_reports == NULL)
+		return -1;
+
+	_gyro_reports = new ringbuffer(2, sizeof(gyro_report));
+	if (_gyro_reports == NULL)
+		return -1;
+
     return 0;
 
 fail0:
@@ -86,6 +125,7 @@ s32 mpu6000::open(s32 flags)
 
 s32 mpu6000::read(u8 *buf, u32 size)
 {
+#if 1
 	data_mpu_t *data = NULL;
 	u32 num = size / sizeof(data_mpu_t);
 	for (u32 i = 0; i < num; i++) {
@@ -96,16 +136,222 @@ s32 mpu6000::read(u8 *buf, u32 size)
 	}
 
 	return (num * sizeof(data_mpu_t));
-}
+#else
+	u32 count = size / sizeof(accel_report);
 
-s32 mpu6000::write(u8 *buf, u32 size)
-{
+	/* buffer must be large enough */
+	if (count < 1)
+		return -ENOSPC;
 
+	/* if automatic measurement is not enabled, get a fresh measurement into the buffer */
+	//if (_call_interval == 0) {
+	//	_accel_reports->flush();
+	//	measure();
+	//}
+
+	/* if no data, error (we could block here) */
+	if (_accel_reports->empty())
+		return -EAGAIN;
+
+
+	/* copy reports out of our buffer to the caller */
+	accel_report *arp = reinterpret_cast<accel_report *>(buf);
+	int transferred = 0;
+	while (count--) {
+		if (!_accel_reports->get(arp))
+			break;
+		transferred++;
+		arp++;
+	}
+
+	/* return the number of bytes transferred */
+	return (transferred * sizeof(accel_report));
+    #endif
 }
 
 s32 mpu6000::close(void)
 {
 
+}
+
+void mpu6000::run(void *parg)
+{
+    u32 cnt = 0;
+	for (cnt = 0; ;cnt++)
+	{
+		//INF("%s: ...\n", _devname);
+        mpu6000::measure();
+        msleep(100);
+	}
+}
+
+
+s16 mpu6000::s16_from_bytes(u8 bytes[])
+{
+	union {
+		u8    b[2];
+		s16    w;
+	} u;
+
+	u.b[1] = bytes[0];
+	u.b[0] = bytes[1];
+
+	return u.w;
+}
+
+void mpu6000::measure(void)
+{
+    struct mpu_report_reg report_reg;
+
+	struct mpu_report {
+        u8		status;
+		s16		accel_x;
+		s16		accel_y;
+		s16		accel_z;
+		s16		temp;
+		s16		gyro_x;
+		s16		gyro_y;
+		s16		gyro_z;
+	} report;
+
+	/*
+	 * Fetch the full set of measurements from the MPU6000 in one pass.
+	 */
+	if (mpu6000::read_reg(MPUREG_INT_STATUS, (u8 *)&report_reg, sizeof(report_reg)))
+        return;
+
+	/*
+	 * Convert from big to little endian
+	 */
+	report.accel_x = s16_from_bytes(report_reg.accel_x);
+	report.accel_y = s16_from_bytes(report_reg.accel_y);
+	report.accel_z = s16_from_bytes(report_reg.accel_z);
+
+	report.temp = s16_from_bytes(report_reg.temp);
+
+	report.gyro_x = s16_from_bytes(report_reg.gyro_x);
+	report.gyro_y = s16_from_bytes(report_reg.gyro_y);
+	report.gyro_z = s16_from_bytes(report_reg.gyro_z);
+
+	if (report.accel_x == 0 &&
+	    report.accel_y == 0 &&
+	    report.accel_z == 0 &&
+	    report.temp == 0 &&
+	    report.gyro_x == 0 &&
+	    report.gyro_y == 0 &&
+	    report.gyro_z == 0) {
+		// all zero data - probably a SPI bus error
+                // note that we don't call reset() here as a reset()
+                // costs 20ms with interrupts disabled. That means if
+                // the mpu6k does go bad it would cause a FMU failure,
+                // regardless of whether another sensor is available,
+		return;
+	}
+
+
+	/*
+	 * Swap axes and negate y
+	 */
+#if 0
+	s16 accel_xt = report.accel_y;
+	s16 accel_yt = ((report.accel_x == -32768) ? 32767 : -report.accel_x);
+
+	s16 gyro_xt = report.gyro_y;
+	s16 gyro_yt = ((report.gyro_x == -32768) ? 32767 : -report.gyro_x);
+
+	/*
+	 * Apply the swap
+	 */
+	report.accel_x = accel_xt;
+	report.accel_y = accel_yt;
+	report.gyro_x = gyro_xt;
+	report.gyro_y = gyro_yt;
+#endif
+
+	/*
+	 * Report buffers.
+	 */
+	accel_report    arb;
+	gyro_report		grb;
+
+	/*
+	 * Adjust and scale results to m/s^2.
+	 */
+	grb.timestamp = arb.timestamp = 0;//hrt_absolute_time();
+
+	// report the error count as the sum of the number of bad
+	// transfers and bad register reads. This allows the higher
+	// level code to decide if it should use this sensor based on
+	// whether it has had failures
+    grb.error_count = arb.error_count = 0;//= perf_event_count(_bad_transfers) + perf_event_count(_bad_registers);
+
+	/*
+	 * 1) Scale raw value to SI units using scaling from datasheet.
+	 * 2) Subtract static offset (in SI units)
+	 * 3) Scale the statically calibrated values with a linear
+	 *    dynamically obtained factor
+	 *
+	 * Note: the static sensor offset is the number the sensor outputs
+	 * 	 at a nominally 'zero' input. Therefore the offset has to
+	 * 	 be subtracted.
+	 *
+	 *	 Example: A gyro outputs a value of 74 at zero angular rate
+	 *	 	  the offset is 74 from the origin and subtracting
+	 *		  74 from all measurements centers them around zero.
+	 */
+
+
+	/* NOTE: Axes have been swapped to match the board a few lines above. */
+
+	arb.x_raw = report.accel_x;
+	arb.y_raw = report.accel_y;
+	arb.z_raw = report.accel_z;
+
+	f32 x_in_new = ((report.accel_x * _accel_range_scale) - _accel_scale.x_offset) * _accel_scale.x_scale;
+	f32 y_in_new = ((report.accel_y * _accel_range_scale) - _accel_scale.y_offset) * _accel_scale.y_scale;
+	f32 z_in_new = ((report.accel_z * _accel_range_scale) - _accel_scale.z_offset) * _accel_scale.z_scale;
+
+
+	arb.x = 0;//_accel_filter_x.apply(x_in_new);
+	arb.y = 0;//_accel_filter_y.apply(y_in_new);
+	arb.z = 0;//_accel_filter_z.apply(z_in_new);
+
+	// apply user specified rotation
+	//rotate_3f(_rotation, arb.x, arb.y, arb.z);
+
+	arb.scaling = _accel_range_scale;
+	arb.range_m_s2 = _accel_range_m_s2;
+
+	_last_temperature = (report.temp) / 361.0f + 35.0f;
+
+	arb.temperature_raw = report.temp;
+	arb.temperature = _last_temperature;
+
+	grb.x_raw = report.gyro_x;
+	grb.y_raw = report.gyro_y;
+	grb.z_raw = report.gyro_z;
+
+	float x_gyro_in_new = ((report.gyro_x * _gyro_range_scale) - _gyro_scale.x_offset) * _gyro_scale.x_scale;
+	float y_gyro_in_new = ((report.gyro_y * _gyro_range_scale) - _gyro_scale.y_offset) * _gyro_scale.y_scale;
+	float z_gyro_in_new = ((report.gyro_z * _gyro_range_scale) - _gyro_scale.z_offset) * _gyro_scale.z_scale;
+
+	grb.x = 0;//_gyro_filter_x.apply(x_gyro_in_new);
+	grb.y = 0;//_gyro_filter_y.apply(y_gyro_in_new);
+	grb.z = 0;//_gyro_filter_z.apply(z_gyro_in_new);
+
+	// apply user specified rotation
+	//rotate_3f(_rotation, grb.x, grb.y, grb.z);
+
+	grb.scaling = _gyro_range_scale;
+	grb.range_rad_s = _gyro_range_rad_s;
+
+	grb.temperature_raw = report.temp;
+	grb.temperature = _last_temperature;
+
+	_accel_reports->force(&arb);
+	_gyro_reports->force(&grb);
+
+    return;
 }
 
 /*

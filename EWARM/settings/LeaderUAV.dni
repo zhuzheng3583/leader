@@ -10,10 +10,10 @@ LimitSize=0
 ByteLimit=50
 [StLinkDriver]
 CStepIntDis=_ 0
-stlinkserialNo=2798FD0D
+stlinkserialNo=037B5AB6
 stlinkfoundProbes=
 [DebugChecksum]
-Checksum=-854862624
+Checksum=2068120259
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -145,9 +145,7 @@ Bp11=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.517.2" 0 0 1 "" 0 
 Bp12=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.463.3" 0 0 1 "" 0 "" 0
 Bp13=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart.cpp}.407.8" 0 0 1 "" 0 "" 0
 Bp14=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart.cpp}.303.9" 0 0 1 "" 0 "" 0
-Bp15=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\accel\mpu6000.cpp}.58.9" 0 0 1 "" 0 "" 0
-Bp16=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\accel\mpu6000.cpp}.43.5" 0 0 1 "" 0 "" 0
-Count=17
+Count=15
 [Aliases]
 A0=_ "E:\code\SKYVIEW_H_SUB\LeaderUAV\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
 A1=_ "E:\code\leader\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""

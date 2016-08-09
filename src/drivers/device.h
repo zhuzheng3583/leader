@@ -1,5 +1,5 @@
 /*******************************Copyright (c)***************************
-** 
+**
 ** Porject name:	leader
 ** Created by:		zhuzheng<happyzhull@163.com>
 ** Created date:	2016/04/05
@@ -31,31 +31,31 @@ enum seek_mode
 enum ioctl_cmd
 {
     CMD_UART_BANUD      = 0x0000A010,	// 设置UART波特率，参数：u32 banud(如9600，115200)
-								
+
     CMD_SPI_CLK         = 0x0000A020,	// 设置SPI时钟线频率，参数：u32 spiclk(如5000000)
-								
+
     CMD_I2C_CLK         = 0x0000A030,	// 设置I2C时钟线频率，		参数：u32 i2cclk(如100000)
     CMD_I2C_SlAVE_ADDR  = 0x0000A031,	// 设置I2C丛机设备地址，	参数：u32 slaveaddr(7bit)
-								
+
     CMD_MPU_TEMPERTURE  = 0x0000A052,
     CMD_MPU_FIFO_RATE   = 0x0000A053,
-								
+
     CMD_GPS_UARTBANUD   = 0x0000A060,	// 设置GPS所依赖的设备UART波特率，  参数：u32 banud(如9600，115200)
-								
+
     CMD_GPIO_SETDIR     = 0x0000A070,
     CMD_GPIO_OUT        = 0x0000A071,
     CMD_GPIO_IN         = 0x0000A072,
-								
+
     CMD_LED_ON          = 0x0000A080,
     CMD_LED_OFF         = 0x0000A081,
-								
+
     CMD_TIMER_FUNC      = 0x0000A090,
     CMD_TIMER_FUNC_ARG  = 0x0000A091,
     CMD_TIMER_OUT       = 0x0000A092,
-								
+
     CMD_PWM_DUTY_CYCLE  = 0x0000A0A0,
-								
-    CMD_WDOG_TIMEOUTMS  = 0x0000A0B0, 
+
+    CMD_WDOG_TIMEOUTMS  = 0x0000A0B0,
 };
 
 enum dir_rw
@@ -75,7 +75,7 @@ class device
 public:
     device(void);
     device(PCSTR name, s32 id);
-    
+
     ~device(void);
 
 public:
@@ -85,6 +85,11 @@ public:
     u32 _handle;
     s32 _probed;
     s32 _opened;
+
+	PCSTR _devname;
+	s32 _devid;
+	u32 _devhandle;
+
 
 public:
     s32 probe(void);
@@ -96,7 +101,7 @@ public:
     virtual s32 read(u8 *buf, u32 size);
     virtual s32 write(u8 *buf, u32 size);
     virtual s32 close(void);
-    
+
     /* TODO 阻塞非阻塞接口 */
     /* TODO 实现Linux的poll函数，pendio类似于poll */
     //virtual s32 poll(enum dir_rw dir, s32 timeout); // 时间单位由子类决定

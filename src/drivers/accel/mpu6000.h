@@ -19,6 +19,12 @@
 #include "spi.h"
 
 #include "packet.h"
+#include "ringbuffer.h"
+#include "accel.h"
+#include "gyro.h"
+
+
+#include "os/thread.h"
 
 #define REG_SAMPLE_RATE_DIV     0x19
 #define REG_CONFIG              0x1A
@@ -427,9 +433,9 @@ struct mpu6050_platform_data {
 //q30格式,long转float时的除数.
 #define q30  1073741824.0f
 
+using namespace os;
 
 namespace driver {
-
 
 struct mpu_chip_config {
     u16 gyro_fsr;
@@ -461,11 +467,28 @@ struct mpu_fifo_packet
 	s16 gyro_z;
 };
 
+#pragma pack(push, 1)
+	/**
+	 * Report conversation within the MPU6000, including command byte and
+	 * interrupt status.
+	 */
+	struct mpu_report_reg {
+		u8		status;
+		u8		accel_x[2];
+		u8		accel_y[2];
+		u8		accel_z[2];
+		u8		temp[2];
+		u8		gyro_x[2];
+		u8		gyro_y[2];
+		u8		gyro_z[2];
+	};
+#pragma pack(pop)
 
-class mpu6000 : public device, public interrupt
+
+class mpu6000 : public device, public interrupt, public thread
 {
 public:
-	mpu6000(PCSTR name, s32 id);
+	mpu6000(PCSTR devname, s32 devid);
 	~mpu6000(void);
 
 protected:
@@ -474,14 +497,30 @@ protected:
 	spi		*_spi;
 	gpio    *_gpio_cs;
 
+	ringbuffer	*_accel_reports;
+	struct accel_scale	_accel_scale;
+	f32			_accel_range_scale;
+	f32			_accel_range_m_s2;
+
+	ringbuffer	*_gyro_reports;
+	struct gyro_scale	_gyro_scale;
+	f32			_gyro_range_scale;
+	f32			_gyro_range_rad_s;
+
+	// last temperature reading for print_info()
+	f32			_last_temperature;
+
+public:
+	s16 s16_from_bytes(u8 bytes[]);
+	void measure(void);
+
 public:
     s32 probe(spi *pspi, gpio *gpio_cs);
     s32 remove(void);
 
 public:
     virtual s32 open(s32 flags);
-    virtual s32 read(u8 *buf, u32 count);
-    virtual s32 write(u8 *buf, u32 count);
+    virtual s32 read(u8 *buf, u32 size);
     virtual s32 close(void);
 
 public:
@@ -512,6 +551,10 @@ public:
 public:
 	s32 self_test(void);
 	s32 chip_self_test(void);
+
+public:
+	virtual void run(void *parg);
+
 };
 
 

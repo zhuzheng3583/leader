@@ -3377,6 +3377,12 @@
       <name>$PROJ_DIR$\..\src\drivers\pwm.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\src\drivers\ringbuffer.cpp</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\drivers\ringbuffer.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\src\drivers\sensorhub.cpp</name>
     </file>
     <file>
