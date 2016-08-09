@@ -191,20 +191,6 @@ s32 mpu6000::read_gyro(u8 *buf, u32 size)
 	return (transferred * sizeof(gyro_report));
 }
 
-s32 mpu6000::read(u8 *buf, u32 size)
-{
-	data_mpu_t *data = NULL;
-	u32 num = size / sizeof(data_mpu_t);
-	for (u32 i = 0; i < num; i++) {
-		data = &((data_mpu_t *)buf)[i];
-		mpu6000::get_gyro_raw((s16 *)(&(data->gyro)));
-		mpu6000::get_accel_raw((s16 *)(&(data->acce)));
-        //core::udelay(200);
-	}
-
-	return (num * sizeof(data_mpu_t));
-}
-
 s32 mpu6000::close(void)
 {
 
@@ -235,6 +221,167 @@ s16 mpu6000::s16_from_bytes(u8 bytes[])
 	return u.w;
 }
 
+
+s32 mpu6000::init(void)
+{
+#if 0
+	int ret;
+
+	/* do SPI init (and probe) first */
+	ret = SPI::init();
+
+	/* if probe/setup failed, bail now */
+	if (ret != OK) {
+		debug("SPI setup failed");
+		return ret;
+	}
+
+	/* allocate basic report buffers */
+	_accel_reports = new RingBuffer(2, sizeof(accel_report));
+	if (_accel_reports == nullptr)
+		goto out;
+
+	_gyro_reports = new RingBuffer(2, sizeof(gyro_report));
+	if (_gyro_reports == nullptr)
+		goto out;
+
+	if (reset() != OK)
+		goto out;
+
+	/* Initialize offsets and scales */
+	_accel_scale.x_offset = 0;
+	_accel_scale.x_scale  = 1.0f;
+	_accel_scale.y_offset = 0;
+	_accel_scale.y_scale  = 1.0f;
+	_accel_scale.z_offset = 0;
+	_accel_scale.z_scale  = 1.0f;
+
+	_gyro_scale.x_offset = 0;
+	_gyro_scale.x_scale  = 1.0f;
+	_gyro_scale.y_offset = 0;
+	_gyro_scale.y_scale  = 1.0f;
+	_gyro_scale.z_offset = 0;
+	_gyro_scale.z_scale  = 1.0f;
+
+
+	/* do CDev init for the gyro device node, keep it optional */
+	ret = _gyro->init();
+	/* if probe/setup failed, bail now */
+	if (ret != OK) {
+		debug("gyro init failed");
+		return ret;
+	}
+
+	_accel_class_instance = register_class_devname(ACCEL_BASE_DEVICE_PATH);
+
+	measure();
+
+	/* advertise sensor topic, measure manually to initialize valid report */
+	struct accel_report arp;
+	_accel_reports->get(&arp);
+
+	/* measurement will have generated a report, publish */
+	_accel_topic = orb_advertise_multi(ORB_ID(sensor_accel), &arp,
+		&_accel_orb_class_instance, (is_external()) ? ORB_PRIO_MAX : ORB_PRIO_HIGH);
+
+	if (_accel_topic < 0) {
+		warnx("ADVERT FAIL");
+	}
+
+
+	/* advertise sensor topic, measure manually to initialize valid report */
+	struct gyro_report grp;
+	_gyro_reports->get(&grp);
+
+	_gyro->_gyro_topic = orb_advertise_multi(ORB_ID(sensor_gyro), &grp,
+		&_gyro->_gyro_orb_class_instance, (is_external()) ? ORB_PRIO_MAX : ORB_PRIO_HIGH);
+
+	if (_gyro->_gyro_topic < 0) {
+		warnx("ADVERT FAIL");
+	}
+
+out:
+	return ret;
+#endif
+	return 0;
+}
+
+s32 mpu6000::reset(void)
+{
+#if 0
+	// if the mpu6000 is initialised after the l3gd20 and lsm303d
+	// then if we don't do an irqsave/irqrestore here the mpu6000
+	// frequenctly comes up in a bad state where all transfers
+	// come as zero
+	uint8_t tries = 5;
+	while (--tries != 0) {
+		irqstate_t state;
+		state = irqsave();
+
+		write_reg(MPUREG_PWR_MGMT_1, BIT_H_RESET);
+		up_udelay(10000);
+
+		// Wake up device and select GyroZ clock. Note that the
+		// MPU6000 starts up in sleep mode, and it can take some time
+		// for it to come out of sleep
+		write_checked_reg(MPUREG_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
+		up_udelay(1000);
+
+		// Disable I2C bus (recommended on datasheet)
+		write_checked_reg(MPUREG_USER_CTRL, BIT_I2C_IF_DIS);
+		irqrestore(state);
+
+		if (read_reg(MPUREG_PWR_MGMT_1) == MPU_CLK_SEL_PLLGYROZ) {
+			break;
+		}
+		perf_count(_reset_retries);
+		usleep(2000);
+	}
+	if (read_reg(MPUREG_PWR_MGMT_1) != MPU_CLK_SEL_PLLGYROZ) {
+		return -EIO;
+	}
+
+	usleep(1000);
+
+	// SAMPLE RATE
+	_set_sample_rate(_sample_rate);
+	usleep(1000);
+
+	// FS & DLPF   FS=2000 deg/s, DLPF = 20Hz (low pass filter)
+	// was 90 Hz, but this ruins quality and does not improve the
+	// system response
+	_set_dlpf_filter(MPU6000_DEFAULT_ONCHIP_FILTER_FREQ);
+	usleep(1000);
+	// Gyro scale 2000 deg/s ()
+	write_checked_reg(MPUREG_GYRO_CONFIG, BITS_FS_2000DPS);
+	usleep(1000);
+
+	// correct gyro scale factors
+	// scale to rad/s in SI units
+	// 2000 deg/s = (2000/180)*PI = 34.906585 rad/s
+	// scaling factor:
+	// 1/(2^15)*(2000/180)*PI
+	_gyro_range_scale = (0.0174532 / 16.4);//1.0f / (32768.0f * (2000.0f / 180.0f) * M_PI_F);
+	_gyro_range_rad_s = (2000.0f / 180.0f) * M_PI_F;
+
+	set_accel_range(8);
+
+	usleep(1000);
+
+	// INT CFG => Interrupt on Data Ready
+	write_checked_reg(MPUREG_INT_ENABLE, BIT_RAW_RDY_EN);        // INT: Raw data ready
+	usleep(1000);
+	write_checked_reg(MPUREG_INT_PIN_CFG, BIT_INT_ANYRD_2CLEAR); // INT: Clear on any read
+	usleep(1000);
+
+	// Oscillator set
+	// write_reg(MPUREG_PWR_MGMT_1,MPU_CLK_SEL_PLLGYROZ);
+	usleep(1000);
+
+	return OK;
+#endif
+	return 0;
+}
 void mpu6000::measure(void)
 {
     struct mpu_report_reg report_reg;
@@ -1316,40 +1463,6 @@ s8 mpu6000::dmp_get_data(f32 *pitch, f32 *roll, f32 *yaw)
 	return 0;
 }
 
-
-u8 mpu6000::reg_read_byte(u8 reg)
-{
-    u8 data = 0;
-    mpu6000::reg_read(reg, sizeof(data), &data);
-    return data;
-}
-
-
-void mpu6000::reg_write_byte(u8 reg, u8 data)
-{
-    mpu6000::reg_write(reg, sizeof(data), &data);
-}
-
-s8 mpu6000::reg_read(u8 reg, u8 len, u8 *buf)
-{
-    reg = 0x80 | reg;
-    _spi->chip_select_active(_gpio);
-    _spi->transfer((s8*)&reg, NULL, sizeof(reg));
-    if (_spi->transfer(NULL, (s8*)buf, len) != len)
-        return -1;
-    _spi->chip_select_deactive(_gpio);
-    return 0;
-}
-
-s8 mpu6000::reg_write(u8 reg, u8 len, u8 *buf)
-{
-    reg = 0x7f & reg;
-    _spi->chip_select_active(_gpio);
-    _spi->transfer((s8*)&reg, NULL, sizeof(reg));
-    if (_spi->transfer((s8*)buf, NULL, len) != len)
-        return -1;
-    _spi->chip_select_deactive(_gpio);
-    return 0;
 }
 
 

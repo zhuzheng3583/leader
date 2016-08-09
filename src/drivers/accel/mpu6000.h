@@ -365,26 +365,7 @@ struct mpu6050_platform_data {
 #define MPUREG_ACCEL_MOT_THR	0X1F		// 运动检测阀值设置寄存器
 #define MPUREG_ACCEL_MOT_DUR	0X20
 #define MPUREG_FIFO_ENABLE		0X23		// FIFO使能寄存器
-#define MPUREG_I2CMST_CTRL		0X24		// IIC主机控制寄存器
-#define MPUREG_I2CSLV0_ADDR		0X25		// IIC从机0器件地址寄存器
-#define MPUREG_I2CSLV0			0X26		// IIC从机0数据地址寄存器
-#define MPUREG_I2CSLV0_CTRL		0X27		// IIC从机0控制寄存器
-#define MPUREG_I2CSLV1_ADDR		0X28		// IIC从机1器件地址寄存器
-#define MPUREG_I2CSLV1			0X29		// IIC从机1数据地址寄存器
-#define MPUREG_I2CSLV1_CTRL		0X2A		// IIC从机1控制寄存器
-#define MPUREG_I2CSLV2_ADDR		0X2B		// IIC从机2器件地址寄存器
-#define MPUREG_I2CSLV2			0X2C		// IIC从机2数据地址寄存器
-#define MPUREG_I2CSLV2_CTRL		0X2D		// IIC从机2控制寄存器
-#define MPUREG_I2CSLV3_ADDR		0X2E		// IIC从机3器件地址寄存器
-#define MPUREG_I2CSLV3			0X2F		// IIC从机3数据地址寄存器
-#define MPUREG_I2CSLV3_CTRL		0X30		// IIC从机3控制寄存器
-#define MPUREG_I2CSLV4_ADDR		0X31		// IIC从机4器件地址寄存器
-#define MPUREG_I2CSLV4			0X32		// IIC从机4数据地址寄存器
-#define MPUREG_I2CSLV4_DO		0X33		// IIC从机4写数据寄存器
-#define MPUREG_I2CSLV4_CTRL		0X34		// IIC从机4控制寄存器
-#define MPUREG_I2CSLV4_DI		0X35		// IIC从机4读数据寄存器
 
-#define MPUREG_I2CMST_STA		0X36		// IIC主机状态寄存器
 #define MPUREG_INT_PIN_CFG		0X37		// 中断/旁路设置寄存器
 #define MPUREG_INT_ENABLE		0X38		// 中断使能寄存器
 #define MPUREG_INT_STATUS		0X3A		// 中断状态寄存器
@@ -433,40 +414,12 @@ struct mpu6050_platform_data {
 //q30格式,long转float时的除数.
 #define q30  1073741824.0f
 
+
+
+
 using namespace os;
 
 namespace driver {
-
-struct mpu_chip_config {
-    u16 gyro_fsr;
-    u8 accel_fsr;
-    u8 sensors;
-    u8 lpf;
-    u8 clk_src;
-    u16 sample_rate;
-    u8 fifo_enable;
-    u8 int_enable;
-    u8 bypass_mode;
-    u8 accel_half;
-    u8 lp_accel_mode;
-    u8 int_motion_only;
-    u8 active_low_int;
-    u8 latched_int;
-    u8 dmp_on;
-    u8 dmp_loaded;
-    u16 dmp_sample_rate;
-};
-
-struct mpu_fifo_packet
-{
-	s16 acce_x;
-	s16 acce_y;
-	s16 acce_z;
-	s16 gyro_x;
-	s16 gyro_y;
-	s16 gyro_z;
-};
-
 #pragma pack(push, 1)
 	/**
 	 * Report conversation within the MPU6000, including command byte and
@@ -510,10 +463,12 @@ protected:
 	// last temperature reading for print_info()
 	f32			_last_temperature;
 
-public:
-	s16 s16_from_bytes(u8 bytes[]);
-	void measure(void);
-
+public:	
+    s32 reset(void);
+    s32 init(void);
+    void measure(void);
+    s16 s16_from_bytes(u8 bytes[]);
+    
 public:
     s32 probe(spi *pspi, gpio *gpio_cs);
     s32 remove(void);
@@ -522,7 +477,6 @@ public:
     virtual s32 open(s32 flags);
     s32 read_accel(u8 *buf, u32 size);
     s32 read_gyro(u8 *buf, u32 size);
-    virtual s32 read(u8 *buf, u32 size);
     virtual s32 close(void);
 
 public:
@@ -544,7 +498,7 @@ public:
 	u16 row_2_scale(s8 *row);
 	s8 	dmp_get_data(f32 *pitch, f32 *roll, f32 *yaw);
 
-
+private:
 	inline s32 read_reg8(u8 reg);
 	inline s32 write_reg8(u8 reg, u8 data);
 	s32 read_reg(u8 reg, u8 *buf, u8 len);
