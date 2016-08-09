@@ -422,8 +422,7 @@ using namespace os;
 namespace driver {
 #pragma pack(push, 1)
 	/**
-	 * Report conversation within the MPU6000, including command byte and
-	 * interrupt status.
+	 * Report conversation within the MPU6000
 	 */
 	struct mpu_report_reg {
 		u8		status;
@@ -464,8 +463,8 @@ protected:
 	f32			_last_temperature;
 
 public:	
-    s32 reset(void);
     s32 init(void);
+    s32 reset(void);
     void measure(void);
     s16 s16_from_bytes(u8 bytes[]);
     

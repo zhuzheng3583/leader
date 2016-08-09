@@ -80,9 +80,12 @@ public:
     s32 probe(i2c *pi2c, u8 slave_addr);
     s32 remove(void);
 
-
 public:
-	s32 init(void);
+    s32 init(void);
+    //s32 reset(void);
+    //void measure(void);
+    
+public:
 	s32 read_raw(void);
 
 	s32 read_reg8(u8 reg);

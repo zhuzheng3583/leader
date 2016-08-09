@@ -54,7 +54,7 @@ mpu6000::~mpu6000(void)
 
 s32 mpu6000::probe(spi *pspi, gpio *gpio_cs)
 {
-    ASSERT((pspi != NULL) && (gpio_cs != NULL));
+	ASSERT((pspi != NULL) && (gpio_cs != NULL));
 
 	if (device::probe() < 0) {
 		ERR("%s: failed to probe.\n", _devname);
@@ -67,30 +67,12 @@ s32 mpu6000::probe(spi *pspi, gpio *gpio_cs)
 	_gpio_cs->set_direction_output();
 	_gpio_cs->set_value(true);
 
-	//等待上电稳定
-    core::mdelay(2000);
-    write_reg8(MPUREG_PWR_MGMT1, 0X80); 	// 复位MPU6050
-    core::mdelay(100);
-    write_reg8(MPUREG_PWR_MGMT1, 0X00);  	// 唤醒MPU6050
-
-    set_gyro_fsr(2000);                         //陀螺仪传感器,±2000dps
-    set_accel_fsr(2);                           //加速度传感器,±2g
-    set_sample_rate(50);                        //设置采样率50Hz
-    write_reg8(MPUREG_INT_ENABLE, 0X00);    //关闭所有中断
-    write_reg8(MPUREG_USER_CTRL, 0X00);     //I2C主模式关闭
-    write_reg8(MPUREG_FIFO_ENABLE, 0X00);   //关闭FIFO
-    write_reg8(MPUREG_INT_PIN_CFG, 0X80);   //INT引脚低电平有效
-    u8 who_am_i = read_reg8(MPUREG_DEVICE_ID);
-    core::mdelay(1000);
-    if(who_am_i != MPU_I2C_SLAVE_ADDR) {
-        // 器件ID不正确
-        ERR("Failed to read mpu6000 ID...\n");
-        return -1;
-    }
-    write_reg8(MPUREG_PWR_MGMT1, 0X01);     //设置CLKSEL,PLL X轴为参考
-    write_reg8(MPUREG_PWR_MGMT2, 0X00);     // 加速度与陀螺仪都工作
-    set_sample_rate(200);                        //设置采样率
-
+	s32 ret = 0;
+	ret = init();
+	if (ret) {
+		ERR("%s: failed to init.\n", _devname);
+	}
+	
 #if 0 //test
     s16 gyro[3] = { 0 };
     s16 accel[3] = { 0 };
@@ -102,15 +84,6 @@ s32 mpu6000::probe(spi *pspi, gpio *gpio_cs)
             accel[0], accel[1], accel[2],gyro[0], gyro[1], gyro[2]);
     }
 #endif
-
-        /* allocate basic report buffers */
-	_accel_reports = new ringbuffer(2, sizeof(accel_report));
-	if (_accel_reports == NULL)
-		return -1;
-
-	_gyro_reports = new ringbuffer(2, sizeof(gyro_report));
-	if (_gyro_reports == NULL)
-		return -1;
 
     return 0;
 
@@ -224,6 +197,52 @@ s16 mpu6000::s16_from_bytes(u8 bytes[])
 
 s32 mpu6000::init(void)
 {
+	//等待上电稳定
+	core::mdelay(2000);
+    write_reg8(MPUREG_PWR_MGMT1, 0X80); 	// 复位MPU6050
+    core::mdelay(100);
+    write_reg8(MPUREG_PWR_MGMT1, 0X00);  	// 唤醒MPU6050
+
+    set_gyro_fsr(2000);                         //陀螺仪传感器,±2000dps
+    set_accel_fsr(2);                           //加速度传感器,±2g
+    set_sample_rate(50);                        //设置采样率50Hz
+    write_reg8(MPUREG_INT_ENABLE, 0X00);    //关闭所有中断
+    write_reg8(MPUREG_USER_CTRL, 0X00);     //I2C主模式关闭
+    write_reg8(MPUREG_FIFO_ENABLE, 0X00);   //关闭FIFO
+    write_reg8(MPUREG_INT_PIN_CFG, 0X80);   //INT引脚低电平有效
+    u8 who_am_i = read_reg8(MPUREG_DEVICE_ID);
+    core::mdelay(1000);
+    if(who_am_i != MPU_I2C_SLAVE_ADDR) {
+        // 器件ID不正确
+        ERR("Failed to read mpu6000 ID...\n");
+        return -1;
+    }
+    write_reg8(MPUREG_PWR_MGMT1, 0X01);     //设置CLKSEL,PLL X轴为参考
+    write_reg8(MPUREG_PWR_MGMT2, 0X00);     // 加速度与陀螺仪都工作
+    set_sample_rate(200);                        //设置采样率
+
+#if 0 //test
+    s16 gyro[3] = { 0 };
+    s16 accel[3] = { 0 };
+    while (1) {
+        mpu6000::get_gyro_raw(gyro);
+        mpu6000::get_accel_raw(accel);
+        INF("accel[0]=%d, accel[1]=%d, accel[2]=%d "
+            "gyro[0]=%d, gyro[1]=%d, gyro[2]=%d.\n",
+            accel[0], accel[1], accel[2],gyro[0], gyro[1], gyro[2]);
+    }
+#endif
+
+	/* allocate basic report buffers */
+	_accel_reports = new ringbuffer(2, sizeof(accel_report));
+	if (_accel_reports == NULL)
+		return -1;
+
+	_gyro_reports = new ringbuffer(2, sizeof(gyro_report));
+	if (_gyro_reports == NULL)
+		return -1;
+
+    return 0;
 #if 0
 	int ret;
 
@@ -303,7 +322,6 @@ s32 mpu6000::init(void)
 out:
 	return ret;
 #endif
-	return 0;
 }
 
 s32 mpu6000::reset(void)
