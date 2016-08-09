@@ -52,16 +52,26 @@ void receive::run(void *parg)
 	item_attitude_t *pitem_atti = (item_attitude_t *)(ppacket->get_item_data(ID_ITEM_ATTITUDE));
 	item_rc_t *pitem_rc = (item_rc_t *)ppacket->get_item_data(ID_ITEM_RC);
 
+	struct accel_report accel;
+	memset(&accel, 0, sizeof(accel));
+
 	for ( ; ;)
 	{
-        mpu6000->read((u8 *)(pitem_mpu->data_mpu), pattr->num_mpu * sizeof(data_mpu_t));
+        //mpu6000->read((u8 *)(pitem_mpu->data_mpu), pattr->num_mpu * sizeof(data_mpu_t));
         //mpu6000->get_temperature(&(pitem_mpu->temperature));
+        mpu6000->read((u8 *)&accel, sizeof(accel_report));
+        DBG("%s: accel.x_raw=%d, accel.y_raw=%d, accel.z_raw=%d.\n",
+                _os_name,
+                accel.x_raw,
+                accel.y_raw,
+                accel.z_raw
+                );
 #if 0
         ms5611->read((u8 *)(pitem_baro->data_baro), pattr->num_baro * sizeof(data_baro_t));
 		for (u32 i = 0; /*i < pattr->num_baro*/ i < 1; i++)
 		{
             DBG("%s: temp=%d, pres=%d, alt=%f.\n",
-                _name,
+                _os_name,
                 pitem_baro->data_baro[i].temperature,
                 pitem_baro->data_baro[i].pressure,
                 pitem_baro->data_baro[i].altitude
@@ -100,8 +110,8 @@ void receive::run(void *parg)
 			pitem_rc->data_rc[i].aux5 = 6;
 		}
 
-        msleep(0);
-		sync_rc->post((void *)packet_addr, sizeof(void *), 1000);
+        msleep(100);
+		//sync_rc->post((void *)packet_addr, sizeof(void *), 1000);
 
 		//DBG("%s: task is active[%u]...\n", _os_name, cnt++);
 

@@ -125,7 +125,7 @@ s32 mpu6000::open(s32 flags)
 
 s32 mpu6000::read(u8 *buf, u32 size)
 {
-#if 1
+#if 0
 	data_mpu_t *data = NULL;
 	u32 num = size / sizeof(data_mpu_t);
 	for (u32 i = 0; i < num; i++) {

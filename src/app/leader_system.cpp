@@ -191,11 +191,12 @@ s32 leader_system::init(void)
     _transmit = new transmit;
 
 	_logger->create(NULL);
+    _mpu6000->create(NULL);
 	_heartbeat->create(NULL);
 	_terminal->create(NULL);
 	_receive->create(NULL);
-	_calculate->create(NULL);
-	_transmit->create(NULL);
+	//_calculate->create(NULL);
+	//_transmit->create(NULL);
 
 	if(ret < 0) {
 		INF("Failed to leader_system::init");
