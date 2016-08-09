@@ -20,6 +20,10 @@
 #include "spi.h"
 
 #include "packet.h"
+#include "ringbuffer.h"
+#include "baro.h"
+
+#include "os/thread.h"
 
 
 #define ADDR_RESET_CMD			0x1E	/* write to this address to reset chip */
@@ -42,23 +46,31 @@
 #pragma pack(push,1)
 struct prom_s {
 	u16 factory_setup;
-	u16 c1_pres_sens;
-	u16 c2_pres_offset;
+	u16 c1_pressure_sens;
+	u16 c2_pressure_offset;
 	u16 c3_temp_coeff_pres_sens;
 	u16 c4_temp_coeff_pres_offset;
 	u16 c5_reference_temp;
 	u16 c6_temp_coeff_temp;
 	u16 serial_and_crc;
 };
+
+/**
+ * Grody hack for crc4()
+ */
+union prom_u {
+	uint16_t c[8];
+	prom_s s;
+};
 #pragma pack(pop)
 
-
+using namespace os;
 namespace driver {
 
-class ms5611 : public device, public interrupt
+class ms5611 : public device, public interrupt, public thread
 {
 public:
-    ms5611(PCSTR name, s32 id);
+    ms5611(PCSTR devname, s32 devid);
     ~ms5611(void);
 
 public:
@@ -70,20 +82,36 @@ public:
     s32 _temperature, _pressure;
     f32 _altitude;
 
+	ringbuffer		*_reports;
+
+	bool			_collect_phase;
+	unsigned		_measure_phase;
+
+	/* intermediate temperature values per MS5611 datasheet */
+	int32_t			_TEMP;
+	int64_t			_OFF;
+	int64_t			_SENS;
+	float			_P;
+	float			_T;
+
+	/* altitude conversion calibration */
+	unsigned		_msl_pressure;	/* in Pa */
+
 public:
     s32 probe(spi *pspi, gpio *gpio_cs);
     s32 remove(void);
 
 public:
     virtual s32 open(s32 flags);
-    virtual s32 read(u8 *buf, u32 count);
+    virtual s32 read(u8 *buf, u32 size);
     virtual s32 close(void);
 
 public:
-	void init(void);
-    s32 measure(data_baro_t *data);
+	s32 init(void);
+	s32 reset(void);
+	void measure(void);
+	s32 measure(data_baro_t *data);
 
-    void reset(void);
 	void read_prom(void);
     s32 crc4(u16 *prom);
 
@@ -94,6 +122,14 @@ public:
 	s32 write_reg8(u8 reg, u8 data);
 	s32 read_reg(u8 reg, u8 *buf, u8 len);
 	s32 write_reg(u8 reg, u8 *buf, u8 len);
+
+public:
+	virtual void run(void *parg);
+
 };
+
 }
+/***********************************************************************
+** End of file
+***********************************************************************/
 

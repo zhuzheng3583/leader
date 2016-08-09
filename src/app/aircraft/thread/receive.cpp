@@ -39,8 +39,9 @@ void receive::run(void *parg)
 	mpu6000->open(NULL);
 	ms5611 *ms5611 = leader_system::get_instance()->get_ms5611();
 	ms5611->open(NULL);
-
-
+	hmc5883 *hmc5883 = leader_system::get_instance()->get_hmc5883();
+	hmc5883->open(NULL);
+    
 	packet *ppacket  = leader_system::get_instance()->get_packet();
 	u32 packet_addr = (u32)ppacket;
 	packet_attribute_t *pattr = ppacket->get_attribute();
@@ -55,20 +56,34 @@ void receive::run(void *parg)
 	memset(&accel, 0, sizeof(accel));
 	struct gyro_report gyro;
 	memset(&gyro, 0, sizeof(gyro));
-	
+    struct mag_report mag;
+	memset(&mag, 0, sizeof(mag));
+    struct baro_report baro;
+	memset(&baro, 0, sizeof(baro));
+
 	for ( ; ;)
 	{
-		//mpu6000->read((u8 *)(pitem_mpu->data_mpu), pattr->num_mpu * sizeof(data_mpu_t));
-		//mpu6000->get_temperature(&(pitem_mpu->temperature));
 		mpu6000->read_accel((u8 *)&accel, sizeof(accel_report));
 		mpu6000->read_gyro((u8 *)&gyro, sizeof(gyro_report));
-
 		DBG("%s: accel.x_raw=%d, accel.y_raw=%d, accel.z_raw=%d, "
 			"gyro.x_raw=%d, gyro.y_raw=%d, gyro.z_raw=%d.\n",
 			_os_name,
 			accel.x_raw, accel.y_raw, accel.z_raw,
 			gyro.x_raw, gyro.y_raw, gyro.z_raw
 			);
+
+        hmc5883->read((u8 *)&mag, sizeof(mag_report));
+		DBG("%s: mag.x_raw=%d, mag.y_raw=%d, mag.z_raw=%d.\n",
+			_os_name,
+			mag.x_raw, mag.y_raw, mag.z_raw
+			);
+
+        ms5611->read((u8 *)&baro, sizeof(baro_report));
+		DBG("%s: temperature=%f, pressure=%f, altitude=%f.\n",
+			_os_name,
+			baro.temperature, baro.pressure, baro.altitude
+			);
+
 #if 0
         ms5611->read((u8 *)(pitem_baro->data_baro), pattr->num_baro * sizeof(data_baro_t));
 		for (u32 i = 0; /*i < pattr->num_baro*/ i < 1; i++)

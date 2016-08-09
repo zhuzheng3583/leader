@@ -22,7 +22,6 @@
 #include "ringbuffer.h"
 #include "magn.h"
 
-
 #include "os/thread.h"
 
 //bit0-bit1 xyz是否使用偏压,默认为0正常配置
@@ -141,5 +140,9 @@ public:
 public:
 	virtual void run(void *parg);
 };
+
 }
+/***********************************************************************
+** End of file
+***********************************************************************/
 

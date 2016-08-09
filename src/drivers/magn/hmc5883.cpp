@@ -27,6 +27,12 @@ hmc5883::hmc5883(PCSTR devname, s32 devid) :
 	_scale.y_scale = 1.0f;
 	_scale.z_offset = 0;
 	_scale.z_scale = 1.0f;
+
+	_params.name = "hmc5883_thread";
+	_params.priority = 0;
+	_params.stacksize = 1024;
+	_params.func = (void *)thread::func;
+	_params.parg = (thread *)this;
 }
 
 hmc5883::~hmc5883(void)
@@ -47,9 +53,11 @@ s32 hmc5883::probe(i2c *pi2c, u8 slave_addr)
         goto fail0;
     }
 
-    //while(1) {
-      //  hmc5883::read_raw();
-    //}
+#if 0//test
+    while(1) {
+        hmc5883::read_raw();
+    }
+#endif
     return 0;
 
 fail0:
@@ -344,3 +352,7 @@ s32 hmc5883::write_reg(u8 reg, u8 *buf, u8 len)
 }
 
 }
+/***********************************************************************
+** End of file
+***********************************************************************/
+

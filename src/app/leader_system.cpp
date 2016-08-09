@@ -191,7 +191,9 @@ s32 leader_system::init(void)
     _transmit = new transmit;
 
 	_logger->create(NULL);
-    _mpu6000->create(NULL);
+    //_mpu6000->create(NULL);
+    _hmc5883->create(NULL);
+    _ms5611->create(NULL);
 	_heartbeat->create(NULL);
 	_terminal->create(NULL);
 	_receive->create(NULL);
