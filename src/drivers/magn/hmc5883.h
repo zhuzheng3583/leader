@@ -99,7 +99,7 @@ using namespace os;
 
 namespace driver {
 
-class hmc5883 : public device, public interrupt, public thread
+class hmc5883 : public device, public thread
 {
 public:
     hmc5883(PCSTR devname, s32 devid);
@@ -114,9 +114,18 @@ public:
 	float 			_range_scale;
 	float 			_range_ga;
 	struct mag_report	_last_report;           /**< used for info() */
+
 public:
     s32 probe(i2c *pi2c, u8 slave_addr);
     s32 remove(void);
+
+public:
+	virtual s32 open(s32 flags);
+	virtual s32 read(u8 *buf, u32 size);
+	virtual s32 close(void);
+public:
+	virtual void run(void *parg);
+
 
 public:
     s32 init(void);
@@ -124,21 +133,13 @@ public:
     void measure(void);
 
 public:
-    virtual s32 open(s32 flags);
-    virtual s32 read(u8 *buf, u32 size);
-    virtual s32 close(void);
+	s32 self_test(void);
 
-
-public:
-	s32 read_raw(void);
-
+private:
 	s32 read_reg8(u8 reg);
 	s32 write_reg8(u8 reg, u8 data);
 	s32 read_reg(u8 reg, u8 *buf, u8 len);
 	s32 write_reg(u8 reg, u8 *buf, u8 len);
-
-public:
-	virtual void run(void *parg);
 };
 
 }

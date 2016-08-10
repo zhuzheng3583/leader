@@ -53,16 +53,67 @@ s32 hmc5883::probe(i2c *pi2c, u8 slave_addr)
         goto fail0;
     }
 
-#if 0//test
-    while(1) {
-        hmc5883::read_raw();
-    }
-#endif
     return 0;
 
 fail0:
     return -1;
 }
+
+
+
+s32 hmc5883::open(s32 flags)
+{
+    return 0;
+}
+
+s32 hmc5883::read(u8 *buf, u32 size)
+{
+    u32 count = size / sizeof(struct mag_report);
+
+	/* buffer must be large enough */
+	if (count < 1)
+		return -ENOSPC;
+
+	/* if automatic measurement is not enabled, get a fresh measurement into the buffer */
+	//if (_call_interval == 0) {
+	//	_accel_reports->flush();
+	//	measure();
+	//}
+
+	/* if no data, error (we could block here) */
+	if (_mag_reports->empty())
+		return -EAGAIN;
+
+	//perf_count(_accel_reads);
+
+	/* copy reports out of our buffer to the caller */
+    struct mag_report *mag_buf = reinterpret_cast<struct mag_report *>(buf);
+	int transferred = 0;
+	while (count--) {
+		if (!_mag_reports->get(mag_buf))
+			break;
+		transferred++;
+		mag_buf++;
+	}
+
+	/* return the number of bytes transferred */
+	return (transferred * sizeof(mag_report));
+
+}
+
+void hmc5883::run(void *parg)
+{
+    for (;;) {
+        /* Send the command to begin a measurement. */
+        write_reg8(ADDR_MODE, MODE_REG_SINGLE_MODE);
+
+        /* wait for it to complete */
+        msleep(HMC5883_CONVERSION_INTERVAL_MS);
+
+        measure();
+    }
+}
+
 
 s32 hmc5883::init(void)
 {
@@ -204,61 +255,8 @@ out:
     return;
 }
 
-s32 hmc5883::open(s32 flags)
-{
-    return 0;
-}
 
-s32 hmc5883::read(u8 *buf, u32 size)
-{
-    u32 count = size / sizeof(struct mag_report);
-
-	/* buffer must be large enough */
-	if (count < 1)
-		return -ENOSPC;
-
-	/* if automatic measurement is not enabled, get a fresh measurement into the buffer */
-	//if (_call_interval == 0) {
-	//	_accel_reports->flush();
-	//	measure();
-	//}
-
-	/* if no data, error (we could block here) */
-	if (_mag_reports->empty())
-		return -EAGAIN;
-
-	//perf_count(_accel_reads);
-
-	/* copy reports out of our buffer to the caller */
-    struct mag_report *mag_buf = reinterpret_cast<struct mag_report *>(buf);
-	int transferred = 0;
-	while (count--) {
-		if (!_mag_reports->get(mag_buf))
-			break;
-		transferred++;
-		mag_buf++;
-	}
-
-	/* return the number of bytes transferred */
-	return (transferred * sizeof(mag_report));
-
-}
-
-void hmc5883::run(void *parg)
-{
-    for (;;) {
-        /* Send the command to begin a measurement. */
-        write_reg8(ADDR_MODE, MODE_REG_SINGLE_MODE);
-
-        /* wait for it to complete */
-        msleep(HMC5883_CONVERSION_INTERVAL_MS);
-
-        measure();
-    }
-}
-
-
-s32 hmc5883::read_raw(void)
+s32 hmc5883::self_test(void)
 {
 	f64 angle;
 	u32 acr;
@@ -277,6 +275,8 @@ s32 hmc5883::read_raw(void)
 
     return 0;
 }
+
+
 
 
 s32 hmc5883::read_reg8(u8 reg)
