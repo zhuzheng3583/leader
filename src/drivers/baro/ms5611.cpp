@@ -86,13 +86,6 @@ s32 ms5611::open(s32 flags)
 
 s32 ms5611::read(u8 *buf, u32 size)
 {
-#if 0
-    data_baro_t *pdata = (data_baro_t *)buf;
-    u32 n = count / sizeof(data_baro_t);
-    for (u32 i = 0; i < n; i++) {
-        ms5611::measure(&pdata[i]);
-    }
-#endif
     u32 count = size / sizeof(struct baro_report);
 	struct baro_report *brp = reinterpret_cast<struct baro_report *>(buf);
 	int ret = 0;
@@ -144,75 +137,18 @@ fail0:
 
 s32 ms5611::reset(void)
 {
-    ms5611::write_cmd8(ADDR_RESET_CMD, 0);
-    core::mdelay(10);
+    ms5611::write_cmd8(ADDR_RESET_CMD);
+
+    /*
+	 * Wait for PROM contents to be in the device (2.8 ms) in the case we are
+	 * called immediately after reset.
+	 */
+    core::mdelay(MS5611_CONVERSION_INTERVAL_MS);
 }
-
-
 
 //Maximum values for calculation results:
 //PMIN = 10mbar PMAX = 1200mbar
 //TMIN = -40°C TMAX = 85°C TREF = 20°C
-s32 ms5611::measure(data_baro_t *data)
-{
-    s32 ret = 0;
-    s32 dt;                        //实际和参考温度之间的差异
-    static u32 d2_temp;                    //用于存放温度
-    ret = ms5611::read_raw(ADDR_CMD_CONVERT_D2);
-    if (ret >= 0) {
-        d2_temp = (u32)ret;
-    }
-	dt = (s32)d2_temp - (s32)_prom.c5_reference_temp * 256;
-	_temperature = 2000 + dt * _prom.c6_temp_coeff_temp / 8388608;
-
-    static u32 d1_pres;                    //用于存放压力
-    s64 off, sens;                  //实际温度抵消、实际温度灵敏度
-    s64 aux, off2, sens2, temp2;    //温度校验值
-    ret = ms5611::read_raw(ADDR_CMD_CONVERT_D1);
-    if (ret >= 0) {
-        d1_pres = (u32)ret;
-    }
-	off = ((s64)_prom.c2_pressure_offset * 65536) + ((s64)_prom.c4_temp_coeff_pres_offset * dt / 128);
-	sens = ((s64)_prom.c1_pressure_sens * 32768) + ((s64)_prom.c3_temp_coeff_pres_sens * dt / 256);
-
-    if(_temperature < 2000)// second order temperature compensation when under 20 degrees C
-    {
-		temp2 = (dt * dt) / 0x80000000;
-		aux = (_temperature - 2000) * (_temperature - 2000);
-		off2 = 2.5 * aux;
-		sens2 = 1.25 * aux;
-		if(_temperature < -1500)
-		{
-			aux = (_temperature + 1500) * (_temperature + 1500);
-			off2 = off2 + 7 * aux;
-			sens2 = sens2 + 5.5 * aux;
-		}
-	} else { //(Temperature > 2000)
-        temp2 = 0;
-		off2 = 0;
-		sens2 = 0;
-	}
-	_temperature = _temperature - temp2;
-	off = off - off2;
-	sens = sens - sens2;
-
-    _pressure = (((d1_pres * sens) / 2097152 - off) / 32768);
-
-    f64 tmp;
-    tmp = (_pressure / 101325.0);
-    tmp = pow(tmp, 0.190295);
-    _altitude = 44330 * (1.0 - tmp);
-
-    data->altitude = _altitude;
-    data->pressure = _pressure;
-    data->temperature = _temperature;
-    //DBG("%s: temperature=%f, pressure=%f, altitude=%f.\n",
-    //        _name, (f32)_temperature/100, (f32)_pressure/100, _altitude);
-
-    return 0;
-}
-
-
 void ms5611::measure(void)
 {
 	s32 ret;
@@ -238,9 +174,13 @@ void ms5611::measure(void)
     addr = (_measure_phase == 0) ? ADDR_CMD_CONVERT_D2 : ADDR_CMD_CONVERT_D1;
 
     taskENTER_CRITICAL();
-    ms5611::write_cmd8(addr, 0);
-    core::mdelay(MS5611_CONVERSION_INTERVAL_MS);
+    ms5611::write_cmd8(addr);
+    taskEXIT_CRITICAL();
+
+    msleep(MS5611_CONVERSION_INTERVAL_MS);
+
     /* read the most recent measurement */
+    taskENTER_CRITICAL();
     ret = read_reg(ADDR_DATA, buf, sizeof(buf));
     taskEXIT_CRITICAL();
 	if (ret < 0) {
@@ -260,13 +200,13 @@ void ms5611::measure(void)
 	/* handle a measurement */
 	if (_measure_phase == 0) {
 
-		/* temperature offset (in ADC units) */
+		/* temperature offset (in ADC units) */ //实际和参考温度之间的差异
 		s32 dT = (s32)raw - ((s32)_prom.c5_reference_temp << 8);
 
 		/* absolute temperature in centidegrees - note intermediate value is outside 32-bit range */
 		_TEMP = 2000 + (s32)(((s64)dT * _prom.c6_temp_coeff_temp) >> 23);
 
-		/* base sensor scale/offset values */
+		/* base sensor scale/offset values */ //实际温度抵消、实际温度灵敏度
 		_SENS = ((s64)_prom.c1_pressure_sens << 15) + (((s64)_prom.c3_temp_coeff_pres_sens * dT) >> 8);
 		_OFF  = ((s64)_prom.c2_pressure_offset << 16) + (((s64)_prom.c4_temp_coeff_pres_offset * dT) >> 7);
 
@@ -359,26 +299,6 @@ void ms5611::run(void *parg)
     for (;;) {
         measure();
         msleep(0);
-#if 0
-        taskENTER_CRITICAL();
-        //SPI_PEND(_spi);
-
-        _measure_phase = false;
-        /* do temperature first */
-        u8 addr = (_measure_phase == 0) ? ADDR_CMD_CONVERT_D2 : ADDR_CMD_CONVERT_D1;
-        ms5611::write_cmd8(addr, MS5611_CONVERSION_INTERVAL_MS);
-        //msleep(MS5611_CONVERSION_INTERVAL_MS);
-        measure();
-
-        /* now do a pressure measurement */
-        _measure_phase = true;
-        addr = (_measure_phase == 0) ? ADDR_CMD_CONVERT_D2 : ADDR_CMD_CONVERT_D1;
-        ms5611::write_cmd8(addr, MS5611_CONVERSION_INTERVAL_MS);
-        //msleep(MS5611_CONVERSION_INTERVAL_MS);
-
-        //SPI_POST(_spi);
-        taskEXIT_CRITICAL();
-#endif
     }
 }
 
@@ -422,12 +342,11 @@ s32 ms5611::read_raw(u8 cmd_osr)
         u32 raw;
     };
 
-    ms5611::write_cmd8(cmd_osr, 10);
+    ms5611::write_cmd8(cmd_osr);
 
     union cvt data;
     u8 buf[3] = { 0 };
     /* read the most recent measurement */
-    //core::mdelay(10);
     s32 ret = ms5611::read_reg(ADDR_DATA, buf, sizeof(buf));
     if (ret == 0) {
         /* fetch the raw value */
@@ -487,7 +406,7 @@ s32 ms5611::crc4(u16 *prom)
 }
 
 
-s32 ms5611::write_cmd8(u8 cmd, s32 ms)
+s32 ms5611::write_cmd8(u8 cmd)
 {
     s32 ret = 0;
     //cmd = cmd & SPI_WRITE_CMD /*WRITE_CMD*/;
@@ -503,11 +422,8 @@ s32 ms5611::write_cmd8(u8 cmd, s32 ms)
         goto fail0;
     }
 
-    /*
-	 * Wait for PROM contents to be in the device (2.8 ms) in the case we are
-	 * called immediately after reset.
-	 */
-    core::mdelay(ms);
+    //core::mdelay(0);
+    core::udelay(100);
     _gpio_cs->set_value(true);
 
     return 0;

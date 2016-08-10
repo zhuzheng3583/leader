@@ -149,9 +149,6 @@ s32 spi::probe(void)
 	//interrupt::enable_irq(_irq);
 #endif
 
-    _pmutex = new mutex;
-    _pmutex->create("spi_mutex");
-
 	INF("%s: probe success.\n", _name);
 	return 0;
 

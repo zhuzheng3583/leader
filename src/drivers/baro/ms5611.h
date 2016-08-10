@@ -110,14 +110,13 @@ public:
 	s32 init(void);
 	s32 reset(void);
 	void measure(void);
-	s32 measure(data_baro_t *data);
 
 	void read_prom(void);
     s32 crc4(u16 *prom);
 
 	s32 read_raw(u8 cmd_osr);
 
-	s32 write_cmd8(u8 cmd, s32 ms);
+	s32 write_cmd8(u8 cmd);
 	s32 read_reg8(u8 reg);
 	s32 write_reg8(u8 reg, u8 data);
 	s32 read_reg(u8 reg, u8 *buf, u8 len);

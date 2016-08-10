@@ -13,7 +13,7 @@ CStepIntDis=_ 0
 stlinkserialNo=2798FD0D
 stlinkfoundProbes=
 [DebugChecksum]
-Checksum=758910989
+Checksum=-1904613157
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -112,8 +112,8 @@ SumSortOrder=0
 mode=0
 [Breakpoints2]
 Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\dma.cpp}.94.2" 0 0 1 "" 0 "" 0
-Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\spi.cpp}.380.7" 0 0 1 "" 0 "" 0
-Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\spi.cpp}.358.7" 0 0 1 "" 0 "" 0
+Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\spi.cpp}.377.1" 0 0 1 "" 0 "" 0
+Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\spi.cpp}.355.3" 0 0 1 "" 0 "" 0
 Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\kernel.cpp}.58.2" 0 0 1 "" 0 "" 0
 Bp4=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\receive.cpp}.1.1" 0 0 1 "" 0 "" 0
 Bp5=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\receive.cpp}.1.1" 0 0 1 "" 0 "" 0
@@ -134,6 +134,9 @@ Count=18
 LoggingEnabled=_ 0
 LogFile=_ ""
 Category=_ 0
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""
 [Aliases]
 A0=_ "E:\code\SKYVIEW_H_SUB\LeaderUAV\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
 A1=_ "E:\code\leader\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
@@ -149,6 +152,3 @@ Exclusions=
 Enabled=0
 [CallStackStripe]
 ShowTiming=1
-[TermIOLog]
-LoggingEnabled=_ 0
-LogFile=_ ""

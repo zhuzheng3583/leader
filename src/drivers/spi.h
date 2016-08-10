@@ -17,7 +17,6 @@
 #include "device.h"
 #include "dma.h"
 #include "gpio.h"
-#include "mutex.h"
 
 #define	SPI_NBITS_SINGLE	    0x01 /* 1bit transfer */
 #define	SPI_NBITS_DUAL		0x02 /* 2bits transfer */
@@ -41,12 +40,6 @@ struct spi_msg {
     u16     flags;
 };
 
-#define SPI_PEND(devspi) ((spi*)(devspi)->_pmutex->pend(1000))
-#define SPI_POST(devspi) ((spi*)(devspi)->_pmutex->post(1000))
-
-
-using namespace os;
-
 namespace driver {
 
 class spi : public device, public interrupt
@@ -68,8 +61,7 @@ public:
     s32 _dma_rx_id;
 
     s32 _eventtxrx;
-
-	mutex *_pmutex;
+    
 public:
     s32 probe(void);
     s32 remove(void);
