@@ -140,7 +140,7 @@ void imu_send_data(s16 aacx,s16 aacy,s16 aacz,s16 gyrox,s16 gyroy,s16 gyroz,s16 
 
 
 /*******************************Copyright (c)***************************
-** 
+**
 ** Porject name:	leader
 ** Created by:	zhuzheng<happyzhull@163.com>
 ** Created date:	2016/04/08
@@ -182,23 +182,23 @@ void niming::report_status(data_attitude_t *atti)
 	s16 temp = 0;
 	s32 temp2 = 0;
 	u8 sum = 0;
-	
+
 	data[cnt++] = 0xAA;
 	data[cnt++] = 0xAA;
 	data[cnt++] = 0x01;
 	data[cnt++] = 0;
-	
-	temp = (int)(atti->roll * 100);
+
+	temp = (int)1;//(atti->roll * 100);
 	data[cnt++] = BYTE1(temp);
 	data[cnt++] = BYTE0(temp);
-	temp = (int)(atti->pitch * 100);
+	temp = (int)2;//(atti->pitch * 100);
 	data[cnt++] = BYTE1(temp);
 	data[cnt++] = BYTE0(temp);
-	temp = (int)(atti->yaw * 100);
+	temp = (int)3;//(atti->yaw * 100);
 	data[cnt++] = BYTE1(temp);
 	data[cnt++] = BYTE0(temp);
-	
-	temp2 = atti->altitude;
+
+	temp2 = 4;//atti->altitude;
 	data[cnt++] = BYTE3(temp2);
 	data[cnt++] = BYTE2(temp2);
 	data[cnt++] = BYTE1(temp2);
@@ -207,47 +207,49 @@ void niming::report_status(data_attitude_t *atti)
 	//if(Rc_C.ARMED==0)		data[cnt++]=0xA0;
 	//else if(Rc_C.ARMED==1)		data[cnt++]=0xA1;
 	data[cnt++]=0xA1;
-	
+
 	data[3] = cnt - 4;
-	
+
 	for(u8 i = 0; i < cnt; i++) {
 		sum += data[i];
 	}
-		
+
 	data[cnt++] = sum;
 
 	_uart->write(data, cnt);
 }
 
+
 // 2：发送传感器数据
-void niming::report_sensor(data_mpu_t *mpu, data_magn_t *magn)
+void niming::report_sensor(struct accel_report *accel,
+    struct gyro_report *gyro, struct mag_report *mag)
 {
 	u8 cnt = 0;
 	u8 data[32];
 	u8 sum = 0;
-	
+
 	data[cnt++] = 0xAA;
 	data[cnt++] = 0xAA;
 	data[cnt++] = 0x02;
 	data[cnt++] = 0;
-	data[cnt++] = BYTE1(mpu->acce.x);  //高8位
-	data[cnt++] = BYTE0(mpu->acce.x);  //低8位
-	data[cnt++] = BYTE1(mpu->acce.y);
-	data[cnt++] = BYTE0(mpu->acce.y);
-	data[cnt++] = BYTE1(mpu->acce.z);
-	data[cnt++] = BYTE0(mpu->acce.z);
-	data[cnt++] = BYTE1(mpu->gyro.x);
-	data[cnt++] = BYTE0(mpu->gyro.x);
-	data[cnt++] = BYTE1(mpu->gyro.y);
-	data[cnt++] = BYTE0(mpu->gyro.y);
-	data[cnt++] = BYTE1(mpu->gyro.z);
-	data[cnt++] = BYTE0(mpu->gyro.z);
-	data[cnt++] = BYTE1(magn->x);
-	data[cnt++] = BYTE0(magn->x);
-	data[cnt++] = BYTE1(magn->y);
-	data[cnt++] = BYTE0(magn->y);
-	data[cnt++] = BYTE1(magn->z);
-	data[cnt++] = BYTE0(magn->z);
+	data[cnt++] = BYTE1(accel->x_raw);  //高8位
+	data[cnt++] = BYTE0(accel->x_raw);  //低8位
+	data[cnt++] = BYTE1(accel->y_raw);
+	data[cnt++] = BYTE0(accel->y_raw);
+	data[cnt++] = BYTE1(accel->z_raw);
+	data[cnt++] = BYTE0(accel->z_raw);
+	data[cnt++] = BYTE1(gyro->x_raw);
+	data[cnt++] = BYTE0(gyro->x_raw);
+	data[cnt++] = BYTE1(gyro->y_raw);
+	data[cnt++] = BYTE0(gyro->y_raw);
+	data[cnt++] = BYTE1(gyro->z_raw);
+	data[cnt++] = BYTE0(gyro->z_raw);
+	data[cnt++] = BYTE1(mag->x_raw);
+	data[cnt++] = BYTE0(mag->x_raw);
+	data[cnt++] = BYTE1(mag->y_raw);
+	data[cnt++] = BYTE0(mag->y_raw);
+	data[cnt++] = BYTE1(mag->z_raw);
+	data[cnt++] = BYTE0(mag->z_raw);
 
 	data[3] = cnt - 4;
 
@@ -263,7 +265,7 @@ void niming::report_rc(data_rc_t *rc)
 	u8 cnt = 0;
 	u8 data[32];
 	u8 sum = 0;
-	
+
 	data[cnt++] = 0xAA;
 	data[cnt++] = 0xAA;
 	data[cnt++] = 0x03;
@@ -288,14 +290,14 @@ void niming::report_rc(data_rc_t *rc)
 	data[cnt++] = BYTE0(rc->aux5);
 	data[cnt++] = BYTE1(rc->aux6);
 	data[cnt++] = BYTE0(rc->aux6);
-	
+
 	data[3] = cnt-4;
 
 	for(u8 i = 0; i < cnt; i++)
 		sum += data[i];
-	
+
 	data[cnt++]=sum;
-	
+
 	_uart->write(data, cnt);
 }
 
@@ -323,15 +325,15 @@ void Data_Send_MotoPWM(void)
 	data[cnt++]=BYTE0(Moto_PWM_7);
 	data[cnt++]=BYTE1(Moto_PWM_8);
 	data[cnt++]=BYTE0(Moto_PWM_8);
-	
+
 	data[3] = cnt-4;
-	
+
 	u8 sum = 0;
 	for(u8 i=0;i<cnt;i++)
 		sum += data[i];
-	
+
 	data[cnt++]=sum;
-	
+
 #ifdef DATA_TRANSFER_USE_USART
 	Uart1_Put_Buf(data,cnt);
 #else
@@ -351,15 +353,15 @@ void Data_Send_OFFSET(void)
 	_temp = AngleOffset_Pit*1000;
 	data[cnt++]=BYTE1(_temp);
 	data[cnt++]=BYTE0(_temp);
-	
+
 	data[3] = cnt-4;
-	
+
 	u8 sum = 0;
 	for(u8 i=0;i<cnt;i++)
 		sum += data[i];
-	
+
 	data[cnt++]=sum;
-	
+
 #ifdef DATA_TRANSFER_USE_USART
 	Uart1_Put_Buf(data,cnt);
 #else
@@ -373,7 +375,7 @@ void Data_Send_PID1(void)
 	data[cnt++]=0xAA;
 	data[cnt++]=0x10;
 	data[cnt++]=0;
-	
+
 	vs16 _temp;
 	_temp = PID_ROL.P * 100;
 	data[cnt++]=BYTE1(_temp);
@@ -402,15 +404,15 @@ void Data_Send_PID1(void)
 	_temp = PID_YAW.D * 100;
 	data[cnt++]=BYTE1(_temp);
 	data[cnt++]=BYTE0(_temp);
-	
+
 	data[3] = cnt-4;
-	
+
 	u8 sum = 0;
 	for(u8 i=0;i<cnt;i++)
 		sum += data[i];
-	
+
 	data[cnt++]=sum;
-	
+
 #ifdef DATA_TRANSFER_USE_USART
 	Uart1_Put_Buf(data,cnt);
 #else
@@ -424,7 +426,7 @@ void Data_Send_PID2(void)
 	data[cnt++]=0xAA;
 	data[cnt++]=0x11;
 	data[cnt++]=0;
-	
+
 	vs16 _temp;
 	_temp = PID_ALT.P * 100;
 	data[cnt++]=BYTE1(_temp);
@@ -453,15 +455,15 @@ void Data_Send_PID2(void)
 	_temp = PID_PID_1.D * 100;
 	data[cnt++]=BYTE1(_temp);
 	data[cnt++]=BYTE0(_temp);
-	
+
 	data[3] = cnt-4;
-	
+
 	u8 sum = 0;
 	for(u8 i=0;i<cnt;i++)
 		sum += data[i];
-	
+
 	data[cnt++]=sum;
-	
+
 #ifdef DATA_TRANSFER_USE_USART
 	Uart1_Put_Buf(data,cnt);
 #else
@@ -475,7 +477,7 @@ void Data_Send_PID3(void)
 	data[cnt++]=0xAA;
 	data[cnt++]=0x12;
 	data[cnt++]=0;
-	
+
 	vs16 _temp;
 	_temp = PID_PID_2.P * 100;
 	data[cnt++]=BYTE1(_temp);
@@ -486,15 +488,15 @@ void Data_Send_PID3(void)
 	_temp = PID_PID_2.D * 100;
 	data[cnt++]=BYTE1(_temp);
 	data[cnt++]=BYTE0(_temp);
-	
+
 	data[3] = cnt-4;
-	
+
 	u8 sum = 0;
 	for(u8 i=0;i<cnt;i++)
 		sum += data[i];
-	
+
 	data[cnt++]=sum;
-	
+
 #ifdef DATA_TRANSFER_USE_USART
 	Uart1_Put_Buf(data,cnt);
 #else
@@ -508,14 +510,14 @@ void Data_Send_Check(u16 check)
 	data[2]=0xF0;
 	data[3]=3;
 	data[4]=0xBA;
-	
+
 	data[5]=BYTE1(check);
 	data[6]=BYTE0(check);
-	
+
 	u8 sum = 0;
 	for(u8 i=0;i<7;i++)
 		sum += data[i];
-	
+
 	data[7]=sum;
 #ifdef DATA_TRANSFER_USE_USART
 	Uart1_Put_Buf(data,8);

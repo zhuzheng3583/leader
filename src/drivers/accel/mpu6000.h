@@ -446,11 +446,7 @@ protected:
 	// last temperature reading for print_info()
 	f32			_last_temperature;
 
-public:
-    s32 init(void);
-    s32 reset(void);
-    void measure(void);
-    s16 s16_from_bytes(u8 bytes[]);
+
 
 public:
     s32 probe(spi *pspi, gpio *gpio_cs);
@@ -461,6 +457,19 @@ public:
     s32 read_accel(u8 *buf, u32 size);
     s32 read_gyro(u8 *buf, u32 size);
     virtual s32 close(void);
+
+public:
+	virtual void run(void *parg);
+
+public:
+    s32 init(void);
+    s32 reset(void);
+    void measure(void);
+    s16 s16_from_bytes(u8 bytes[]);
+
+public:
+	s32 self_test(void);
+	s32 chip_self_test(void);
 
 public:
 	s32 reset_fifo(void);
@@ -486,14 +495,6 @@ private:
 	inline s32 write_reg8(u8 reg, u8 data);
 	s32 read_reg(u8 reg, u8 *buf, u8 len);
 	s32 write_reg(u8 reg, u8 *buf, u8 len);
-
-public:
-	s32 self_test(void);
-	s32 chip_self_test(void);
-
-public:
-	virtual void run(void *parg);
-
 };
 
 

@@ -107,24 +107,23 @@ public:
     virtual s32 close(void);
 
 public:
+	virtual void run(void *parg);
+
+public:
 	s32 init(void);
 	s32 reset(void);
 	void measure(void);
 
 	void read_prom(void);
     s32 crc4(u16 *prom);
+	s32 self_test(u8 cmd_osr);
 
-	s32 read_raw(u8 cmd_osr);
-
+private:
 	s32 write_cmd8(u8 cmd);
 	s32 read_reg8(u8 reg);
 	s32 write_reg8(u8 reg, u8 data);
 	s32 read_reg(u8 reg, u8 *buf, u8 len);
 	s32 write_reg(u8 reg, u8 *buf, u8 len);
-
-public:
-	virtual void run(void *parg);
-
 };
 
 }

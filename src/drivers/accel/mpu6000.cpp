@@ -92,6 +92,11 @@ s32 mpu6000::open(s32 flags)
 	return 0;
 }
 
+s32 mpu6000::close(void)
+{
+    return 0;
+}
+
 s32 mpu6000::read_accel(u8 *buf, u32 size)
 {
 	u32 count = size / sizeof(accel_report);
@@ -160,41 +165,19 @@ s32 mpu6000::read_gyro(u8 *buf, u32 size)
 	return (transferred * sizeof(gyro_report));
 }
 
-s32 mpu6000::close(void)
-{
-
-}
-
 void mpu6000::run(void *parg)
 {
 	for (;;)
 	{
-      //SPI_PEND(_spi);
-      //SPI_POST(_spi);
         mpu6000::measure();
         msleep(100);
 	}
 }
 
-
-s16 mpu6000::s16_from_bytes(u8 bytes[])
-{
-	union {
-		u8    b[2];
-		s16    w;
-	} u;
-
-	u.b[1] = bytes[0];
-	u.b[0] = bytes[1];
-
-	return u.w;
-}
-
-
 s32 mpu6000::init(void)
 {
 	//等待上电稳定
-	core::mdelay(2000);
+	core::mdelay(5000);
     write_reg8(MPUREG_PWR_MGMT1, 0X80); 	// 复位MPU6050
     core::mdelay(100);
     write_reg8(MPUREG_PWR_MGMT1, 0X00);  	// 唤醒MPU6050
@@ -207,7 +190,7 @@ s32 mpu6000::init(void)
     write_reg8(MPUREG_FIFO_ENABLE, 0X00);   //关闭FIFO
     write_reg8(MPUREG_INT_PIN_CFG, 0X80);   //INT引脚低电平有效
     u8 who_am_i = read_reg8(MPUREG_DEVICE_ID);
-    core::mdelay(1000);
+    core::mdelay(3000);
     if(who_am_i != MPU_I2C_SLAVE_ADDR) {
         // 器件ID不正确
         ERR("Failed to read mpu6000 ID...\n");
@@ -215,7 +198,7 @@ s32 mpu6000::init(void)
     }
     write_reg8(MPUREG_PWR_MGMT1, 0X01);     //设置CLKSEL,PLL X轴为参考
     write_reg8(MPUREG_PWR_MGMT2, 0X00);     // 加速度与陀螺仪都工作
-    set_sample_rate(200);                        //设置采样率
+    set_sample_rate(200);                        //设置采样率200Hz
 
 #if 0 //test
     s16 gyro[3] = { 0 };
@@ -466,7 +449,6 @@ void mpu6000::measure(void)
 	/*
 	 * Swap axes and negate y
 	 */
-#if 0
 	s16 accel_xt = report.accel_y;
 	s16 accel_yt = ((report.accel_x == -32768) ? 32767 : -report.accel_x);
 
@@ -480,13 +462,12 @@ void mpu6000::measure(void)
 	report.accel_y = accel_yt;
 	report.gyro_x = gyro_xt;
 	report.gyro_y = gyro_yt;
-#endif
 
 	/*
 	 * Report buffers.
 	 */
 	accel_report	arb;
-	gyro_report	grb;
+	gyro_report	    grb;
 
 	/*
 	 * Adjust and scale results to m/s^2.
@@ -566,6 +547,19 @@ void mpu6000::measure(void)
 	_gyro_reports->force(&grb);
 
     return;
+}
+
+s16 mpu6000::s16_from_bytes(u8 bytes[])
+{
+	union {
+		u8    b[2];
+		s16    w;
+	} u;
+
+	u.b[1] = bytes[0];
+	u.b[0] = bytes[1];
+
+	return u.w;
 }
 
 /*

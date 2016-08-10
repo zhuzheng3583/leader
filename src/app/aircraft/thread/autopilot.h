@@ -23,11 +23,11 @@ using namespace os;
 
 namespace app {
 
-class receive : public thread
+class autopilot : public thread
 {
 public:
-	receive(void);
-	~receive(void);
+	autopilot(void);
+	~autopilot(void);
 
 public:
 	virtual void run(void *parg);

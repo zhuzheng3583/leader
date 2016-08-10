@@ -34,10 +34,9 @@
 #include "kernel.h"
 #include "logger.h"
 #include "heartbeat.h"
-#include "receive.h"
-#include "calculate.h"
-#include "transmit.h"
 #include "terminal.h"
+#include "autopilot.h"
+
 
 #include "msgque.h"
 #include "semaphore.h"
@@ -98,20 +97,11 @@ public:
     timer                   *_timer;
     pwm                     *_pwm;
 
-
-    msgque					*_sync_rc;
-    msgque					*_sync_ct;
-    msgque					*_sync;
-
     logger                  *_logger;
     heartbeat               *_heartbeat;
-    receive					*_receive;
-    calculate				*_calculate;
-    transmit				*_transmit;
     terminal				*_terminal;
-
-    packet                  *_packet;
-
+    autopilot			    *_autopilot;
+    
     niming                  *_niming;
 
 public:
@@ -133,11 +123,6 @@ public:
 	hmc5883		*get_hmc5883(void)        	{ return _hmc5883; }
 
     logger		*get_logger(void)        	{ return _logger; }
-    msgque   	*get_sync_rc(void)			{ return _sync_rc; }
-    msgque   	*get_sync_ct(void)			{ return _sync_ct; }
-    msgque   	*get_sync(void)			    { return _sync; }
-
-    packet      *get_packet(void)           { return _packet; }
 
     niming      *get_niming(void)           { return _niming; }
 protected:

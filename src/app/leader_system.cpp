@@ -174,21 +174,9 @@ s32 leader_system::init(void)
     while(1);
 #endif
 
-    _packet = new packet;
-    _packet->create(NULL);
-
-    _sync_rc = new msgque;
-    _sync_ct = new msgque;
-    _sync = new msgque;
-    _sync_rc->create("sync_rc", 1);
-    _sync_ct->create("sync_ct", 1);
-    _sync->create("sync", 1);
-
     _heartbeat = new heartbeat;
     _terminal = new terminal;
-    _receive = new receive;
-    _calculate = new calculate;
-    _transmit = new transmit;
+    _autopilot = new autopilot;
 
 	_logger->create(NULL);
     _mpu6000->create(NULL);
@@ -196,9 +184,7 @@ s32 leader_system::init(void)
     _ms5611->create(NULL);
 	_heartbeat->create(NULL);
 	_terminal->create(NULL);
-	_receive->create(NULL);
-	//_calculate->create(NULL);
-	//_transmit->create(NULL);
+    _autopilot->create(NULL);
 
 	if(ret < 0) {
 		INF("Failed to leader_system::init");

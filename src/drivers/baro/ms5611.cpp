@@ -84,6 +84,19 @@ s32 ms5611::open(s32 flags)
     return 0;
 }
 
+s32 ms5611::close(void)
+{
+    return 0;
+}
+
+void ms5611::run(void *parg)
+{
+    for (;;) {
+        measure();
+        msleep(0);
+    }
+}
+
 s32 ms5611::read(u8 *buf, u32 size)
 {
     u32 count = size / sizeof(struct baro_report);
@@ -110,10 +123,6 @@ s32 ms5611::read(u8 *buf, u32 size)
     return ret ? ret : -EAGAIN;
 }
 
-s32 ms5611::close(void)
-{
-    return 0;
-}
 
 s32 ms5611::init(void)
 {
@@ -133,7 +142,6 @@ fail0:
     return -1;
 
 }
-
 
 s32 ms5611::reset(void)
 {
@@ -294,13 +302,7 @@ out:
 
 }
 
-void ms5611::run(void *parg)
-{
-    for (;;) {
-        measure();
-        msleep(0);
-    }
-}
+
 
 
 void ms5611::read_prom(void)
@@ -334,33 +336,6 @@ void ms5611::read_prom(void)
 
     //return ret;
 }
-
-s32 ms5611::read_raw(u8 cmd_osr)
-{
-    union cvt {
-        u8 byte[4];
-        u32 raw;
-    };
-
-    ms5611::write_cmd8(cmd_osr);
-
-    union cvt data;
-    u8 buf[3] = { 0 };
-    /* read the most recent measurement */
-    s32 ret = ms5611::read_reg(ADDR_DATA, buf, sizeof(buf));
-    if (ret == 0) {
-        /* fetch the raw value */
-        data.byte[0] = buf[2];
-        data.byte[1] = buf[1];
-        data.byte[2] = buf[0];
-        data.byte[3] = 0;
-
-        return (data.raw); //(u32)((buf[0]<<16) | (buf[1]<<8) | (buf[2]));
-    }
-
-    return -1;
-}
-
 
 /**
  * MS5611 crc4 cribbed from the datasheet
@@ -404,6 +379,33 @@ s32 ms5611::crc4(u16 *prom)
 
     return 0;
 }
+
+s32 ms5611::self_test(u8 cmd_osr)
+{
+    union cvt {
+        u8 byte[4];
+        u32 raw;
+    };
+
+    ms5611::write_cmd8(cmd_osr);
+
+    union cvt data;
+    u8 buf[3] = { 0 };
+    /* read the most recent measurement */
+    s32 ret = ms5611::read_reg(ADDR_DATA, buf, sizeof(buf));
+    if (ret == 0) {
+        /* fetch the raw value */
+        data.byte[0] = buf[2];
+        data.byte[1] = buf[1];
+        data.byte[2] = buf[0];
+        data.byte[3] = 0;
+
+        return (data.raw); //(u32)((buf[0]<<16) | (buf[1]<<8) | (buf[2]));
+    }
+
+    return -1;
+}
+
 
 
 s32 ms5611::write_cmd8(u8 cmd)

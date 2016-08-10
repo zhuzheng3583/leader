@@ -3147,10 +3147,10 @@
       <group>
         <name>thread</name>
         <file>
-          <name>$PROJ_DIR$\..\src\app\aircraft\thread\calculate.cpp</name>
+          <name>$PROJ_DIR$\..\src\app\aircraft\thread\autopilot.cpp</name>
         </file>
         <file>
-          <name>$PROJ_DIR$\..\src\app\aircraft\thread\calculate.h</name>
+          <name>$PROJ_DIR$\..\src\app\aircraft\thread\autopilot.h</name>
         </file>
         <file>
           <name>$PROJ_DIR$\..\src\app\aircraft\thread\heartbeat.cpp</name>
@@ -3165,22 +3165,10 @@
           <name>$PROJ_DIR$\..\src\app\aircraft\thread\logger.h</name>
         </file>
         <file>
-          <name>$PROJ_DIR$\..\src\app\aircraft\thread\receive.cpp</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\app\aircraft\thread\receive.h</name>
-        </file>
-        <file>
           <name>$PROJ_DIR$\..\src\app\aircraft\thread\terminal.cpp</name>
         </file>
         <file>
           <name>$PROJ_DIR$\..\src\app\aircraft\thread\terminal.h</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\app\aircraft\thread\transmit.cpp</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\app\aircraft\thread\transmit.h</name>
         </file>
       </group>
       <file>
@@ -3418,6 +3406,9 @@
     <file>
       <name>$PROJ_DIR$\..\src\drivers\usb_dev.h</name>
     </file>
+  </group>
+  <group>
+    <name>lib</name>
   </group>
   <group>
     <name>os</name>
