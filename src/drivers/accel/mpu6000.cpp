@@ -169,6 +169,8 @@ void mpu6000::run(void *parg)
 {
 	for (;;)
 	{
+      //SPI_PEND(_spi);
+      //SPI_POST(_spi);
         mpu6000::measure();
         msleep(100);
 	}
@@ -396,6 +398,7 @@ s32 mpu6000::reset(void)
 }
 void mpu6000::measure(void)
 {
+    s32 ret = 0;
 #pragma pack(push, 1)
 	struct mpu_report_reg { /* Report conversation within the MPU6000 */
 		u8		status;
@@ -422,8 +425,14 @@ void mpu6000::measure(void)
 	/*
 	 * Fetch the full set of measurements from the MPU6000 in one pass.
 	 */
-	if (mpu6000::read_reg(MPUREG_INT_STATUS, (u8 *)&report_reg, sizeof(report_reg)))
+    //SPI_PEND(_spi);
+    taskENTER_CRITICAL();
+	ret = mpu6000::read_reg(MPUREG_INT_STATUS, (u8 *)&report_reg, sizeof(report_reg));
+    taskEXIT_CRITICAL();
+    //SPI_POST(_spi);
+    if (ret < 0) {
         return;
+    }
 
 	/*
 	 * Convert from big to little endian

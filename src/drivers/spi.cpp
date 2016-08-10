@@ -85,16 +85,11 @@ spi::~spi(void)
 
 s32 spi::probe(void)
 {
-	if (device::probe() < 0) {
-		ERR("%s: failed to probe.\n", _name);
-		goto fail0;
-	}
-
 	SPI_HandleTypeDef *hspi = &spi_hw_table[_id].SPI_Handle;
 	if(HAL_SPI_GetState(hspi) != HAL_SPI_STATE_RESET)
 	{
 		ERR("%s: failed HAL_SPI_GetState.\n", _name);
-		goto fail1;
+		goto fail0;
 	}
 
 	//void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
@@ -125,7 +120,7 @@ s32 spi::probe(void)
 
 	/* 3- Configure the SPI peripheral*/
   	if(HAL_SPI_Init(hspi) != HAL_OK) {
-		goto fail2;
+		goto fail1;
   	}
 	_handle = (u32)hspi;
 
@@ -154,15 +149,14 @@ s32 spi::probe(void)
 	//interrupt::enable_irq(_irq);
 #endif
 
+    _pmutex = new mutex;
+    _pmutex->create("spi_mutex");
 
 	INF("%s: probe success.\n", _name);
 	return 0;
 
-
-fail2:
-	HAL_GPIO_DeInit(GPIOx, GPIO_Init->Pin);
 fail1:
-	device::remove();
+	HAL_GPIO_DeInit(GPIOx, GPIO_Init->Pin);
 fail0:
 	return -1;
 }
@@ -170,9 +164,7 @@ fail0:
 s32 spi::remove(void)
 {
 	SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)_handle;
-	if (device::remove() < 0) {
-		goto fail0;
-	}
+
 #if (SPI_MODE == SPI_IT_MODE || SPI_MODE == SPI_DMA_MODE)
 	interrupt::disable_irq(_irq);
 #endif
@@ -185,7 +177,7 @@ s32 spi::remove(void)
 	_dmarx = NULL;
 #endif
 	if(HAL_SPI_DeInit(hspi)!= HAL_OK) {
-    		goto fail1;
+    		goto fail0;
 	}
 
 	//void HAL_SPI_MspDeInit(UART_HandleTypeDef *huart)
@@ -215,7 +207,6 @@ s32 spi::remove(void)
 	_handle = NULL;
 	return 0;
 
-fail1:
 fail0:
     return -1;
 }

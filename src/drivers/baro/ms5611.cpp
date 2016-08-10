@@ -12,7 +12,7 @@
 #include <math.h>
 
 /* helper macro for handling report buffer indices */
-#define INCREMENT(_x, _lim)	do { __typeof__(_x) _tmp = _x+1; if (_tmp >= _lim) _tmp = 0; _x = _tmp; } while(0)
+#define INCREMENT(_x, _lim)	do { s32 _tmp = _x+1; if (_tmp >= _lim) _tmp = 0; _x = _tmp; } while(0)
 
 /* helper macro for arithmetic - returns the square of the argument */
 #define POW2(_x)		((_x) * (_x))
@@ -144,7 +144,8 @@ fail0:
 
 s32 ms5611::reset(void)
 {
-    ms5611::write_cmd8(ADDR_RESET_CMD, 10);
+    ms5611::write_cmd8(ADDR_RESET_CMD, 0);
+    core::mdelay(10);
 }
 
 
@@ -228,11 +229,20 @@ void ms5611::measure(void)
         u8 byte[4];
         u32 raw;
     };
-    //ms5611::write_cmd8(cmd_osr, 10);
+
+    u8 addr = 0;
     union cvt data;
     u8 buf[3] = { 0 };
+
+    /* _measure_phase == 0 do temperature first, else now do a pressure measurement */
+    addr = (_measure_phase == 0) ? ADDR_CMD_CONVERT_D2 : ADDR_CMD_CONVERT_D1;
+
+    taskENTER_CRITICAL();
+    ms5611::write_cmd8(addr, 0);
+    core::mdelay(MS5611_CONVERSION_INTERVAL_MS);
     /* read the most recent measurement */
     ret = read_reg(ADDR_DATA, buf, sizeof(buf));
+    taskEXIT_CRITICAL();
 	if (ret < 0) {
 		//perf_count(_comms_errors);
 		//perf_end(_sample_perf);
@@ -246,7 +256,6 @@ void ms5611::measure(void)
     data.byte[3] = 0;
 
     raw = data.raw;
-
 
 	/* handle a measurement */
 	if (_measure_phase == 0) {
@@ -334,7 +343,7 @@ void ms5611::measure(void)
     }
 
 	/* update the measurement state machine */
-	//INCREMENT(_measure_phase, MS5611_MEASUREMENT_RATIO + 1);
+	INCREMENT(_measure_phase, MS5611_MEASUREMENT_RATIO + 1);
 
 	//perf_end(_sample_perf);
 
@@ -348,19 +357,28 @@ out:
 void ms5611::run(void *parg)
 {
     for (;;) {
+        measure();
+        msleep(0);
+#if 0
+        taskENTER_CRITICAL();
+        //SPI_PEND(_spi);
+
         _measure_phase = false;
         /* do temperature first */
         u8 addr = (_measure_phase == 0) ? ADDR_CMD_CONVERT_D2 : ADDR_CMD_CONVERT_D1;
         ms5611::write_cmd8(addr, MS5611_CONVERSION_INTERVAL_MS);
-        msleep(MS5611_CONVERSION_INTERVAL_MS);
+        //msleep(MS5611_CONVERSION_INTERVAL_MS);
         measure();
 
         /* now do a pressure measurement */
         _measure_phase = true;
         addr = (_measure_phase == 0) ? ADDR_CMD_CONVERT_D2 : ADDR_CMD_CONVERT_D1;
         ms5611::write_cmd8(addr, MS5611_CONVERSION_INTERVAL_MS);
-        msleep(MS5611_CONVERSION_INTERVAL_MS);
-        measure();
+        //msleep(MS5611_CONVERSION_INTERVAL_MS);
+
+        //SPI_POST(_spi);
+        taskEXIT_CRITICAL();
+#endif
     }
 }
 
