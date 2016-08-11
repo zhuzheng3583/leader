@@ -62,8 +62,8 @@ void autopilot::run(void *parg)
 		//	_os_name, mag.x_raw, mag.y_raw, mag.z_raw);
 
         ms5611->read((u8 *)&baro, sizeof(baro_report));
-		DBG("%s: temperature=%f, pressure=%f, altitude=%f.\n",
-			_os_name, baro.temperature, baro.pressure, baro.altitude);
+		//DBG("%s: temperature=%f, pressure=%f, altitude=%f.\n",
+		//	_os_name, baro.temperature, baro.pressure, baro.altitude);
 
         niming->report_status(NULL);
         niming->report_sensor(&accel, &gyro, &mag);
@@ -110,7 +110,7 @@ void autopilot::run(void *parg)
 		}
 #endif
 
-        msleep(10);
+        msleep(2);
 
 		//DBG("%s: task is active[%u]...\n", _os_name, cnt++);
 

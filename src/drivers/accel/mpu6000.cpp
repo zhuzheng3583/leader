@@ -178,7 +178,7 @@ void mpu6000::run(void *parg)
 	for (;;)
 	{
         mpu6000::measure();
-        msleep(10);
+        msleep(2);
 	}
 }
 
