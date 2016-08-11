@@ -254,51 +254,6 @@ out:
 }
 
 
-
-s32 mpu6000::set_accel_range(u32 max_g_in)
-{
-	// workaround for bugged versions of MPU6k (rev C)
-	switch (_product) {
-		case MPU6000ES_REV_C4:
-		case MPU6000ES_REV_C5:
-		case MPU6000_REV_C4:
-		case MPU6000_REV_C5:
-			write_checked_reg(MPUREG_ACCEL_CONFIG, 1 << 3);
-			_accel_range_scale = (MPU6000_ONE_G / 4096.0f);
-			_accel_range_m_s2 = 8.0f * MPU6000_ONE_G;
-			return 0;
-	}
-
-	u8 afs_sel;
-	float lsb_per_g;
-	float max_accel_g;
-
-	if (max_g_in > 8) { // 16g - AFS_SEL = 3
-		afs_sel = 3;
-		lsb_per_g = 2048;
-		max_accel_g = 16;
-	} else if (max_g_in > 4) { //  8g - AFS_SEL = 2
-		afs_sel = 2;
-		lsb_per_g = 4096;
-		max_accel_g = 8;
-	} else if (max_g_in > 2) { //  4g - AFS_SEL = 1
-		afs_sel = 1;
-		lsb_per_g = 8192;
-		max_accel_g = 4;
-	} else {                //  2g - AFS_SEL = 0
-		afs_sel = 0;
-		lsb_per_g = 16384;
-		max_accel_g = 2;
-	}
-
-	write_checked_reg(MPUREG_ACCEL_CONFIG, afs_sel << 3);
-	_accel_range_scale = (MPU6000_ONE_G / lsb_per_g);
-	_accel_range_m_s2 = max_accel_g * MPU6000_ONE_G;
-
-	return 0;
-}
-
-
 s32 mpu6000::reset(void)
 {
 	// if the mpu6000 is initialised after the l3gd20 and lsm303d
@@ -709,6 +664,49 @@ void mpu6000::set_sample_rate(u32 desired_sample_rate_hz)
 	_sample_rate = 1000 / div;
 }
 
+s32 mpu6000::set_accel_range(u32 max_g_in)
+{
+	// workaround for bugged versions of MPU6k (rev C)
+	switch (_product) {
+		case MPU6000ES_REV_C4:
+		case MPU6000ES_REV_C5:
+		case MPU6000_REV_C4:
+		case MPU6000_REV_C5:
+			write_checked_reg(MPUREG_ACCEL_CONFIG, 1 << 3);
+			_accel_range_scale = (MPU6000_ONE_G / 4096.0f);
+			_accel_range_m_s2 = 8.0f * MPU6000_ONE_G;
+			return 0;
+	}
+
+	u8 afs_sel;
+	float lsb_per_g;
+	float max_accel_g;
+
+	if (max_g_in > 8) { // 16g - AFS_SEL = 3
+		afs_sel = 3;
+		lsb_per_g = 2048;
+		max_accel_g = 16;
+	} else if (max_g_in > 4) { //  8g - AFS_SEL = 2
+		afs_sel = 2;
+		lsb_per_g = 4096;
+		max_accel_g = 8;
+	} else if (max_g_in > 2) { //  4g - AFS_SEL = 1
+		afs_sel = 1;
+		lsb_per_g = 8192;
+		max_accel_g = 4;
+	} else {                //  2g - AFS_SEL = 0
+		afs_sel = 0;
+		lsb_per_g = 16384;
+		max_accel_g = 2;
+	}
+
+	write_checked_reg(MPUREG_ACCEL_CONFIG, afs_sel << 3);
+	_accel_range_scale = (MPU6000_ONE_G / lsb_per_g);
+	_accel_range_m_s2 = max_accel_g * MPU6000_ONE_G;
+
+	return 0;
+}
+
 /**
  *  @brief      Read raw gyro data directly from the registers.
  *  @param[out] gyro        Raw data in hardware units.
@@ -761,6 +759,71 @@ s32 mpu6000::get_temperature(f32 *temperature)
     //data[0] = (long)((35 + ((raw - (float)st.hw->temp_offset) / st.hw->temp_sens)) * 65536L);
 	temperature[0] = 36.53 + ((double)raw)/340;
 	return 0;
+}
+
+s32 mpu6000::calibrate_gyro(void)
+{
+	struct gyro_report gyro_report;
+	u32 counter = 0;
+	const u32 total_count = 5000;
+	u32 err_count = 0;	/* determine gyro mean values */
+	u32 good_count = 0;
+	s32 size;
+	s32 ret = 1;
+
+	struct gyro_scale gyro_scale = { 
+		0.0f,
+		1.0f,
+		0.0f,
+		1.0f,
+		0.0f,
+		1.0f,
+	};
+
+	/* reset all offsets to zero and all scales to one */
+	memcpy(&_gyro_scale, &gyro_scale, sizeof(gyro_scale));
+
+	/* read the sensor up to 50x, stopping when we have 10 good values */
+	for (counter = 0; counter < total_count; counter++) {
+		/* now go get it */
+		size = mpu6000::read_gyro((u8 *)&gyro_report, sizeof(gyro_report));
+		if (size != sizeof(gyro_report)) {
+			ERR("%s:¡¡ERROR: READ 1");
+			ret = -EIO;
+			goto out;
+		}
+
+		gyro_scale.x_offset += gyro_report.x;
+		gyro_scale.y_offset += gyro_report.y;
+		gyro_scale.z_offset += gyro_report.z;
+		good_count++;
+	}
+
+	if (good_count < 4000) {
+		ret = -EIO;
+		goto out;
+	}
+	gyro_scale.x_offset /= counter;
+	gyro_scale.y_offset /= counter;
+	gyro_scale.z_offset /= counter;
+	
+	memcpy(&_gyro_scale, &gyro_scale, sizeof(gyro_scale));
+
+	INF("%s: gyro_scale: \n"
+		"	X: x_offset = %f, x_scale = %f. \n"
+		"	Y: y_offset = %f, y_scale = %f. \n"
+		"	Z: z_offset = %f, z_scale = %f. \n", 
+		_devname,
+		_gyro_scale.x_offset, _gyro_scale.x_scale, 
+		_gyro_scale.y_offset, _gyro_scale.y_scale, 
+		_gyro_scale.z_offset, _gyro_scale.z_scale);
+
+	/* TODO: save params */
+
+	return 0;
+
+out:
+	return -1;
 }
 
 void mpu6000::write_checked_reg(u32 reg, u8 value)

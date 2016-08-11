@@ -377,7 +377,8 @@ public:
     s32 reset(void);
     void measure(void);
     s16 s16_from_bytes(u8 bytes[]);
-
+    s32 calibrate_gyro(void);
+    
 public:
 	s32 self_test(void);
 	s32 chip_self_test(void);
