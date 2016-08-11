@@ -178,7 +178,7 @@ void mpu6000::run(void *parg)
 	for (;;)
 	{
         mpu6000::measure();
-        msleep(100);
+        msleep(10);
 	}
 }
 
@@ -328,6 +328,7 @@ s32 mpu6000::reset(void)
 		core::mdelay(2);
 	}
 	if (read_reg8(MPUREG_PWR_MGMT_1) != MPU_CLK_SEL_PLLGYROZ) {
+        ERR("%s: failed to set mpu clk pll.\n", _devname);
 		return -EIO;
 	}
 
