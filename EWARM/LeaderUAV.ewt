@@ -3153,6 +3153,12 @@
           <name>$PROJ_DIR$\..\src\app\aircraft\thread\autopilot.h</name>
         </file>
         <file>
+          <name>$PROJ_DIR$\..\src\app\aircraft\thread\calibration.cpp</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\app\aircraft\thread\calibration.h</name>
+        </file>
+        <file>
           <name>$PROJ_DIR$\..\src\app\aircraft\thread\heartbeat.cpp</name>
         </file>
         <file>

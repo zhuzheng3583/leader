@@ -58,31 +58,6 @@ void kernel::systick_config(void)
 	HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq() / configTICK_RATE_HZ);
   	/*Configure the SysTick IRQ priority */
   	HAL_NVIC_SetPriority(SysTick_IRQn, TICK_INT_PRIORITY ,0);
-	//OS_CPU_SysTickInit(OS_CFG_TICK_RATE_HZ);
-
-#if 0
-    /*
-	 * 根据OS_TICKS_PER_SEC设定溢出时间
-	 * reload为24位寄存器,最大值:16777216,在168M下,约合0.7989s左右
-	 */
-	SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK_Div8);
-	U32 sysclk = get_cpu_freq();
-	U32 reload = sysclk / 8 / OS_CFG_TICK_RATE_HZ;
-#if 0
-	if (SysTick_Config(reload))
-	{
-		/* Capture error */
-		while (1);
-	}
-#elif 1
-	SysTick->CTRL |= SysTick_CTRL_TICKINT_Msk; 	// 开启SYSTICK中断
-	/* TODO: OS_CFG_TICK_RATE_HZ 直接更改reload/2，看能否缩短tick周期两倍 */
-	SysTick->LOAD = reload;					 	// 每1/OS_CFG_TICK_RATE_HZ秒中断一次
-	SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;  	// 开启SYSTICK
-#else
-	OS_CPU_SysTickInit(OS_CFG_TICK_RATE_HZ);
-#endif
-#endif
 }
 
 /**
@@ -91,7 +66,7 @@ void kernel::systick_config(void)
  */
 void kernel::init(void)
 {
-    kernel::systick_config();
+    
 }
 
 /**

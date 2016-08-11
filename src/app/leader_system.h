@@ -36,7 +36,7 @@
 #include "heartbeat.h"
 #include "terminal.h"
 #include "autopilot.h"
-
+#include "calibration.h"
 
 #include "msgque.h"
 #include "semaphore.h"
@@ -101,7 +101,8 @@ public:
     heartbeat               *_heartbeat;
     terminal				*_terminal;
     autopilot			    *_autopilot;
-    
+    calibration             *_calibration;
+        
     niming                  *_niming;
 
 public:

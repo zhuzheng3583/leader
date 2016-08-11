@@ -1,8 +1,8 @@
 /*******************************Copyright (c)***************************
-** 
+**
 ** Porject name:	leader
 ** Created by:	zhuzheng<happyzhull@163.com>
-** Created date:	2016/04/08
+** Created date:	2016/07/23
 ** Modified by:
 ** Modified date:
 ** Descriptions:
@@ -12,29 +12,27 @@
 #include "leader_type.h"
 #include "leader_misc.h"
 
-#include "leader_system.h"
+#include "os/thread.h"
+#include "os/msgque.h"
+
+#include "drivers/core.h"
+
+
+using namespace os;
 
 namespace app {
 
-class aircraft : public leader_system
+class calibration : public thread
 {
 public:
-	aircraft(void);
-	~aircraft(void);
+	calibration(void);
+	~calibration(void);
 
 public:
-    s32 _into_calibration;
-    
-public:
-	s32 init(void);
-	void start(void);
-	s32 exit(void);
+	virtual void run(void *parg);
 };
 
 }
-
 /***********************************************************************
 ** End of file
 ***********************************************************************/
-
-
