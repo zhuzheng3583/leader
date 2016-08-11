@@ -13,7 +13,7 @@ CStepIntDis=_ 0
 stlinkserialNo=2798FD0D
 stlinkfoundProbes=
 [DebugChecksum]
-Checksum=-224343950
+Checksum=-781681049
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -44,17 +44,12 @@ ITMlogFile=$PROJ_DIR$\ITM.log
 Show=1 1
 Sort=4 0
 [struct_types]
-Fmt0=item_index_t-magic	4	0
-Fmt1=packet_header_t-checksum	4	0
-Fmt2=packet_header_t-magic	4	0
-Fmt3=packet_header_t-revision	4	0
-Fmt4=packet_header_t-size	4	0
-Fmt5=struct prom_s-c3_temp_coeff_pres_sens	3	0
-Fmt6=struct prom_s-c4_temp_coeff_pres_offset	3	0
-Fmt7=struct prom_s-c5_reference_temp	3	0
-Fmt8=struct prom_s-c6_temp_coeff_temp	3	0
-Fmt9=struct prom_s-factory_setup	3	0
-Fmt10=struct prom_s-serial_and_crc	4	0
+Fmt0=struct prom_s-c3_temp_coeff_pres_sens	3	0
+Fmt1=struct prom_s-c4_temp_coeff_pres_offset	3	0
+Fmt2=struct prom_s-c5_reference_temp	3	0
+Fmt3=struct prom_s-c6_temp_coeff_temp	3	0
+Fmt4=struct prom_s-factory_setup	3	0
+Fmt5=struct prom_s-serial_and_crc	4	0
 [array_types]
 Fmt0=u16[8]	3	0
 Fmt1=u8[4]	4	0
@@ -127,8 +122,9 @@ Bp12=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart.cpp}.407.8" 0 0 1 "" 0 "" 
 Bp13=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart.cpp}.303.9" 0 0 1 "" 0 "" 0
 Bp14=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\mutex.cpp}.71.3" 0 0 1 "" 0 "" 0
 Bp15=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\mutex.cpp}.58.3" 0 0 1 "" 0 "" 0
-Bp16=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\accel\mpu6000.cpp}.478.5" 0 0 1 "" 0 "" 0
-Count=17
+Bp16=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\accel\mpu6000.cpp}.214.2" 0 0 1 "" 0 "" 0
+Bp17=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\accel\mpu6000.cpp}.224.2" 0 0 1 "" 0 "" 0
+Count=18
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""

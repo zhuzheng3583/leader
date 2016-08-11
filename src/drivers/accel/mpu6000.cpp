@@ -184,29 +184,6 @@ void mpu6000::run(void *parg)
 
 s32 mpu6000::init(void)
 {
-    /* look for a product ID we recognise */
-    _product = read_reg8(MPUREG_PRODUCT_ID);
-    // verify product revision
-	if (MPU6000ES_REV_C4 == _product || 
-		MPU6000ES_REV_C5 == _product ||
-		MPU6000_REV_C4 == _product ||
-		MPU6000_REV_C5 == _product ||
-		MPU6000ES_REV_D6 == _product ||
-		MPU6000ES_REV_D7 == _product ||
-		MPU6000ES_REV_D8 == _product ||
-		MPU6000_REV_D6 == _product ||
-		MPU6000_REV_D7 == _product ||
-		MPU6000_REV_D8 == _product ||
-		MPU6000_REV_D9 == _product ||
-		MPU6000_REV_D10 == _product) {
-        DBG("%s: ID 0x%02x", _devname, _product);
-        _checked_values[0] = _product;
-        return 0;
-	} else {
-		DBG("%s: unexpected ID 0x%02x", _devname, _product);
-    		return -EIO;
-	}
-
 #if 0
 	//等待上电稳定
 	core::mdelay(10000);
@@ -249,7 +226,6 @@ s32 mpu6000::init(void)
 		goto out;
 	}
 
-
 	/* initialize offsets and scales */
 	_accel_scale.x_offset = 0;
 	_accel_scale.x_scale  = 1.0f;
@@ -268,28 +244,19 @@ s32 mpu6000::init(void)
 	/* discard any stale data in the buffers */
 	_accel_reports->flush();
 	_gyro_reports->flush();
-	
+
 	measure();
-	
+
 	return 0;
 
 out:
 	return -1;
 }
 
-void mpu6000::write_checked_reg(u32 reg, u8 value)
-{
-	write_reg8(reg, value);
-	for (u8 i = 0; i < MPU6000_NUM_CHECKED_REGISTERS; i++) {
-		if (reg == _checked_registers[i]) {
-			_checked_values[i] = value;
-		}
-	}
-}
 
-s32 mpu6000::set_accel_range(unsigned max_g_in)
+
+s32 mpu6000::set_accel_range(u32 max_g_in)
 {
-    #if  0
 	// workaround for bugged versions of MPU6k (rev C)
 	switch (_product) {
 		case MPU6000ES_REV_C4:
@@ -299,10 +266,10 @@ s32 mpu6000::set_accel_range(unsigned max_g_in)
 			write_checked_reg(MPUREG_ACCEL_CONFIG, 1 << 3);
 			_accel_range_scale = (MPU6000_ONE_G / 4096.0f);
 			_accel_range_m_s2 = 8.0f * MPU6000_ONE_G;
-			return OK;
+			return 0;
 	}
 
-	U8 afs_sel;
+	u8 afs_sel;
 	float lsb_per_g;
 	float max_accel_g;
 
@@ -327,7 +294,7 @@ s32 mpu6000::set_accel_range(unsigned max_g_in)
 	write_checked_reg(MPUREG_ACCEL_CONFIG, afs_sel << 3);
 	_accel_range_scale = (MPU6000_ONE_G / lsb_per_g);
 	_accel_range_m_s2 = max_accel_g * MPU6000_ONE_G;
-#endif
+
 	return 0;
 }
 
@@ -364,6 +331,28 @@ s32 mpu6000::reset(void)
 		return -EIO;
 	}
 
+    /* look for a product ID we recognise */
+    _product = read_reg8(MPUREG_PRODUCT_ID);
+    // verify product revision
+	if (MPU6000ES_REV_C4 == _product ||
+		MPU6000ES_REV_C5 == _product ||
+		MPU6000_REV_C4 == _product ||
+		MPU6000_REV_C5 == _product ||
+		MPU6000ES_REV_D6 == _product ||
+		MPU6000ES_REV_D7 == _product ||
+		MPU6000ES_REV_D8 == _product ||
+		MPU6000_REV_D6 == _product ||
+		MPU6000_REV_D7 == _product ||
+		MPU6000_REV_D8 == _product ||
+		MPU6000_REV_D9 == _product ||
+		MPU6000_REV_D10 == _product) {
+        DBG("%s: ID 0x%02x", _devname, _product);
+        _checked_values[0] = _product;
+	} else {
+		DBG("%s: unexpected ID 0x%02x", _devname, _product);
+        return -EIO;
+	}
+    
 	core::mdelay(1);
 
 	// SAMPLE RATE
@@ -773,6 +762,15 @@ s32 mpu6000::get_temperature(f32 *temperature)
 	return 0;
 }
 
+void mpu6000::write_checked_reg(u32 reg, u8 value)
+{
+	write_reg8(reg, value);
+	for (u8 i = 0; i < MPU6000_NUM_CHECKED_REGISTERS; i++) {
+		if (reg == _checked_registers[i]) {
+			_checked_values[i] = value;
+		}
+	}
+}
 
 
 s32 mpu6000::read_reg8(u8 reg)
@@ -786,7 +784,6 @@ s32 mpu6000::read_reg8(u8 reg)
 
     return ((s32)data);
 }
-
 
 s32 mpu6000::write_reg8(u8 reg, u8 data)
 {
