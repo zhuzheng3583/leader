@@ -12,6 +12,23 @@
 
 namespace driver {
 
+/*
+  list of registers that will be checked in check_registers(). Note
+  that MPUREG_PRODUCT_ID must be first in the list.
+ */
+const u8 mpu6000::_checked_registers[MPU6000_NUM_CHECKED_REGISTERS] = {
+    MPUREG_PRODUCT_ID,
+    MPUREG_PWR_MGMT_1,
+    MPUREG_USER_CTRL,
+    MPUREG_SMPLRT_DIV,
+    MPUREG_CONFIG,
+    MPUREG_GYRO_CONFIG,
+    MPUREG_ACCEL_CONFIG,
+    MPUREG_INT_ENABLE,
+    MPUREG_INT_PIN_CFG
+};
+
+
 mpu6000::mpu6000(PCSTR devname, s32 devid) :
     device(devname, devid),
     _accel_reports(NULL),
@@ -19,7 +36,10 @@ mpu6000::mpu6000(PCSTR devname, s32 devid) :
     _accel_range_m_s2(0.0f),
     _gyro_reports(NULL),
     _gyro_range_scale(0.0f),
-    _gyro_range_rad_s(0.0f)
+    _gyro_range_rad_s(0.0f),
+
+	_dlpf_freq(MPU6000_DEFAULT_ONCHIP_FILTER_FREQ),
+	_sample_rate(1000)
 
 {
     // default accel scale factors
@@ -176,10 +196,37 @@ void mpu6000::run(void *parg)
 
 s32 mpu6000::init(void)
 {
+#if 0
+    /* look for a product ID we recognise */
+    _product = read_reg(MPUREG_PRODUCT_ID);
+
+    // verify product revision
+    switch (_product) {
+    case MPU6000ES_REV_C4:
+    case MPU6000ES_REV_C5:
+    case MPU6000_REV_C4:
+    case MPU6000_REV_C5:
+    case MPU6000ES_REV_D6:
+    case MPU6000ES_REV_D7:
+    case MPU6000ES_REV_D8:
+    case MPU6000_REV_D6:
+    case MPU6000_REV_D7:
+    case MPU6000_REV_D8:
+    case MPU6000_REV_D9:
+    case MPU6000_REV_D10:
+        DBG("ID 0x%02x", _product);
+        _checked_values[0] = _product;
+        return OK;
+    }
+
+    debug("unexpected ID 0x%02x", _product);
+    return -EIO;
+#endif
+#if 0
 	//等待上电稳定
-	core::mdelay(5000);
+	core::mdelay(10000);
     write_reg8(MPUREG_PWR_MGMT1, 0X80); 	// 复位MPU6050
-    core::mdelay(100);
+    core::mdelay(1000);
     write_reg8(MPUREG_PWR_MGMT1, 0X00);  	// 唤醒MPU6050
 
     set_gyro_fsr(2000);                         //陀螺仪传感器,±2000dps
@@ -191,7 +238,7 @@ s32 mpu6000::init(void)
     write_reg8(MPUREG_INT_PIN_CFG, 0X80);   //INT引脚低电平有效
     u8 who_am_i = read_reg8(MPUREG_DEVICE_ID);
     core::mdelay(3000);
-    if(who_am_i != MPU_I2C_SLAVE_ADDR) {
+    if(who_am_i != MPU6050_ID) {
         // 器件ID不正确
         ERR("Failed to read mpu6000 ID...\n");
         return -1;
@@ -199,7 +246,7 @@ s32 mpu6000::init(void)
     write_reg8(MPUREG_PWR_MGMT1, 0X01);     //设置CLKSEL,PLL X轴为参考
     write_reg8(MPUREG_PWR_MGMT2, 0X00);     // 加速度与陀螺仪都工作
     set_sample_rate(200);                        //设置采样率200Hz
-
+#endif
 #if 0 //test
     s16 gyro[3] = { 0 };
     s16 accel[3] = { 0 };
@@ -220,6 +267,9 @@ s32 mpu6000::init(void)
 	_gyro_reports = new ringbuffer(2, sizeof(gyro_report));
 	if (_gyro_reports == NULL)
 		return -1;
+
+    if (reset() != 0)
+        return -1;
 
     return 0;
 #if 0
@@ -303,55 +353,168 @@ out:
 #endif
 }
 
+void mpu6000::write_checked_reg(u32 reg, u8 value)
+{
+	write_reg8(reg, value);
+	for (u8 i = 0; i < MPU6000_NUM_CHECKED_REGISTERS; i++) {
+		if (reg == _checked_registers[i]) {
+			_checked_values[i] = value;
+		}
+	}
+}
+
+/*
+  set sample rate (approximate) - 1kHz to 5Hz, for both accel and gyro
+*/
+void mpu6000::_set_sample_rate(unsigned desired_sample_rate_hz)
+{
+	if (desired_sample_rate_hz == 0 ||
+        desired_sample_rate_hz > MPU6000_GYRO_DEFAULT_RATE) {
+		desired_sample_rate_hz = MPU6000_GYRO_DEFAULT_RATE;
+	}
+
+	u8 div = 1000 / desired_sample_rate_hz;
+	if(div > 200)
+        div = 200;
+	if(div < 1)
+        div = 1;
+	write_checked_reg(MPUREG_SMPLRT_DIV, div-1);
+	_sample_rate = 1000 / div;
+}
+
+
+/*
+  set the DLPF filter frequency. This affects both accel and gyro.
+ */
+ void mpu6000::_set_dlpf_filter(u16 frequency_hz)
+{
+	u8 filter;
+
+	/*
+	   choose next highest filter frequency available
+	 */
+	if (frequency_hz == 0) {
+		_dlpf_freq = 0;
+		filter = BITS_DLPF_CFG_2100HZ_NOLPF;
+	} else if (frequency_hz <= 5) {
+		_dlpf_freq = 5;
+		filter = BITS_DLPF_CFG_5HZ;
+	} else if (frequency_hz <= 10) {
+		_dlpf_freq = 10;
+		filter = BITS_DLPF_CFG_10HZ;
+	} else if (frequency_hz <= 20) {
+		_dlpf_freq = 20;
+		filter = BITS_DLPF_CFG_20HZ;
+	} else if (frequency_hz <= 42) {
+		_dlpf_freq = 42;
+		filter = BITS_DLPF_CFG_42HZ;
+	} else if (frequency_hz <= 98) {
+		_dlpf_freq = 98;
+		filter = BITS_DLPF_CFG_98HZ;
+	} else if (frequency_hz <= 188) {
+		_dlpf_freq = 188;
+		filter = BITS_DLPF_CFG_188HZ;
+	} else if (frequency_hz <= 256) {
+		_dlpf_freq = 256;
+		filter = BITS_DLPF_CFG_256HZ_NOLPF2;
+	} else {
+		_dlpf_freq = 0;
+		filter = BITS_DLPF_CFG_2100HZ_NOLPF;
+	}
+	write_checked_reg(MPUREG_CONFIG, filter);
+}
+
+s32 mpu6000::set_accel_range(unsigned max_g_in)
+{
+    #if  0
+	// workaround for bugged versions of MPU6k (rev C)
+	switch (_product) {
+		case MPU6000ES_REV_C4:
+		case MPU6000ES_REV_C5:
+		case MPU6000_REV_C4:
+		case MPU6000_REV_C5:
+			write_checked_reg(MPUREG_ACCEL_CONFIG, 1 << 3);
+			_accel_range_scale = (MPU6000_ONE_G / 4096.0f);
+			_accel_range_m_s2 = 8.0f * MPU6000_ONE_G;
+			return OK;
+	}
+
+	U8 afs_sel;
+	float lsb_per_g;
+	float max_accel_g;
+
+	if (max_g_in > 8) { // 16g - AFS_SEL = 3
+		afs_sel = 3;
+		lsb_per_g = 2048;
+		max_accel_g = 16;
+	} else if (max_g_in > 4) { //  8g - AFS_SEL = 2
+		afs_sel = 2;
+		lsb_per_g = 4096;
+		max_accel_g = 8;
+	} else if (max_g_in > 2) { //  4g - AFS_SEL = 1
+		afs_sel = 1;
+		lsb_per_g = 8192;
+		max_accel_g = 4;
+	} else {                //  2g - AFS_SEL = 0
+		afs_sel = 0;
+		lsb_per_g = 16384;
+		max_accel_g = 2;
+	}
+
+	write_checked_reg(MPUREG_ACCEL_CONFIG, afs_sel << 3);
+	_accel_range_scale = (MPU6000_ONE_G / lsb_per_g);
+	_accel_range_m_s2 = max_accel_g * MPU6000_ONE_G;
+#endif
+	return 0;
+}
+
+
 s32 mpu6000::reset(void)
 {
-#if 0
 	// if the mpu6000 is initialised after the l3gd20 and lsm303d
 	// then if we don't do an irqsave/irqrestore here the mpu6000
 	// frequenctly comes up in a bad state where all transfers
 	// come as zero
-	uint8_t tries = 5;
+	u8 tries = 5;
 	while (--tries != 0) {
-		irqstate_t state;
-		state = irqsave();
-
-		write_reg(MPUREG_PWR_MGMT_1, BIT_H_RESET);
-		up_udelay(10000);
+        taskDISABLE_INTERRUPTS();
+		write_reg8(MPUREG_PWR_MGMT_1, BIT_H_RESET);
+		core::mdelay(10);
 
 		// Wake up device and select GyroZ clock. Note that the
 		// MPU6000 starts up in sleep mode, and it can take some time
 		// for it to come out of sleep
 		write_checked_reg(MPUREG_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
-		up_udelay(1000);
+		core::mdelay(1);
 
 		// Disable I2C bus (recommended on datasheet)
 		write_checked_reg(MPUREG_USER_CTRL, BIT_I2C_IF_DIS);
-		irqrestore(state);
+		taskENABLE_INTERRUPTS();
 
-		if (read_reg(MPUREG_PWR_MGMT_1) == MPU_CLK_SEL_PLLGYROZ) {
+		if (read_reg8(MPUREG_PWR_MGMT_1) == MPU_CLK_SEL_PLLGYROZ) {
 			break;
 		}
-		perf_count(_reset_retries);
-		usleep(2000);
+		//perf_count(_reset_retries);
+		core::mdelay(2);
 	}
-	if (read_reg(MPUREG_PWR_MGMT_1) != MPU_CLK_SEL_PLLGYROZ) {
+	if (read_reg8(MPUREG_PWR_MGMT_1) != MPU_CLK_SEL_PLLGYROZ) {
 		return -EIO;
 	}
 
-	usleep(1000);
+	core::mdelay(1);
 
 	// SAMPLE RATE
 	_set_sample_rate(_sample_rate);
-	usleep(1000);
+	core::mdelay(1);
 
 	// FS & DLPF   FS=2000 deg/s, DLPF = 20Hz (low pass filter)
 	// was 90 Hz, but this ruins quality and does not improve the
 	// system response
 	_set_dlpf_filter(MPU6000_DEFAULT_ONCHIP_FILTER_FREQ);
-	usleep(1000);
+	core::mdelay(1);
 	// Gyro scale 2000 deg/s ()
 	write_checked_reg(MPUREG_GYRO_CONFIG, BITS_FS_2000DPS);
-	usleep(1000);
+	core::mdelay(1);
 
 	// correct gyro scale factors
 	// scale to rad/s in SI units
@@ -363,22 +526,21 @@ s32 mpu6000::reset(void)
 
 	set_accel_range(8);
 
-	usleep(1000);
+	core::mdelay(1);
 
 	// INT CFG => Interrupt on Data Ready
-	write_checked_reg(MPUREG_INT_ENABLE, BIT_RAW_RDY_EN);        // INT: Raw data ready
-	usleep(1000);
-	write_checked_reg(MPUREG_INT_PIN_CFG, BIT_INT_ANYRD_2CLEAR); // INT: Clear on any read
-	usleep(1000);
+	//write_checked_reg(MPUREG_INT_ENABLE, BIT_RAW_RDY_EN);        // INT: Raw data ready
+	//core::mdelay(1);
+	//write_checked_reg(MPUREG_INT_PIN_CFG, BIT_INT_ANYRD_2CLEAR); // INT: Clear on any read
+	//core::mdelay(1);
 
 	// Oscillator set
 	// write_reg(MPUREG_PWR_MGMT_1,MPU_CLK_SEL_PLLGYROZ);
-	usleep(1000);
+	core::mdelay(1);
 
-	return OK;
-#endif
-	return 0;
+    return 0;
 }
+
 void mpu6000::measure(void)
 {
     s32 ret = 0;

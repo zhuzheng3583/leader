@@ -26,28 +26,28 @@
 
 #include "os/thread.h"
 
-#define REG_SAMPLE_RATE_DIV     0x19
-#define REG_CONFIG              0x1A
+#define MPUREG_SAMPLE_RATE_DIV     0x19
+#define MPUREG_CONFIG              0x1A
 
-#define REG_GYRO_CONFIG         0x1B
+#define MPUREG_GYRO_CONFIG         0x1B
 #define BITS_SELF_TEST_EN       0xE0
 #define GYRO_CONFIG_FSR_SHIFT   3
 
-#define REG_ACCEL_CONFIG        0x1C
-#define REG_ACCEL_MOT_THR       0x1F
-#define REG_ACCEL_MOT_DUR       0x20
+#define MPUREG_ACCEL_CONFIG        0x1C
+#define MPUREG_ACCEL_MOT_THR       0x1F
+#define MPUREG_ACCEL_MOT_DUR       0x20
 #define ACCL_CONFIG_FSR_SHIFT   3
 
-#define REG_ACCELMOT_THR        0x1F
+#define MPUREG_ACCELMOT_THR        0x1F
 
-#define REG_ACCEL_MOT_DUR       0x20
+#define MPUREG_ACCEL_MOT_DUR       0x20
 
-#define REG_FIFO_EN             0x23
+#define MPUREG_FIFO_EN             0x23
 #define FIFO_DISABLE_ALL        0x00
 #define BIT_ACCEL_OUT           0x08
 #define BITS_GYRO_OUT           0x70
 
-#define REG_INT_PIN_CFG         0x37
+#define MPUREG_INT_PIN_CFG         0x37
 #define BIT_INT_ACTIVE_LOW      0x80
 #define BIT_INT_OPEN_DRAIN      0x40
 #define BIT_INT_LATCH_EN        0x20
@@ -55,7 +55,7 @@
 #define BIT_I2C_BYPASS_EN       0x02
 #define BIT_INT_CFG_DEFAULT     (BIT_INT_LATCH_EN | BIT_INT_RD_CLR)
 
-#define REG_INT_ENABLE          0x38
+#define MPUREG_INT_ENABLE          0x38
 #define BIT_DATA_RDY_EN         0x01
 #define BIT_DMP_INT_EN          0x02
 #define BIT_FIFO_OVERFLOW       0x10
@@ -63,9 +63,9 @@
 #define BIT_MOT_EN              0x40
 #define BIT_6500_WOM_EN         0x40
 
-#define REG_DMP_INT_STATUS      0x39
+#define MPUREG_DMP_INT_STATUS      0x39
 
-#define REG_INT_STATUS          0x3A
+#define MPUREG_INT_STATUS          0x3A
 #define BIT_DATA_RDY_INT        0x01
 #define BIT_DMP_INT_INT         0x02
 #define BIT_FIFO_OVERFLOW       0x10
@@ -73,10 +73,10 @@
 #define BIT_MOT_INT             0x40
 #define BIT_6500_WOM_INT        0x40
 
-#define REG_RAW_ACCEL           0x3B
-#define REG_TEMPERATURE         0x41
-#define REG_RAW_GYRO            0x43
-#define REG_EXT_SENS_DATA_00    0x49
+#define MPUREG_RAW_ACCEL           0x3B
+#define MPUREG_TEMPERATURE         0x41
+#define MPUREG_RAW_GYRO            0x43
+#define MPUREG_EXT_SENS_DATA_00    0x49
 
 #define BIT_FIFO_RST            0x04
 #define BIT_DMP_RST             0x08
@@ -86,14 +86,14 @@
 #define BIT_ACCEL_FIFO          0x08
 #define BIT_GYRO_FIFO           0x70
 
-#define REG_DETECT_CTRL         0x69
+#define MPUREG_DETECT_CTRL         0x69
 #define MOT_DET_DELAY_SHIFT     4
 
-#define REG_USER_CTRL           0x6A
+#define MPUREG_USER_CTRL           0x6A
 #define BIT_FIFO_EN             0x40
 #define BIT_FIFO_RESET          0x04
 
-#define REG_PWR_MGMT_1          0x6B
+#define MPUREG_PWR_MGMT_1          0x6B
 #define BIT_H_RESET             0x80
 #define BIT_SLEEP               0x40
 #define BIT_CYCLE               0x20
@@ -101,16 +101,16 @@
 #define BIT_RESET_ALL           0xCF
 #define BIT_WAKEUP_AFTER_RESET  0x00
 
-#define REG_PWR_MGMT_2          0x6C
+#define MPUREG_PWR_MGMT_2          0x6C
 #define BIT_PWR_ACCEL_STBY_MASK 0x38
 #define BIT_PWR_GYRO_STBY_MASK  0x07
 #define BIT_LPA_FREQ_MASK       0xC0
 #define BITS_PWR_ALL_AXIS_STBY  (BIT_PWR_ACCEL_STBY_MASK | \
                                     BIT_PWR_GYRO_STBY_MASK)
 
-#define REG_FIFO_COUNT_H        0x72
-#define REG_FIFO_R_W            0x74
-#define REG_WHOAMI              0x75
+#define MPUREG_FIFO_COUNT_H        0x72
+#define MPUREG_FIFO_R_W            0x74
+#define MPUREG_WHOAMI              0x75
 
 #define SAMPLE_DIV_MAX          0xFF
 #define ODR_DLPF_DIS            8000
@@ -415,6 +415,100 @@ struct mpu6050_platform_data {
 #define q30  1073741824.0f
 
 
+// MPU 6000 registers
+#define MPUREG_WHOAMI			0x75
+#define MPUREG_SMPLRT_DIV		0x19
+#define MPUREG_CONFIG			0x1A
+#define MPUREG_GYRO_CONFIG		0x1B
+#define MPUREG_ACCEL_CONFIG		0x1C
+#define MPUREG_FIFO_EN			0x23
+#define MPUREG_INT_PIN_CFG		0x37
+#define MPUREG_INT_ENABLE		0x38
+#define MPUREG_INT_STATUS		0x3A
+#define MPUREG_ACCEL_XOUT_H		0x3B
+#define MPUREG_ACCEL_XOUT_L		0x3C
+#define MPUREG_ACCEL_YOUT_H		0x3D
+#define MPUREG_ACCEL_YOUT_L		0x3E
+#define MPUREG_ACCEL_ZOUT_H		0x3F
+#define MPUREG_ACCEL_ZOUT_L		0x40
+#define MPUREG_TEMP_OUT_H		0x41
+#define MPUREG_TEMP_OUT_L		0x42
+#define MPUREG_GYRO_XOUT_H		0x43
+#define MPUREG_GYRO_XOUT_L		0x44
+#define MPUREG_GYRO_YOUT_H		0x45
+#define MPUREG_GYRO_YOUT_L		0x46
+#define MPUREG_GYRO_ZOUT_H		0x47
+#define MPUREG_GYRO_ZOUT_L		0x48
+#define MPUREG_USER_CTRL		0x6A
+#define MPUREG_PWR_MGMT_1		0x6B
+#define MPUREG_PWR_MGMT_2		0x6C
+#define MPUREG_FIFO_COUNTH		0x72
+#define MPUREG_FIFO_COUNTL		0x73
+#define MPUREG_FIFO_R_W			0x74
+#define MPUREG_PRODUCT_ID		0x0C
+#define MPUREG_TRIM1			0x0D
+#define MPUREG_TRIM2			0x0E
+#define MPUREG_TRIM3			0x0F
+#define MPUREG_TRIM4			0x10
+
+// Configuration bits MPU 3000 and MPU 6000 (not revised)?
+#define BIT_SLEEP			0x40
+#define BIT_H_RESET			0x80
+#define BITS_CLKSEL			0x07
+#define MPU_CLK_SEL_PLLGYROX		0x01
+#define MPU_CLK_SEL_PLLGYROZ		0x03
+#define MPU_EXT_SYNC_GYROX		0x02
+#define BITS_GYRO_ST_X			0x80
+#define BITS_GYRO_ST_Y			0x40
+#define BITS_GYRO_ST_Z			0x20
+#define BITS_FS_250DPS			0x00
+#define BITS_FS_500DPS			0x08
+#define BITS_FS_1000DPS			0x10
+#define BITS_FS_2000DPS			0x18
+#define BITS_FS_MASK			0x18
+#define BITS_DLPF_CFG_256HZ_NOLPF2	0x00
+#define BITS_DLPF_CFG_188HZ		0x01
+#define BITS_DLPF_CFG_98HZ		0x02
+#define BITS_DLPF_CFG_42HZ		0x03
+#define BITS_DLPF_CFG_20HZ		0x04
+#define BITS_DLPF_CFG_10HZ		0x05
+#define BITS_DLPF_CFG_5HZ		0x06
+#define BITS_DLPF_CFG_2100HZ_NOLPF	0x07
+#define BITS_DLPF_CFG_MASK		0x07
+#define BIT_INT_ANYRD_2CLEAR		0x10
+#define BIT_RAW_RDY_EN			0x01
+#define BIT_I2C_IF_DIS			0x10
+#define BIT_INT_STATUS_DATA		0x01
+
+// Product ID Description for MPU6000
+// high 4 bits 	low 4 bits
+// Product Name	Product Revision
+#define MPU6000ES_REV_C4		0x14
+#define MPU6000ES_REV_C5		0x15
+#define MPU6000ES_REV_D6		0x16
+#define MPU6000ES_REV_D7		0x17
+#define MPU6000ES_REV_D8		0x18
+#define MPU6000_REV_C4			0x54
+#define MPU6000_REV_C5			0x55
+#define MPU6000_REV_D6			0x56
+#define MPU6000_REV_D7			0x57
+#define MPU6000_REV_D8			0x58
+#define MPU6000_REV_D9			0x59
+#define MPU6000_REV_D10			0x5A
+
+#define MPU6000_ACCEL_DEFAULT_RANGE_G			8
+#define MPU6000_ACCEL_DEFAULT_RATE			1000
+#define MPU6000_ACCEL_DEFAULT_DRIVER_FILTER_FREQ	30
+
+#define MPU6000_GYRO_DEFAULT_RANGE_G			8
+#define MPU6000_GYRO_DEFAULT_RATE			1000
+#define MPU6000_GYRO_DEFAULT_DRIVER_FILTER_FREQ		30
+
+#define MPU6000_DEFAULT_ONCHIP_FILTER_FREQ		42
+
+#define MPU6000_ONE_G					9.80665f
+
+
 
 
 using namespace os;
@@ -443,10 +537,21 @@ protected:
 	f32			_gyro_range_scale;
 	f32			_gyro_range_rad_s;
 
+	u32		_dlpf_freq;
+	u32		_sample_rate;
+
 	// last temperature reading for print_info()
 	f32			_last_temperature;
 
+	u8			_product;	/** product code */
 
+	// this is used to support runtime checking of key
+	// configuration registers to detect SPI bus errors and sensor
+	// reset
+#define MPU6000_NUM_CHECKED_REGISTERS 9
+	static const u8	_checked_registers[MPU6000_NUM_CHECKED_REGISTERS];
+	u8			_checked_values[MPU6000_NUM_CHECKED_REGISTERS];
+	u8			_checked_next;
 
 public:
     s32 probe(spi *pspi, gpio *gpio_cs);
@@ -490,7 +595,12 @@ public:
 	u16 row_2_scale(s8 *row);
 	s8 	dmp_get_data(f32 *pitch, f32 *roll, f32 *yaw);
 
+	void _set_sample_rate(unsigned desired_sample_rate_hz);
+	s32 set_accel_range(unsigned max_g_in);
+	void _set_dlpf_filter(u16 frequency_hz);
+    
 private:
+	void write_checked_reg(u32 reg, u8 value);
 	inline s32 read_reg8(u8 reg);
 	inline s32 write_reg8(u8 reg, u8 data);
 	s32 read_reg(u8 reg, u8 *buf, u8 len);
