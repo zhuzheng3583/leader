@@ -178,7 +178,7 @@ void mpu6000::run(void *parg)
 	for (;;)
 	{
         mpu6000::measure();
-        msleep(2);
+        //msleep(1);
 	}
 }
 
@@ -211,12 +211,12 @@ s32 mpu6000::init(void)
 #endif
 
 	/* allocate basic report buffers */
-	_accel_reports = new ringbuffer(2, sizeof(accel_report));
+	_accel_reports = new ringbuffer(5, sizeof(accel_report));
 	if (_accel_reports == NULL) {
 		goto out;
 	}
 
-	_gyro_reports = new ringbuffer(2, sizeof(gyro_report));
+	_gyro_reports = new ringbuffer(5, sizeof(gyro_report));
 	if (_gyro_reports == NULL) {
 		goto out;
 	}
@@ -783,7 +783,7 @@ s32 mpu6000::calibrate_gyro(void)
 {
 	struct gyro_report gyro_report;
 	u32 counter = 0;
-	const u32 total_count = 5000;
+	const u32 total_count = 1000;
 	u32 err_count = 0;	/* determine gyro mean values */
 	u32 good_count = 0;
 	s32 size;
@@ -801,6 +801,7 @@ s32 mpu6000::calibrate_gyro(void)
 	/* reset all offsets to zero and all scales to one */
 	memcpy(&_gyro_scale, &gyro_scale, sizeof(gyro_scale));
 
+    core::mdelay(10);
 	/* read the sensor up to 50x, stopping when we have 10 good values */
 	for (counter = 0; counter < total_count; counter++) {
 		/* now go get it */
@@ -819,7 +820,7 @@ s32 mpu6000::calibrate_gyro(void)
 		good_count++;
 	}
 
-	if (good_count < 4000) {
+	if (good_count < (counter * 0.8)) {
 		ret = -EIO;
 		goto out;
 	}
