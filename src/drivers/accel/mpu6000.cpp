@@ -324,7 +324,7 @@ s32 mpu6000::reset(void)
 	// Gyro scale 2000 deg/s ()
 	write_checked_reg(MPUREG_GYRO_CONFIG, BITS_FS_2000DPS);
 	core::mdelay(10);
-
+    DBG("%s: gyro range = %d", read_reg8(MPUREG_GYRO_CONFIG));
 	// correct gyro scale factors
 	// scale to rad/s in SI units
 	// 2000 deg/s = (2000/180)*PI = 34.906585 rad/s
@@ -335,6 +335,7 @@ s32 mpu6000::reset(void)
 
 	set_accel_range(8);
 	core::mdelay(10);
+    DBG("%s: accel range = %d", read_reg8(MPUREG_ACCEL_CONFIG));
 #if 0
     set_accel_fsr(8);
     core::mdelay(10);
@@ -809,7 +810,7 @@ s32 mpu6000::calibrate_gyro(void)
             //ERR("%s: ERROR: READ 1.\n", _devname);
             core::mdelay(2);
             continue;
-            
+
 		}
 
 		gyro_scale.x_offset += gyro_report.x;

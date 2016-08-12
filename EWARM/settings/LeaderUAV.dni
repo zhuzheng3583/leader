@@ -13,7 +13,7 @@ CStepIntDis=_ 0
 stlinkserialNo=2798FD0D
 stlinkfoundProbes=
 [DebugChecksum]
-Checksum=-66110454
+Checksum=-114379847
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -123,11 +123,12 @@ Bp13=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart.cpp}.303.9" 0 0 1 "" 0 "" 
 Bp14=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\mutex.cpp}.71.3" 0 0 1 "" 0 "" 0
 Bp15=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\mutex.cpp}.58.3" 0 0 1 "" 0 "" 0
 Bp16=_ 0 "EMUL_CODE" "0x0800881C" 0 0 1 "" 0 "" 0
-Bp17=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\accel\mpu6000.cpp}.791.20" 0 0 1 "" 0 "" 0
+Bp17=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\accel\mpu6000.cpp}.792.20" 0 0 1 "" 0 "" 0
 Bp18=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\accel\mpu6000.cpp}.32.1" 0 0 1 "" 0 "" 0
-Bp19=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\accel\mpu6000.cpp}.845.2" 0 0 1 "" 0 "" 0
-Bp20=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\accel\mpu6000.cpp}.821.2" 0 0 1 "" 0 "" 0
-Count=21
+Bp19=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\accel\mpu6000.cpp}.846.2" 0 0 1 "" 0 "" 0
+Bp20=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\accel\mpu6000.cpp}.822.2" 0 0 1 "" 0 "" 0
+Bp21=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\accel\mpu6000.cpp}.338.5" 0 0 1 "" 0 "" 0
+Count=22
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
