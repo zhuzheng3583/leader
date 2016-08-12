@@ -256,6 +256,7 @@ out:
 
 s32 mpu6000::reset(void)
 {
+    //core::mdelay(5000);
 	// if the mpu6000 is initialised after the l3gd20 and lsm303d
 	// then if we don't do an irqsave/irqrestore here the mpu6000
 	// frequenctly comes up in a bad state where all transfers
@@ -286,7 +287,7 @@ s32 mpu6000::reset(void)
         ERR("%s: failed to set mpu clk pll.\n", _devname);
 		return -EIO;
 	}
-
+    //core::mdelay(5000);
     /* look for a product ID we recognise */
     _product = read_reg8(MPUREG_PRODUCT_ID);
     // verify product revision
@@ -308,7 +309,7 @@ s32 mpu6000::reset(void)
 		DBG("%s: unexpected ID 0x%02x", _devname, _product);
         return -EIO;
 	}
-    
+
 	core::mdelay(1);
 
 	// SAMPLE RATE
@@ -322,7 +323,7 @@ s32 mpu6000::reset(void)
 	core::mdelay(1);
 	// Gyro scale 2000 deg/s ()
 	write_checked_reg(MPUREG_GYRO_CONFIG, BITS_FS_2000DPS);
-	core::mdelay(1);
+	core::mdelay(10);
 
 	// correct gyro scale factors
 	// scale to rad/s in SI units
@@ -333,9 +334,13 @@ s32 mpu6000::reset(void)
 	_gyro_range_rad_s = (2000.0f / 180.0f) * M_PI_F;
 
 	set_accel_range(8);
-
-	core::mdelay(1);
-
+	core::mdelay(10);
+#if 0
+    set_accel_fsr(8);
+    core::mdelay(10);
+    set_gyro_fsr(2000);
+    core::mdelay(10);
+#endif
 	// INT CFG => Interrupt on Data Ready
 	//write_checked_reg(MPUREG_INT_ENABLE, BIT_RAW_RDY_EN);        // INT: Raw data ready
 	//core::mdelay(1);
@@ -477,9 +482,9 @@ void mpu6000::measure(void)
 	f32 z_in_new = ((report.accel_z * _accel_range_scale) - _accel_scale.z_offset) * _accel_scale.z_scale;
 
 
-	arb.x = 0;//_accel_filter_x.apply(x_in_new);
-	arb.y = 0;//_accel_filter_y.apply(y_in_new);
-	arb.z = 0;//_accel_filter_z.apply(z_in_new);
+	arb.x = x_in_new;//_accel_filter_x.apply(x_in_new);
+	arb.y = y_in_new;//_accel_filter_y.apply(y_in_new);
+	arb.z = z_in_new;//_accel_filter_z.apply(z_in_new);
 
 	// apply user specified rotation
 	//rotate_3f(_rotation, arb.x, arb.y, arb.z);
@@ -500,9 +505,9 @@ void mpu6000::measure(void)
 	float y_gyro_in_new = ((report.gyro_y * _gyro_range_scale) - _gyro_scale.y_offset) * _gyro_scale.y_scale;
 	float z_gyro_in_new = ((report.gyro_z * _gyro_range_scale) - _gyro_scale.z_offset) * _gyro_scale.z_scale;
 
-	grb.x = 0;//_gyro_filter_x.apply(x_gyro_in_new);
-	grb.y = 0;//_gyro_filter_y.apply(y_gyro_in_new);
-	grb.z = 0;//_gyro_filter_z.apply(z_gyro_in_new);
+	grb.x = x_gyro_in_new;//_gyro_filter_x.apply(x_gyro_in_new);
+	grb.y = y_gyro_in_new;//_gyro_filter_y.apply(y_gyro_in_new);
+	grb.z = z_gyro_in_new;//_gyro_filter_z.apply(z_gyro_in_new);
 
 	// apply user specified rotation
 	//rotate_3f(_rotation, grb.x, grb.y, grb.z);
@@ -561,6 +566,12 @@ s32 mpu6000::set_gyro_fsr(u16 fsr)
 
     ret = write_reg8(MPUREG_GYRO_CONFIG, data);
     if (ret) {
+        ERR("%s: failed to set_gyro_fsr 1.\n", _devname);
+        return -1;
+    }
+
+    if (read_reg8(MPUREG_GYRO_CONFIG) != data) {
+        ERR("%s: failed to set_gyro_fsr 2.\n", _devname);
         return -1;
     }
 
@@ -596,6 +607,12 @@ s32 mpu6000::set_accel_fsr(u8 fsr)
 
     ret = write_reg8(MPUREG_ACCEL_CONFIG, data);
     if (ret) {
+        ERR("%s: failed to set_accel_fsr 1.\n", _devname);
+        return -1;
+    }
+
+    if (read_reg8(MPUREG_ACCEL_CONFIG) != data) {
+        ERR("%s: failed to set_accel_fsr 2.\n", _devname);
         return -1;
     }
 
@@ -771,7 +788,7 @@ s32 mpu6000::calibrate_gyro(void)
 	s32 size;
 	s32 ret = 1;
 
-	struct gyro_scale gyro_scale = { 
+	struct gyro_scale gyro_scale = {
 		0.0f,
 		1.0f,
 		0.0f,
@@ -788,9 +805,11 @@ s32 mpu6000::calibrate_gyro(void)
 		/* now go get it */
 		size = mpu6000::read_gyro((u8 *)&gyro_report, sizeof(gyro_report));
 		if (size != sizeof(gyro_report)) {
-			ERR("%s:¡¡ERROR: READ 1");
-			ret = -EIO;
-			goto out;
+            err_count++;
+            //ERR("%s: ERROR: READ 1.\n", _devname);
+            core::mdelay(2);
+            continue;
+            
 		}
 
 		gyro_scale.x_offset += gyro_report.x;
@@ -803,19 +822,19 @@ s32 mpu6000::calibrate_gyro(void)
 		ret = -EIO;
 		goto out;
 	}
-	gyro_scale.x_offset /= counter;
-	gyro_scale.y_offset /= counter;
-	gyro_scale.z_offset /= counter;
-	
+	gyro_scale.x_offset /= good_count;
+	gyro_scale.y_offset /= good_count;
+	gyro_scale.z_offset /= good_count;
+
 	memcpy(&_gyro_scale, &gyro_scale, sizeof(gyro_scale));
 
 	INF("%s: gyro_scale: \n"
 		"	X: x_offset = %f, x_scale = %f. \n"
 		"	Y: y_offset = %f, y_scale = %f. \n"
-		"	Z: z_offset = %f, z_scale = %f. \n", 
+		"	Z: z_offset = %f, z_scale = %f. \n",
 		_devname,
-		_gyro_scale.x_offset, _gyro_scale.x_scale, 
-		_gyro_scale.y_offset, _gyro_scale.y_scale, 
+		_gyro_scale.x_offset, _gyro_scale.x_scale,
+		_gyro_scale.y_offset, _gyro_scale.y_scale,
 		_gyro_scale.z_offset, _gyro_scale.z_scale);
 
 	/* TODO: save params */

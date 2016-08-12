@@ -41,7 +41,6 @@ int	print(s32 level, const char* fmt, ...)
     logger *plogger = leader_system::get_instance()->get_logger();
 	count = plogger->vprintf(fmt, ap);
 	//plogger->flush();
-    //core::mdelay(10);
 #endif
 	va_end(ap);
 

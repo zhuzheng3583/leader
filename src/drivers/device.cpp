@@ -15,8 +15,11 @@ namespace driver {
 device::device(void) : 
 	_name(NULL),
     _id(-1),
-    _irq(-1),
     _handle(NULL),
+    _devname(NULL),
+    _devid(-1),
+    _devhandle(NULL),
+    _irq(-1),
     _probed(0),
     _opened(0)
 {
@@ -27,8 +30,11 @@ device::device(void) :
 device::device(PCSTR name, s32 id) :
 	_name(name),
     _id(id),
-    _irq(-1),
     _handle(NULL),
+    _devname(name),
+    _devid(id),
+    _devhandle(NULL),
+    _irq(-1),
     _probed(0),
     _opened(0)
 {

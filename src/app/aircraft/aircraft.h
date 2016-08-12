@@ -23,7 +23,7 @@ public:
 	~aircraft(void);
 
 public:
-    s32 _into_calibration;
+    s32 _into_calibrate;
     
 public:
 	s32 init(void);

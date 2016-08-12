@@ -48,6 +48,8 @@ void autopilot::run(void *parg)
     struct baro_report baro;
 	memset(&baro, 0, sizeof(baro));
 
+    mpu6000->calibrate_gyro();
+
 	for ( ; ;)
 	{
 		mpu6000->read_accel((u8 *)&accel, sizeof(accel_report));
@@ -56,7 +58,7 @@ void autopilot::run(void *parg)
 		//	"gyro.x_raw=%d, gyro.y_raw=%d, gyro.z_raw=%d.\n",
 		//	_os_name, accel.x_raw, accel.y_raw, accel.z_raw,
 		//	gyro.x_raw, gyro.y_raw, gyro.z_raw);
-
+        
         hmc5883->read((u8 *)&mag, sizeof(mag_report));
 		//DBG("%s: mag.x_raw=%d, mag.y_raw=%d, mag.z_raw=%d.\n",
 		//	_os_name, mag.x_raw, mag.y_raw, mag.z_raw);
