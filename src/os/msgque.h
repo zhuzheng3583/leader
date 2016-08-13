@@ -12,7 +12,7 @@
 #include "leader_type.h"
 #include "leader_misc.h"
 
-#include "os/kernel.h"
+#include "kernel.h"
 
 namespace os {
 

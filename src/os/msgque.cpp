@@ -8,9 +8,8 @@
 ** Descriptions:
 **
 ***********************************************************************/
-#include "os/msgque.h"
+#include "msgque.h"
 
-#include "includes.h"
 #include "cmsis_os.h"
 
 namespace os {

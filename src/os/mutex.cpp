@@ -8,7 +8,7 @@
 ** Descriptions:
 **
 ***********************************************************************/
-#include "os/mutex.h"
+#include "mutex.h"
 
 
 namespace os {

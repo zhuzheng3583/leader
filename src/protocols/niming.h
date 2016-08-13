@@ -38,7 +38,7 @@ public:
     void detach(void);
 
     void report_status(data_attitude_t *atti);
-	void report_sensor(struct accel_report *accel,
+	void report_sensor(bool type_raw, struct accel_report *accel,
 		struct gyro_report *gyro, struct mag_report *mag);
 
     void report_rc(data_rc_t *rc);

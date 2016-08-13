@@ -39,7 +39,14 @@ mpu6000::mpu6000(PCSTR devname, s32 devid) :
     _gyro_range_rad_s(0.0f),
 
 	_dlpf_freq(MPU6000_DEFAULT_ONCHIP_FILTER_FREQ),
-	_sample_rate(1000)
+	_sample_rate(1000),
+
+    _accel_filter_x(MPU6000_ACCEL_DEFAULT_RATE, MPU6000_ACCEL_DEFAULT_DRIVER_FILTER_FREQ),
+	_accel_filter_y(MPU6000_ACCEL_DEFAULT_RATE, MPU6000_ACCEL_DEFAULT_DRIVER_FILTER_FREQ),
+	_accel_filter_z(MPU6000_ACCEL_DEFAULT_RATE, MPU6000_ACCEL_DEFAULT_DRIVER_FILTER_FREQ),
+	_gyro_filter_x(MPU6000_GYRO_DEFAULT_RATE, MPU6000_GYRO_DEFAULT_DRIVER_FILTER_FREQ),
+	_gyro_filter_y(MPU6000_GYRO_DEFAULT_RATE, MPU6000_GYRO_DEFAULT_DRIVER_FILTER_FREQ),
+	_gyro_filter_z(MPU6000_GYRO_DEFAULT_RATE, MPU6000_GYRO_DEFAULT_DRIVER_FILTER_FREQ)
 
 {
     // default accel scale factors
@@ -399,9 +406,7 @@ void mpu6000::measure(void)
 	report.accel_x = s16_from_bytes(report_reg.accel_x);
 	report.accel_y = s16_from_bytes(report_reg.accel_y);
 	report.accel_z = s16_from_bytes(report_reg.accel_z);
-
 	report.temp = s16_from_bytes(report_reg.temp);
-
 	report.gyro_x = s16_from_bytes(report_reg.gyro_x);
 	report.gyro_y = s16_from_bytes(report_reg.gyro_y);
 	report.gyro_z = s16_from_bytes(report_reg.gyro_z);
@@ -421,13 +426,11 @@ void mpu6000::measure(void)
 		return;
 	}
 
-
 	/*
 	 * Swap axes and negate y
 	 */
 	s16 accel_xt = report.accel_y;
 	s16 accel_yt = ((report.accel_x == -32768) ? 32767 : -report.accel_x);
-
 	s16 gyro_xt = report.gyro_y;
 	s16 gyro_yt = ((report.gyro_x == -32768) ? 32767 : -report.gyro_x);
 
@@ -473,49 +476,41 @@ void mpu6000::measure(void)
 
 
 	/* NOTE: Axes have been swapped to match the board a few lines above. */
-
 	arb.x_raw = report.accel_x;
 	arb.y_raw = report.accel_y;
 	arb.z_raw = report.accel_z;
-
 	f32 x_in_new = ((report.accel_x * _accel_range_scale) - _accel_scale.x_offset) * _accel_scale.x_scale;
 	f32 y_in_new = ((report.accel_y * _accel_range_scale) - _accel_scale.y_offset) * _accel_scale.y_scale;
 	f32 z_in_new = ((report.accel_z * _accel_range_scale) - _accel_scale.z_offset) * _accel_scale.z_scale;
-
-
-	arb.x = x_in_new;//_accel_filter_x.apply(x_in_new);
-	arb.y = y_in_new;//_accel_filter_y.apply(y_in_new);
-	arb.z = z_in_new;//_accel_filter_z.apply(z_in_new);
+	arb.x = _accel_filter_x.apply(x_in_new);
+	arb.y = _accel_filter_y.apply(y_in_new);
+	arb.z = _accel_filter_z.apply(z_in_new);
 
 	// apply user specified rotation
 	//rotate_3f(_rotation, arb.x, arb.y, arb.z);
 
 	arb.scaling = _accel_range_scale;
 	arb.range_m_s2 = _accel_range_m_s2;
-
 	_last_temperature = (report.temp) / 361.0f + 35.0f;
-
 	arb.temperature_raw = report.temp;
 	arb.temperature = _last_temperature;
+
 
 	grb.x_raw = report.gyro_x;
 	grb.y_raw = report.gyro_y;
 	grb.z_raw = report.gyro_z;
-
 	float x_gyro_in_new = ((report.gyro_x * _gyro_range_scale) - _gyro_scale.x_offset) * _gyro_scale.x_scale;
 	float y_gyro_in_new = ((report.gyro_y * _gyro_range_scale) - _gyro_scale.y_offset) * _gyro_scale.y_scale;
 	float z_gyro_in_new = ((report.gyro_z * _gyro_range_scale) - _gyro_scale.z_offset) * _gyro_scale.z_scale;
-
-	grb.x = x_gyro_in_new;//_gyro_filter_x.apply(x_gyro_in_new);
-	grb.y = y_gyro_in_new;//_gyro_filter_y.apply(y_gyro_in_new);
-	grb.z = z_gyro_in_new;//_gyro_filter_z.apply(z_gyro_in_new);
+	grb.x = _gyro_filter_x.apply(x_gyro_in_new);
+	grb.y = _gyro_filter_y.apply(y_gyro_in_new);
+	grb.z = _gyro_filter_z.apply(z_gyro_in_new);
 
 	// apply user specified rotation
 	//rotate_3f(_rotation, grb.x, grb.y, grb.z);
 
 	grb.scaling = _gyro_range_scale;
 	grb.range_rad_s = _gyro_range_rad_s;
-
 	grb.temperature_raw = report.temp;
 	grb.temperature = _last_temperature;
 

@@ -8,11 +8,9 @@
 ** Descriptions:
 **
 ***********************************************************************/
-#include "os/kernel.h"
+#include "kernel.h"
 
 #include "drivers/core.h"
-#include "includes.h"
-#include "os_cfg_app.h"
 #include "cmsis_os.h"
 /*
 CPU_CFG_CRITICAL_METHOD
@@ -105,7 +103,7 @@ u32 kernel::get_cpu_load(void)
  */
 u32 kernel::get_tick_period(void)
 {
-    return (1 * 1000000 / OS_CFG_TICK_RATE_HZ);
+    return (1 * 1000000 / configTICK_RATE_HZ);
 }
 
 /**

@@ -48,6 +48,7 @@ void autopilot::run(void *parg)
     struct baro_report baro;
 	memset(&baro, 0, sizeof(baro));
 
+    mpu6000->calibrate_accel();
     mpu6000->calibrate_gyro();
 
 	for ( ; ;)
@@ -58,7 +59,7 @@ void autopilot::run(void *parg)
 		//	"gyro.x_raw=%d, gyro.y_raw=%d, gyro.z_raw=%d.\n",
 		//	_os_name, accel.x_raw, accel.y_raw, accel.z_raw,
 		//	gyro.x_raw, gyro.y_raw, gyro.z_raw);
-        
+
         hmc5883->read((u8 *)&mag, sizeof(mag_report));
 		//DBG("%s: mag.x_raw=%d, mag.y_raw=%d, mag.z_raw=%d.\n",
 		//	_os_name, mag.x_raw, mag.y_raw, mag.z_raw);
@@ -68,49 +69,7 @@ void autopilot::run(void *parg)
 		//	_os_name, baro.temperature, baro.pressure, baro.altitude);
 
         niming->report_status(NULL);
-        niming->report_sensor(&accel, &gyro, &mag);
-        //niming->report_rc(&pitem_rc->data_rc[i]);
-#if 0
-        ms5611->read((u8 *)(pitem_baro->data_baro), pattr->num_baro * sizeof(data_baro_t));
-		for (u32 i = 0; /*i < pattr->num_baro*/ i < 1; i++)
-		{
-            DBG("%s: temp=%d, pres=%d, alt=%f.\n",
-                _os_name,
-                pitem_baro->data_baro[i].temperature,
-                pitem_baro->data_baro[i].pressure,
-                pitem_baro->data_baro[i].altitude
-                );
-		}
-
-		for (u32 i = 0; i < pattr->num_magn; i++)
-		{
-			pitem_magn->data_magn[i].x = 1;
-			pitem_magn->data_magn[i].y = 2;
-			pitem_magn->data_magn[i].z = 3;
-		}
-
-		for (u32 i = 0; i < pattr->num_attitude; i++)
-		{
-			pitem_atti->data_attitude[i].roll= 1;
-			pitem_atti->data_attitude[i].pitch= 2;
-			pitem_atti->data_attitude[i].yaw = 3;
-			pitem_atti->data_attitude[i].altitude = 4;
-		}
-
-		for (u32 i = 0; i < pattr->num_rc; i++)
-		{
-			pitem_rc->data_rc[i].throttle= 1;
-			pitem_rc->data_rc[i].roll= 2;
-			pitem_rc->data_rc[i].pitch= 3;
-			pitem_rc->data_rc[i].yaw = 4;
-			pitem_rc->data_rc[i].aux1 = 1;
-			pitem_rc->data_rc[i].aux2 = 2;
-			pitem_rc->data_rc[i].aux3 = 3;
-			pitem_rc->data_rc[i].aux4 = 4;
-			pitem_rc->data_rc[i].aux5 = 5;
-			pitem_rc->data_rc[i].aux5 = 6;
-		}
-#endif
+        niming->report_sensor(true, &accel, &gyro, &mag);
 
         msleep(2);
 

@@ -8,7 +8,7 @@
 ** Descriptions:
 **
 ***********************************************************************/
-#include "os/thread.h"
+#include "thread.h"
 
 namespace os {
 

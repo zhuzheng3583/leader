@@ -219,42 +219,88 @@ void niming::report_status(data_attitude_t *atti)
 	_uart->write(data, cnt);
 }
 
-
 // 2：发送传感器数据
-void niming::report_sensor(struct accel_report *accel,
+void niming::report_sensor(bool type_raw, struct accel_report *accel,
     struct gyro_report *gyro, struct mag_report *mag)
 {
 	u8 cnt = 0;
-	u8 data[32];
-	u8 sum = 0;
+	u8 data[64];
+    s16 temp = 0;
+    u8 sum = 0;
 
 	data[cnt++] = 0xAA;
 	data[cnt++] = 0xAA;
 	data[cnt++] = 0x02;
 	data[cnt++] = 0;
-	data[cnt++] = BYTE1(accel->x_raw);  //高8位
-	data[cnt++] = BYTE0(accel->x_raw);  //低8位
-	data[cnt++] = BYTE1(accel->y_raw);
-	data[cnt++] = BYTE0(accel->y_raw);
-	data[cnt++] = BYTE1(accel->z_raw);
-	data[cnt++] = BYTE0(accel->z_raw);
-	data[cnt++] = BYTE1(gyro->x_raw);
-	data[cnt++] = BYTE0(gyro->x_raw);
-	data[cnt++] = BYTE1(gyro->y_raw);
-	data[cnt++] = BYTE0(gyro->y_raw);
-	data[cnt++] = BYTE1(gyro->z_raw);
-	data[cnt++] = BYTE0(gyro->z_raw);
-	data[cnt++] = BYTE1(mag->x_raw);
-	data[cnt++] = BYTE0(mag->x_raw);
-	data[cnt++] = BYTE1(mag->y_raw);
-	data[cnt++] = BYTE0(mag->y_raw);
-	data[cnt++] = BYTE1(mag->z_raw);
-	data[cnt++] = BYTE0(mag->z_raw);
+
+    if (type_raw == true) {
+        temp = (s16)accel->x_raw;
+        data[cnt++] = BYTE1(temp);
+        data[cnt++] = BYTE0(temp);
+        temp = (s16)accel->y_raw;
+        data[cnt++] = BYTE1(temp);
+        data[cnt++] = BYTE0(temp);
+        temp = (s16)accel->z_raw;
+        data[cnt++] = BYTE1(temp);
+        data[cnt++] = BYTE0(temp);
+
+        temp = (s16)gyro->x_raw;
+        data[cnt++] = BYTE1(temp);
+        data[cnt++] = BYTE0(temp);
+        temp = (s16)gyro->y_raw;
+        data[cnt++] = BYTE1(temp);
+        data[cnt++] = BYTE0(temp);
+        temp = (s16)gyro->z_raw;
+        data[cnt++] = BYTE1(temp);
+        data[cnt++] = BYTE0(temp);
+
+        temp = (s16)mag->x_raw;
+        data[cnt++] = BYTE1(temp);
+        data[cnt++] = BYTE0(temp);
+        temp = (s16)mag->y_raw;
+        data[cnt++] = BYTE1(temp);
+        data[cnt++] = BYTE0(temp);
+        temp = (s16)mag->z_raw;
+        data[cnt++] = BYTE1(temp);
+        data[cnt++] = BYTE0(temp);
+
+    } else {
+        temp = (s16)accel->x;
+        data[cnt++] = BYTE1(temp);
+        data[cnt++] = BYTE0(temp);
+        temp = (s16)accel->y;
+        data[cnt++] = BYTE1(temp);
+        data[cnt++] = BYTE0(temp);
+        temp = (s16)accel->z;
+        data[cnt++] = BYTE1(temp);
+        data[cnt++] = BYTE0(temp);
+
+        temp = (s16)gyro->x;
+        data[cnt++] = BYTE1(temp);
+        data[cnt++] = BYTE0(temp);
+        temp = (s16)gyro->y;
+        data[cnt++] = BYTE1(temp);
+        data[cnt++] = BYTE0(temp);
+        temp = (s16)gyro->z;
+        data[cnt++] = BYTE1(temp);
+        data[cnt++] = BYTE0(temp);
+
+        temp = (s16)mag->x;
+        data[cnt++] = BYTE1(temp);
+        data[cnt++] = BYTE0(temp);
+        temp = (s16)mag->y;
+        data[cnt++] = BYTE1(temp);
+        data[cnt++] = BYTE0(temp);
+        temp = (s16)mag->z;
+        data[cnt++] = BYTE1(temp);
+        data[cnt++] = BYTE0(temp);
+    }
 
 	data[3] = cnt - 4;
 
-	for(u8 i = 0; i < cnt; i++)
+	for(u8 i = 0; i < cnt; i++) {
 		sum += data[i];
+	}
 	data[cnt++] = sum;
 
 	_uart->write(data, cnt);

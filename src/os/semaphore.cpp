@@ -10,8 +10,6 @@
 ***********************************************************************/
 #include "os/semaphore.h"
 
-#include "includes.h"
-
 namespace os {
 
 semaphore::semaphore(void) :

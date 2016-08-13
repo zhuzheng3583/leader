@@ -17,8 +17,8 @@ hmc5883::hmc5883(PCSTR devname, s32 devid) :
     device(devname, devid),
     _mag_reports(NULL),
     _range_scale(0), /* default range scale from counts to gauss */
-    _range_ga(1.3f)
-
+    _range_ga(1.3f),
+    _range_bits(0)
 {
 	// default scaling
 	_scale.x_offset = 0;
@@ -117,6 +117,11 @@ void hmc5883::run(void *parg)
 
 s32 hmc5883::init(void)
 {
+	/* allocate basic report buffers */
+	_mag_reports = new ringbuffer(2, sizeof(mag_report));
+	if (_mag_reports == NULL)
+		goto fail0;
+
 	u8 id_a = hmc5883::read_reg8(ADDR_ID_A);
 	u8 id_b = hmc5883::read_reg8(ADDR_ID_B);
 	u8 id_c = hmc5883::read_reg8(ADDR_ID_C);
@@ -128,11 +133,8 @@ s32 hmc5883::init(void)
     hmc5883::write_reg8(ADDR_CONFIG_B, HMC_DEFAULT_CONFIGB_VALUE);
     hmc5883::write_reg8(ADDR_MODE, HMC_DEFAULT_MODE_VALUE); //≥ı ºªØHMC5883
 
-	/* allocate basic report buffers */
-	_mag_reports = new ringbuffer(2, sizeof(mag_report));
-	if (_mag_reports == NULL)
-		goto fail0;
 
+    hmc5883::reset();
 
     return 0;
 
@@ -142,8 +144,72 @@ fail0:
 
 s32 hmc5883::reset(void)
 {
-    return 0;
+	/* set range */
+	return set_range(_range_ga);
 }
+
+s32 hmc5883::set_range(u32 range)
+{
+	if (range < 1) {
+		_range_bits = 0x00;
+		_range_scale = 1.0f / 1370.0f;
+		_range_ga = 0.88f;
+
+	} else if (range <= 1) {
+		_range_bits = 0x01;
+		_range_scale = 1.0f / 1090.0f;
+		_range_ga = 1.3f;
+
+	} else if (range <= 2) {
+		_range_bits = 0x02;
+		_range_scale = 1.0f / 820.0f;
+		_range_ga = 1.9f;
+
+	} else if (range <= 3) {
+		_range_bits = 0x03;
+		_range_scale = 1.0f / 660.0f;
+		_range_ga = 2.5f;
+
+	} else if (range <= 4) {
+		_range_bits = 0x04;
+		_range_scale = 1.0f / 440.0f;
+		_range_ga = 4.0f;
+
+	} else if (range <= 4.7f) {
+		_range_bits = 0x05;
+		_range_scale = 1.0f / 390.0f;
+		_range_ga = 4.7f;
+
+	} else if (range <= 5.6f) {
+		_range_bits = 0x06;
+		_range_scale = 1.0f / 330.0f;
+		_range_ga = 5.6f;
+
+	} else {
+		_range_bits = 0x07;
+		_range_scale = 1.0f / 230.0f;
+		_range_ga = 8.1f;
+	}
+
+	int ret;
+
+	/*
+	 * Send the command to set the range
+	 */
+	ret = write_reg8(ADDR_CONFIG_B, (_range_bits << 5));
+
+	//if (0 != ret)
+		//perf_count(_comms_errors);
+
+	u8 range_bits_in = 0;
+	range_bits_in = read_reg8(ADDR_CONFIG_B);
+
+	//if (0 != ret)
+	//	perf_count(_comms_errors);
+
+	return !(range_bits_in == (_range_bits << 5));
+}
+
 
 void hmc5883::measure(void)
 {

@@ -2142,6 +2142,9 @@
           <state>USE_HAL_DRIVER</state>
           <state>USE_STM32F4_DISCO</state>
           <state>__FPU_USED</state>
+          <state>ARM_MATH_CM4</state>
+          <state>ARM_MATH_MATRIX_CHECK</state>
+          <state>ARM_MATH_ROUNDING</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -2285,6 +2288,9 @@
           <state>$PROJ_DIR$\..\src\dsp</state>
           <state>$PROJ_DIR$\..\src\os</state>
           <state>$PROJ_DIR$\..\src\lib\conversion</state>
+          <state>$PROJ_DIR$\..\src\lib\mathlib</state>
+          <state>$PROJ_DIR$\..\src\lib\mathlib\filter</state>
+          <state>$PROJ_DIR$\..\src\lib\mathlib\test</state>
           <state>$PROJ_DIR$\..\src\protocols</state>
           <state>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Include</state>
           <state>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Device\ST\STM32F4xx\Include</state>
@@ -2296,15 +2302,8 @@
           <state>$PROJ_DIR$\..\src\platform\Middlewares\Third_Party\FreeRTOS\Source\include</state>
           <state>$PROJ_DIR$\..\src\platform\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS</state>
           <state>$PROJ_DIR$\..\src\platform\Middlewares\Third_Party\FreeRTOS\Source\portable\IAR\ARM_CM4F</state>
-          <state>$PROJ_DIR$\..\src\os\ucos\ucos</state>
-          <state>$PROJ_DIR$\..\src\os\ucos\ucos\Ports\ARM-Cortex-M4\Generic\IAR</state>
-          <state>$PROJ_DIR$\..\src\os\ucos\ucos\Source</state>
-          <state>$PROJ_DIR$\..\src\os\ucos\ucos_bsp</state>
-          <state>$PROJ_DIR$\..\src\os\ucos\ucos_config</state>
-          <state>$PROJ_DIR$\..\src\os\ucos\ucos_cpu</state>
-          <state>$PROJ_DIR$\..\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR</state>
-          <state>$PROJ_DIR$\..\src\os\ucos\ucos_lib</state>
-          <state>$PROJ_DIR$\..\src\os\ucos\ucos_lib\Ports\ARM-Cortex-M4\IAR</state>
+          <state>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Include</state>
+          <state>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Lib\ARM</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -3223,189 +3222,51 @@
   </group>
   <group>
     <name>lib</name>
+    <group>
+      <name>mathlib</name>
+      <group>
+        <name>filter</name>
+        <file>
+          <name>$PROJ_DIR$\..\src\lib\mathlib\filter\lowpassfilter2p.cpp</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\lib\mathlib\filter\lowpassfilter2p.h</name>
+        </file>
+      </group>
+      <group>
+        <name>test</name>
+        <file>
+          <name>$PROJ_DIR$\..\src\lib\mathlib\test\test.cpp</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\src\lib\mathlib\test\test.h</name>
+        </file>
+      </group>
+      <file>
+        <name>$PROJ_DIR$\..\src\lib\mathlib\limits.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\lib\mathlib\limits.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\lib\mathlib\mathlib.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\lib\mathlib\mathtype.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\lib\mathlib\matrix.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\lib\mathlib\quaternion.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\lib\mathlib\vector.h</name>
+      </file>
+    </group>
   </group>
   <group>
     <name>os</name>
-    <group>
-      <name>ucos</name>
-      <group>
-        <name>ucos</name>
-        <group>
-          <name>ARM-Cortex-M4</name>
-          <file>
-            <name>$PROJ_DIR$\..\src\os\ucos\ucos\Ports\ARM-Cortex-M4\Generic\IAR\os_cpu.h</name>
-          </file>
-          <file>
-            <name>$PROJ_DIR$\..\src\os\ucos\ucos\Ports\ARM-Cortex-M4\Generic\IAR\os_cpu_a.asm</name>
-          </file>
-          <file>
-            <name>$PROJ_DIR$\..\src\os\ucos\ucos\Ports\ARM-Cortex-M4\Generic\IAR\os_cpu_c.c</name>
-          </file>
-        </group>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os.h</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_cfg_app.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_core.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_dbg.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_flag.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_int.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_mem.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_msg.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_mutex.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_pend_multi.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_prio.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_q.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_sem.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_stat.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_task.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_tick.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_time.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_tmr.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_type.h</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos\Source\os_var.c</name>
-        </file>
-      </group>
-      <group>
-        <name>ucos_bsp</name>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos_bsp\bsp.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos_bsp\bsp.h</name>
-        </file>
-      </group>
-      <group>
-        <name>ucos_config</name>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos_config\app_cfg.h</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos_config\cpu_cfg.h</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos_config\includes.h</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos_config\lib_cfg.h</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos_config\os_app_hooks.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos_config\os_app_hooks.h</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos_config\os_cfg.h</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos_config\os_cfg_app.h</name>
-        </file>
-      </group>
-      <group>
-        <name>ucos_cpu</name>
-        <group>
-          <name>ARM-Cortex-M4</name>
-          <file>
-            <name>$PROJ_DIR$\..\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu.h</name>
-          </file>
-          <file>
-            <name>$PROJ_DIR$\..\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm</name>
-          </file>
-          <file>
-            <name>$PROJ_DIR$\..\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_c.c</name>
-          </file>
-        </group>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos_cpu\cpu_core.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos_cpu\cpu_core.h</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos_cpu\cpu_def.h</name>
-        </file>
-      </group>
-      <group>
-        <name>ucos_lib</name>
-        <group>
-          <name>ARM-Cortex-M4</name>
-          <file>
-            <name>$PROJ_DIR$\..\src\os\ucos\ucos_lib\Ports\ARM-Cortex-M4\IAR\lib_mem_a.asm</name>
-          </file>
-        </group>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos_lib\lib_ascii.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos_lib\lib_ascii.h</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos_lib\lib_def.h</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos_lib\lib_math.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos_lib\lib_math.h</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos_lib\lib_mem.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos_lib\lib_mem.h</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos_lib\lib_str.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\os\ucos\ucos_lib\lib_str.h</name>
-        </file>
-      </group>
-    </group>
-    <file>
-      <name>$PROJ_DIR$\..\src\os\event.cpp</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\src\os\event.h</name>
-    </file>
     <file>
       <name>$PROJ_DIR$\..\src\os\kernel.cpp</name>
     </file>
@@ -3458,6 +3319,72 @@
       </group>
       <group>
         <name>CMSIS</name>
+        <group>
+          <name>Include</name>
+          <file>
+            <name>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Include\arm_common_tables.h</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Include\arm_const_structs.h</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Include\arm_math.h</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Include\cmsis_armcc.h</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Include\cmsis_armcc_V6.h</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Include\cmsis_gcc.h</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Include\core_cm0.h</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Include\core_cm0plus.h</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Include\core_cm3.h</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Include\core_cm4.h</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Include\core_cm7.h</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Include\core_cmFunc.h</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Include\core_cmInstr.h</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Include\core_cmSimd.h</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Include\core_sc000.h</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Include\core_sc300.h</name>
+          </file>
+        </group>
+        <group>
+          <name>Lib</name>
+          <file>
+            <name>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Lib\ARM\arm_cortexM4b_math.lib</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Lib\ARM\arm_cortexM4bf_math.lib</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Lib\ARM\arm_cortexM4l_math.lib</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Lib\ARM\arm_cortexM4lf_math.lib</name>
+          </file>
+        </group>
       </group>
       <group>
         <name>Components</name>

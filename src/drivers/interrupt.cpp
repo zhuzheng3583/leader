@@ -12,9 +12,6 @@
 
 #include "device.h"
 
-#include "includes.h"
-#include "os_cfg_app.h"
-
 #include "cmsis_os.h"
 
 namespace driver {

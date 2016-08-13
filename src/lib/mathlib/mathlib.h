@@ -41,15 +41,13 @@
 
 #pragma once
 
-#include "math/Vector.hpp"
-#include "math/Matrix.hpp"
-#include "math/Quaternion.hpp"
-#include "math/Limits.hpp"
+#include "mathtype.h"
 
+#include "vector.h"
+#include "quaternion.h"
+#include "matrix.h"
+#include "limits.h"
 #endif
 
-#ifdef CONFIG_ARCH_ARM
-
-#include "CMSIS/Include/arm_math.h"
-
-#endif
+//#include "platform/CMSIS/Include/arm_math.h"
+#include "arm_math.h"

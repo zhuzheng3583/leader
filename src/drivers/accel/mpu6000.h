@@ -23,8 +23,11 @@
 #include "accel.h"
 #include "gyro.h"
 
-
 #include "os/thread.h"
+
+#include "mathlib.h"
+#include "lowpassfilter2p.h"
+
 
 #define MPUREG_SAMPLE_RATE_DIV     0x19
 #define MPUREG_CONFIG              0x1A
@@ -316,9 +319,8 @@ enum mpu_gyro_fs_shift {
 #define q30                     1073741824.0f   //q30格式,long转float时的除数.
 
 
-
-
 using namespace os;
+using namespace math;
 
 namespace driver {
 
@@ -345,11 +347,18 @@ protected:
 
 	u32		_dlpf_freq;
 	u32		_sample_rate;
-
 	// last temperature reading for print_info()
 	f32	    _last_temperature;
-
 	u8	    _product;	/** product code */
+
+
+	math::lowpassfilter2p	_accel_filter_x;
+	math::lowpassfilter2p	_accel_filter_y;
+	math::lowpassfilter2p	_accel_filter_z;
+	math::lowpassfilter2p	_gyro_filter_x;
+	math::lowpassfilter2p	_gyro_filter_y;
+	math::lowpassfilter2p	_gyro_filter_z;
+
 
 	// this is used to support runtime checking of key
 	// configuration registers to detect SPI bus errors and sensor
@@ -378,7 +387,7 @@ public:
     void measure(void);
     s16 s16_from_bytes(u8 bytes[]);
     s32 calibrate_gyro(void);
-    
+
 public:
 	s32 self_test(void);
 	s32 chip_self_test(void);
@@ -389,7 +398,7 @@ public:
 	void set_dlpf_filter(u16 frequency_hz);
 	void set_sample_rate(u32 desired_sample_rate_hz);
     s32 set_accel_range(u32 max_g_in);
-    
+
 	s32 get_gyro_raw(s16 *gyro);
 	s32 get_accel_raw(s16 *accel);
 	s32 get_temperature(f32 *temperature);
@@ -397,7 +406,7 @@ public:
 	u16 orientation_matrix_to_scalar(s8 *mtx);
 	u16 row_2_scale(s8 *row);
 	s8 	dmp_get_data(f32 *pitch, f32 *roll, f32 *yaw);
-    
+
 private:
 	void write_checked_reg(u32 reg, u8 value);
 	inline s32 read_reg8(u8 reg);

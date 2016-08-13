@@ -113,6 +113,7 @@ public:
 	mag_scale		_scale;
 	float 			_range_scale;
 	float 			_range_ga;
+	u8				_range_bits;
 	struct mag_report	_last_report;           /**< used for info() */
 
 public:
@@ -131,6 +132,7 @@ public:
     s32 init(void);
     s32 reset(void);
     void measure(void);
+	s32 set_range(u32 range);
 
 public:
 	s32 self_test(void);
