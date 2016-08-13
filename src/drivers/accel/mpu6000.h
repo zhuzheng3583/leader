@@ -24,6 +24,7 @@
 #include "gyro.h"
 
 #include "os/thread.h"
+#include "calibration_messages.h"
 
 #include "mathlib.h"
 #include "lowpassfilter2p.h"
@@ -387,6 +388,15 @@ public:
     void measure(void);
     s16 s16_from_bytes(u8 bytes[]);
     s32 calibrate_gyro(void);
+
+
+    s32 calibrate_accel(void);
+    s32 calibratie_accel_measurements(float (&accel_offs)[3], float (&accel_T)[3][3], u32 *active_sensors);
+    s32 detect_orientation(void);
+    s32 read_accelerometer_avg(float (&accel_avg)[6][3], u32 orient, u32 samples_num);
+    s32 mat_invert3(float src[3][3], float dst[3][3]);
+    s32 calculate_calibration_values(float (&accel_ref)[6][3], float (&accel_T)[3][3], float (&accel_offs)[3], float g);
+    
 
 public:
 	s32 self_test(void);

@@ -9,6 +9,8 @@
 **
 ***********************************************************************/
 #include "mpu6000.h"
+#include <float.h>
+#include <math.h>
 
 namespace driver {
 
@@ -778,7 +780,7 @@ s32 mpu6000::calibrate_gyro(void)
 {
 	struct gyro_report gyro_report;
 	u32 counter = 0;
-	const u32 total_count = 1000;
+	const u32 samples_num = 1000;
 	u32 err_count = 0;	/* determine gyro mean values */
 	u32 good_count = 0;
 	s32 size;
@@ -798,7 +800,7 @@ s32 mpu6000::calibrate_gyro(void)
 
     core::mdelay(10);
 	/* read the sensor up to 50x, stopping when we have 10 good values */
-	for (counter = 0; counter < total_count; counter++) {
+	for (counter = 0; counter < samples_num; counter++) {
 		/* now go get it */
 		size = mpu6000::read_gyro((u8 *)&gyro_report, sizeof(gyro_report));
 		if (size != sizeof(gyro_report)) {
@@ -806,7 +808,6 @@ s32 mpu6000::calibrate_gyro(void)
             //ERR("%s: ERROR: READ 1.\n", _devname);
             core::mdelay(2);
             continue;
-
 		}
 
 		gyro_scale.x_offset += gyro_report.x;
@@ -841,6 +842,497 @@ s32 mpu6000::calibrate_gyro(void)
 out:
 	return -1;
 }
+
+s32 mpu6000::calibrate_accel(void)
+{
+	static const char *accel_name = "accel";
+
+	INF(CAL_STARTED_MSG, accel_name);
+
+	INF("You need to put the system on all six sides");
+	INF("Follow the instructions on the screen");
+
+	struct accel_scale accel_scale = {
+		0.0f,
+		1.0f,
+		0.0f,
+		1.0f,
+		0.0f,
+		1.0f,
+	};
+
+	s32 ret = 0;
+	char str[30];
+
+	/* reset all offsets to zero and all scales to one */
+	memcpy(&_accel_scale, &accel_scale, sizeof(accel_scale));
+
+	float accel_offs[3];
+	float accel_T[3][3];
+	u32 active_sensors;
+
+	/* measure and calculate offsets & scales */
+	ret = calibratie_accel_measurements(accel_offs, accel_T, &active_sensors);
+	if (ret != 0 || active_sensors == 0) {
+		ERR(CAL_FAILED_SENSOR_MSG);
+		return -1;
+	}
+
+	accel_scale.x_offset = accel_offs[0];
+	accel_scale.x_scale = accel_T[0][0];
+	accel_scale.y_offset = accel_offs[1];
+	accel_scale.y_scale = accel_T[1][1];
+	accel_scale.z_offset = accel_offs[2];
+	accel_scale.z_scale = accel_T[2][2];
+#if 0
+	/* measurements completed successfully, rotate calibration values */
+	param_t board_rotation_h = param_find("SENS_BOARD_ROT");
+	int32_t board_rotation_int;
+	param_get(board_rotation_h, &(board_rotation_int));
+	enum Rotation board_rotation_id = (enum Rotation)board_rotation_int;
+	math::Matrix<3, 3> board_rotation;
+	get_rot_matrix(board_rotation_id, &board_rotation);
+	math::Matrix<3, 3> board_rotation_t = board_rotation.transposed();
+
+	/* handle individual sensors, one by one */
+	math::Vector<3> accel_offs_vec(accel_offs[i]);
+	math::Vector<3> accel_offs_rotated = board_rotation_t * accel_offs_vec;
+	math::Matrix<3, 3> accel_T_mat(accel_T[i]);
+	math::Matrix<3, 3> accel_T_rotated = board_rotation_t * accel_T_mat * board_rotation;
+
+	accel_scale.x_offset = accel_offs_rotated(0);
+	accel_scale.x_scale = accel_T_rotated(0, 0);
+	accel_scale.y_offset = accel_offs_rotated(1);
+	accel_scale.y_scale = accel_T_rotated(1, 1);
+	accel_scale.z_offset = accel_offs_rotated(2);
+	accel_scale.z_scale = accel_T_rotated(2, 2);
+#endif
+
+	/* TODO: set parameters */
+#if 0
+	bool failed = false;
+	(void)sprintf(str, "CAL_ACC%u_XOFF", i);
+	failed |= (OK != param_set(param_find(str), &(accel_scale.x_offset)));
+	(void)sprintf(str, "CAL_ACC%u_YOFF", i);
+	failed |= (OK != param_set(param_find(str), &(accel_scale.y_offset)));
+	(void)sprintf(str, "CAL_ACC%u_ZOFF", i);
+	failed |= (OK != param_set(param_find(str), &(accel_scale.z_offset)));
+	(void)sprintf(str, "CAL_ACC%u_XSCALE", i);
+	failed |= (OK != param_set(param_find(str), &(accel_scale.x_scale)));
+	(void)sprintf(str, "CAL_ACC%u_YSCALE", i);
+	failed |= (OK != param_set(param_find(str), &(accel_scale.y_scale)));
+	(void)sprintf(str, "CAL_ACC%u_ZSCALE", i);
+	failed |= (OK != param_set(param_find(str), &(accel_scale.z_scale)));
+	(void)sprintf(str, "CAL_ACC%u_ID", i);
+	failed |= (OK != param_set(param_find(str), &(device_id[i])));
+	if (failed) {
+		mavlink_and_console_log_critical(mavlink_fd, CAL_FAILED_SET_PARAMS_MSG);
+		return ERROR;
+	}
+#endif
+		
+	memcpy(&_accel_scale, &accel_scale, sizeof(accel_scale));
+
+	/* TODO:auto-save to EEPROM */
+#if 0
+	if (ret == OK) {
+		
+		ret = param_save_default();
+
+		if (ret != OK) {
+			mavlink_and_console_log_critical(mavlink_fd, CAL_FAILED_SAVE_PARAMS_MSG);
+		}
+
+		mavlink_and_console_log_info(mavlink_fd, CAL_DONE_MSG, sensor_name);
+
+	} else {
+		mavlink_and_console_log_critical(mavlink_fd, CAL_FAILED_MSG, sensor_name);
+	}
+#endif
+	return ret;
+}
+
+s32 mpu6000::calibratie_accel_measurements(float (&accel_offs)[3], float (&accel_T)[3][3], u32 *active_sensors)
+{
+	const unsigned samples_num = 3000;
+	*active_sensors = 0;
+
+    struct accel_report accel_report;
+	u64 timestamps = 0;
+	s32 size = 0;
+	for (u32 i = 0; i < 5 && (size != sizeof(accel_report)); i++) {
+		size = mpu6000::read_accel((u8 *)&accel_report, sizeof(accel_report));
+		if (size != sizeof(accel_report)) {
+            //ERR("%s: ERROR: READ 1.\n", _devname);
+            core::mdelay(100);
+            continue;
+		}
+		timestamps = accel_report.timestamp;
+		INF("%s: read timestamp success.\n", _devname);
+	}
+
+
+	float accel_ref[6][3];
+	bool data_collected[6] = { false, false, false, false, false, false };
+	const char *orientation_strs[6] = { "back", "front", "left", "right", "up", "down" };
+	
+	u32 done_count = 0;
+	s32 res = 0;
+
+	while (true) {
+		bool done = true;
+		u32 old_done_count = done_count;
+		done_count = 0;
+
+		for (s32 i = 0; i < 6; i++) {
+			if (data_collected[i]) {
+				done_count++;
+
+			} else {
+				done = false;
+			}
+		}
+
+		if (old_done_count != done_count) {
+			INF(CAL_PROGRESS_MSG, "accel", 17 * done_count);
+		}
+
+		if (done) {
+			break;
+		}
+
+		/* inform user which axes are still needed */
+		INF("pending: %s%s%s%s%s%s",
+			(!data_collected[5]) ? "down " : "",
+			(!data_collected[0]) ? "back " : "",
+			(!data_collected[1]) ? "front " : "",
+			(!data_collected[2]) ? "left " : "",
+			(!data_collected[3]) ? "right " : "",
+			(!data_collected[4]) ? "up " : "");
+
+		s32 orient = detect_orientation();
+		if (orient < 0) {
+			INF("invalid motion, hold still...");
+			core::mdelay(3000);
+			continue;
+		}
+
+		/* inform user about already handled side */
+		if (data_collected[orient]) {
+			INF("%s side done, rotate to a different side", orientation_strs[orient]);
+			core::mdelay(3000);
+			continue;
+		}
+
+		INF("Hold still, starting to measure %s side", orientation_strs[orient]);
+		core::mdelay(1);
+		read_accelerometer_avg(accel_ref, orient, samples_num);
+		INF("result for %s side: [ %.2f %.2f %.2f ]", orientation_strs[orient],
+			(double)accel_ref[orient][0],
+			(double)accel_ref[orient][1],
+			(double)accel_ref[orient][2]);
+
+		data_collected[orient] = true;
+		//tune_neutral(true);
+	}
+
+
+
+	/* calculate offsets and transform matrix */
+	for (u32 i = 0; i < (*active_sensors); i++) {
+		res = calculate_calibration_values(accel_ref, accel_T, accel_offs, CONSTANTS_ONE_G);
+
+		/* verbose output on the console */
+		INF("accel_T transformation matrix:\n");
+		for (u32 j = 0; j < 3; j++) {
+			INF("  %8.4f %8.4f %8.4f\n", (double)accel_T[j][0], (double)accel_T[j][1], (double)accel_T[j][2]);
+		}
+		INF("\n");
+
+		if (res != 0) {
+			ERR("ERROR: calibration values calculation error");
+			break;
+		}
+	}
+
+	return res;
+}
+
+/**
+ * Wait for vehicle become still and detect it's orientation.
+ *
+ * @param mavlink_fd the MAVLink file descriptor to print output to
+ * @param subs the accelerometer subscriptions. Only the first one will be used.
+ *
+ * @return 0..5 according to orientation when vehicle is still and ready for measurements,
+ * ERROR if vehicle is not still after 30s or orientation error is more than 5m/s^2
+ */
+s32 mpu6000::detect_orientation(void)
+{
+#if 0
+	const u32 ndim = 3;
+
+	struct accel_report accel_report;
+	/* exponential moving average of accel */
+	float accel_ema[ndim] = { 0.0f };
+	/* max-hold dispersion of accel */
+	float accel_disp[3] = { 0.0f, 0.0f, 0.0f };
+	/* EMA time constant in seconds*/
+	float ema_len = 0.5f;
+	/* set "still" threshold to 0.25 m/s^2 */
+	float still_thr2 = powf(0.25f, 2);
+	/* set accel error threshold to 5m/s^2 */
+	float accel_err_thr = 5.0f;
+	/* still time required in us */
+	hrt_abstime still_time = 2000000;
+
+	hrt_abstime t_start = hrt_absolute_time();
+	/* set timeout to 30s */
+	hrt_abstime timeout = 30000000;
+	hrt_abstime t_timeout = t_start + timeout;
+	hrt_abstime t = t_start;
+	hrt_abstime t_prev = t_start;
+	hrt_abstime t_still = 0;
+
+	u32 poll_errcount = 0;
+	s32 size = 0;
+	while (true) {
+		/* wait blocking for new data */
+		size = mpu6000::read_accel((u8 *)&accel_report, sizeof(accel_report));
+		if (size != sizeof(accel_report)) {
+            //ERR("%s: ERROR: READ 1.\n", _devname);
+            poll_errcount++;
+            core::mdelay(1);
+            continue;
+		}
+		
+		t = hrt_absolute_time();
+		float dt = (t - t_prev) / 1000000.0f;
+		t_prev = t;
+		float w = dt / ema_len;
+
+		for (u32 i = 0; i < ndim; i++) {
+
+			float di = 0.0f;
+			switch (i) {
+				case 0:
+					di = accel_report.x;
+					break;
+				case 1:
+					di = accel_report.y;
+					break;
+				case 2:
+					di = accel_report.z;
+					break;
+			}
+
+			float d = di - accel_ema[i];
+			accel_ema[i] += d * w;
+			d = d * d;
+			accel_disp[i] = accel_disp[i] * (1.0f - w);
+
+			if (d > still_thr2 * 8.0f) {
+				d = still_thr2 * 8.0f;
+			}
+
+			if (d > accel_disp[i]) {
+				accel_disp[i] = d;
+			}
+		}
+
+		/* still detector with hysteresis */
+		if (accel_disp[0] < still_thr2 &&
+			accel_disp[1] < still_thr2 &&
+			accel_disp[2] < still_thr2) {
+			/* is still now */
+			if (t_still == 0) {
+				/* first time */
+				INF("detected rest position, hold still...");
+				t_still = t;
+				t_timeout = t + timeout;
+
+			} else {
+				/* still since t_still */
+				if (t > t_still + still_time) {
+					/* vehicle is still, exit from the loop to detection of its orientation */
+					break;
+				}
+			}
+
+		} else if (accel_disp[0] > still_thr2 * 4.0f ||
+				accel_disp[1] > still_thr2 * 4.0f ||
+				accel_disp[2] > still_thr2 * 4.0f) {
+			/* not still, reset still start time */
+			if (t_still != 0) {
+				INF("detected motion, hold still...");
+				core::mdelay(3000);
+				t_still = 0;
+			}
+		}
+
+		if (t > t_timeout) {
+			poll_errcount++;
+		}
+
+		if (poll_errcount > 1000) {
+			ERR(CAL_FAILED_SENSOR_MSG);
+			return -1;
+		}
+	}
+
+	if (fabsf(accel_ema[0] - CONSTANTS_ONE_G) < accel_err_thr &&
+	    fabsf(accel_ema[1]) < accel_err_thr &&
+	    fabsf(accel_ema[2]) < accel_err_thr) {
+		return 0;        // [ g, 0, 0 ]
+	}
+
+	if (fabsf(accel_ema[0] + CONSTANTS_ONE_G) < accel_err_thr &&
+	    fabsf(accel_ema[1]) < accel_err_thr &&
+	    fabsf(accel_ema[2]) < accel_err_thr) {
+		return 1;        // [ -g, 0, 0 ]
+	}
+
+	if (fabsf(accel_ema[0]) < accel_err_thr &&
+	    fabsf(accel_ema[1] - CONSTANTS_ONE_G) < accel_err_thr &&
+	    fabsf(accel_ema[2]) < accel_err_thr) {
+		return 2;        // [ 0, g, 0 ]
+	}
+
+	if (fabsf(accel_ema[0]) < accel_err_thr &&
+	    fabsf(accel_ema[1] + CONSTANTS_ONE_G) < accel_err_thr &&
+	    fabsf(accel_ema[2]) < accel_err_thr) {
+		return 3;        // [ 0, -g, 0 ]
+	}
+
+	if (fabsf(accel_ema[0]) < accel_err_thr &&
+	    fabsf(accel_ema[1]) < accel_err_thr &&
+	    fabsf(accel_ema[2] - CONSTANTS_ONE_G) < accel_err_thr) {
+		return 4;        // [ 0, 0, g ]
+	}
+
+	if (fabsf(accel_ema[0]) < accel_err_thr &&
+	    fabsf(accel_ema[1]) < accel_err_thr &&
+	    fabsf(accel_ema[2] + CONSTANTS_ONE_G) < accel_err_thr) {
+		return 5;        // [ 0, 0, -g ]
+	}
+
+	ERR("ERROR: invalid orientation");
+
+	return ERROR;	// Can't detect orientation
+#else
+	static s32 n = 0;
+	return n++;        
+
+	//0: [ g, 0, 0 ]
+	//1: [ -g, 0, 0 ]
+	//2: [ 0, g, 0 ]
+	//3: [ 0, -g, 0 ]
+	//4: [ 0, 0, g ]
+	//5: [ 0, 0, -g ]
+#endif
+}
+
+/*
+ * Read specified number of accelerometer samples, calculate average and dispersion.
+ */
+s32 mpu6000::read_accelerometer_avg(float (&accel_avg)[6][3], u32 orient, u32 samples_num)
+{
+	u32 counts = 0;
+	float accel_sum[3];
+	memset(accel_sum, 0, sizeof(accel_sum));
+
+	u32 errcount = 0;
+
+	s32 size = 0;
+	struct accel_report accel_report;
+	/* use the first sensor to pace the readout, but do per-sensor counts */
+	while (counts < samples_num) {
+		/* wait blocking for new data */
+		size = mpu6000::read_accel((u8 *)&accel_report, sizeof(accel_report));
+		if (size != sizeof(accel_report)) {
+            //ERR("%s: ERROR: READ 1.\n", _devname);
+            errcount++;
+            core::mdelay(1);
+            continue;
+		}
+
+		accel_sum[0] += accel_report.x;
+		accel_sum[1] += accel_report.y;
+		accel_sum[2] += accel_report.z;
+		counts++;
+
+		if (errcount > samples_num / 10) {
+			return -1;
+		}
+	}
+
+	for (u32 i = 0; i < 3; i++) {
+		accel_avg[orient][i] = accel_sum[i] / counts;
+		WRN("input: axis: %u, orient: %u cnt: %u -> %8.4f", i, orient, counts, (double)accel_avg[orient][i]);
+	}
+
+	return 0;
+}
+
+s32 mpu6000::mat_invert3(float src[3][3], float dst[3][3])
+{
+	float det = src[0][0] * (src[1][1] * src[2][2] - src[1][2] * src[2][1]) -
+		    src[0][1] * (src[1][0] * src[2][2] - src[1][2] * src[2][0]) +
+		    src[0][2] * (src[1][0] * src[2][1] - src[1][1] * src[2][0]);
+
+	if (fabsf(det) < FLT_EPSILON) {
+		return ERROR;        // Singular matrix
+	}
+
+	dst[0][0] = (src[1][1] * src[2][2] - src[1][2] * src[2][1]) / det;
+	dst[1][0] = (src[1][2] * src[2][0] - src[1][0] * src[2][2]) / det;
+	dst[2][0] = (src[1][0] * src[2][1] - src[1][1] * src[2][0]) / det;
+	dst[0][1] = (src[0][2] * src[2][1] - src[0][1] * src[2][2]) / det;
+	dst[1][1] = (src[0][0] * src[2][2] - src[0][2] * src[2][0]) / det;
+	dst[2][1] = (src[0][1] * src[2][0] - src[0][0] * src[2][1]) / det;
+	dst[0][2] = (src[0][1] * src[1][2] - src[0][2] * src[1][1]) / det;
+	dst[1][2] = (src[0][2] * src[1][0] - src[0][0] * src[1][2]) / det;
+	dst[2][2] = (src[0][0] * src[1][1] - src[0][1] * src[1][0]) / det;
+
+	return 0;
+}
+
+s32 mpu6000::calculate_calibration_values(float (&accel_ref)[6][3], float (&accel_T)[3][3], float (&accel_offs)[3], float g)
+{
+	/* calculate offsets */
+	for (u32 i = 0; i < 3; i++) {
+		accel_offs[i] = (accel_ref[i * 2][i] + accel_ref[i * 2 + 1][i]) / 2;
+	}
+
+	/* fill matrix A for linear equations system*/
+	float mat_A[3][3];
+	memset(mat_A, 0, sizeof(mat_A));
+
+	for (u32 i = 0; i < 3; i++) {
+		for (u32 j = 0; j < 3; j++) {
+			float a = accel_ref[i * 2][j] - accel_offs[j];
+			mat_A[i][j] = a;
+		}
+	}
+
+	/* calculate inverse matrix for A */
+	float mat_A_inv[3][3];
+
+	if (mat_invert3(mat_A, mat_A_inv) != 0) {
+		return ERROR;
+	}
+
+	/* copy results to accel_T */
+	for (u32 i = 0; i < 3; i++) {
+		for (u32 j = 0; j < 3; j++) {
+			/* simplify matrices mult because b has only one non-zero element == g at index i */
+			accel_T[j][i] = mat_A_inv[j][i] * g;
+		}
+	}
+
+	return 0;
+}
+
 
 void mpu6000::write_checked_reg(u32 reg, u8 value)
 {

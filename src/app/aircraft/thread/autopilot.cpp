@@ -48,7 +48,7 @@ void autopilot::run(void *parg)
     struct baro_report baro;
 	memset(&baro, 0, sizeof(baro));
 
-    mpu6000->calibrate_accel();
+    //mpu6000->calibrate_accel();
     mpu6000->calibrate_gyro();
 
 	for ( ; ;)

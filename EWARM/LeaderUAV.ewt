@@ -3459,6 +3459,21 @@
     </group>
   </group>
   <group>
+    <name>modules</name>
+    <group>
+      <name>commander</name>
+      <file>
+        <name>$PROJ_DIR$\..\src\modules\commander\calibration_messages.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\modules\commander\calibration_routines.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\modules\commander\calibration_routines.h</name>
+      </file>
+    </group>
+  </group>
+  <group>
     <name>os</name>
     <file>
       <name>$PROJ_DIR$\..\src\os\kernel.cpp</name>

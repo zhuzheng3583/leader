@@ -2292,6 +2292,7 @@
           <state>$PROJ_DIR$\..\src\lib\mathlib\filter</state>
           <state>$PROJ_DIR$\..\src\lib\mathlib\test</state>
           <state>$PROJ_DIR$\..\src\protocols</state>
+          <state>$PROJ_DIR$\..\src\modules\commander</state>
           <state>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Include</state>
           <state>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Device\ST\STM32F4xx\Include</state>
           <state>$PROJ_DIR$\..\src\platform\Drivers\STM32F4xx_HAL_Driver\Inc</state>
@@ -3262,6 +3263,21 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\src\lib\mathlib\vector.h</name>
+      </file>
+    </group>
+  </group>
+  <group>
+    <name>modules</name>
+    <group>
+      <name>commander</name>
+      <file>
+        <name>$PROJ_DIR$\..\src\modules\commander\calibration_messages.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\modules\commander\calibration_routines.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\modules\commander\calibration_routines.h</name>
       </file>
     </group>
   </group>

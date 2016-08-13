@@ -23,6 +23,7 @@
 #include "magn.h"
 
 #include "os/thread.h"
+#include "calibration_messages.h"
 
 //bit0-bit1 xyz是否使用偏压,默认为0正常配置
 //bit2-bit4 数据输出速率, 110为最大75HZ 100为15HZ 最小000 0.75HZ
@@ -134,6 +135,9 @@ public:
     void measure(void);
 	s32 set_range(u32 range);
 
+    s32 calibrate_instance(void);
+    s32 calibrate_mag(void);
+    
 public:
 	s32 self_test(void);
 

@@ -10,6 +10,7 @@
 ***********************************************************************/
 #include "hmc5883.h"
 #include <math.h>
+#include "calibration_routines.h"
 
 namespace driver {
 
@@ -319,6 +320,221 @@ void hmc5883::measure(void)
 out:
     //perf_end(_sample_perf);
     return;
+}
+
+
+s32 hmc5883::calibrate_mag(void)
+{
+	INF(CAL_STARTED_MSG, "mag_hmc5883");
+	sleep(1);
+
+	struct mag_scale mag_scale = {
+		0.0f,
+		1.0f,
+		0.0f,
+		1.0f,
+		0.0f,
+		1.0f,
+	};
+
+	s32 ret = 0;
+	u32 calibrated_ok = 0;
+
+	INF("Calibrating magnetometer..");
+	
+	memcpy(&_scale, &mag_scale, sizeof(mag_scale));
+
+#if 0
+	if (ret == 0) {
+		/* calibrate range */
+		res = ioctl(fd, MAGIOCCALIBRATE, fd);
+
+		if (res != OK) {
+			mavlink_and_console_log_info(mavlink_fd, "Skipped scale calibration");
+			/* this is non-fatal - mark it accordingly */
+			res = OK;
+		}
+	}
+#endif
+
+	if (ret == 0) {
+		ret = calibrate_instance();
+
+		if (ret == 0) {
+			calibrated_ok++;
+		}
+	}
+
+	if (calibrated_ok) {
+		INF(CAL_DONE_MSG, "mag_hmc5883");
+
+		/* auto-save to EEPROM */
+		//res = param_save_default();
+
+		if (ret != 0) {
+			ERR(CAL_FAILED_SAVE_PARAMS_MSG);
+		}
+	} else {
+		ERR(CAL_FAILED_MSG, "mag_hmc5883");
+	}
+
+	return ret;
+}
+
+s32 hmc5883::calibrate_instance(void)
+{
+	/* 45 seconds */
+	u64 calibration_interval = 45 * 1000 * 1000;
+
+	/* maximum 500 values */
+	const s32 calibration_maxcount = 240;
+	u32 calibration_counter;
+
+	float *x = NULL;
+	float *y = NULL;
+	float *z = NULL;
+
+	s32 ret = 0;
+	
+	/* allocate memory */
+	INF(CAL_PROGRESS_MSG, "mag_hmc5883", 20);
+
+	x = reinterpret_cast<float *>(malloc(sizeof(float) * calibration_maxcount));
+	y = reinterpret_cast<float *>(malloc(sizeof(float) * calibration_maxcount));
+	z = reinterpret_cast<float *>(malloc(sizeof(float) * calibration_maxcount));
+
+	if (x == NULL || y == NULL || z == NULL) {
+		ERR("ERROR: out of memory");
+
+		/* clean up */
+		if (x != NULL) {
+			free(x);
+		}
+
+		if (y != NULL) {
+			free(y);
+		}
+
+		if (z != NULL) {
+			free(z);
+		}
+
+		ret = ERROR;
+		return ret;
+	}
+
+	if (ret == 0) {
+		struct mag_report mag_report;
+
+		/* limit update rate to get equally spaced measurements over time (in ms) */
+		//orb_set_interval(sub_mag, (calibration_interval / 1000) / calibration_maxcount);
+
+		/* calibrate offsets */
+		//uint64_t calibration_deadline = hrt_absolute_time() + calibration_interval;
+		u32 poll_errcount = 0;
+
+		INF("Turn on all sides: front/back,left/right,up/down");
+
+		calibration_counter = 0U;
+		s32 size = 0;
+		while (calibration_counter < calibration_maxcount) {
+			/* wait blocking for new data */
+			/* now go get it */
+			size = hmc5883::read((u8 *)&mag_report, sizeof(mag_report));
+			if (size != sizeof(mag_report)) {
+				poll_errcount++;
+		       	//ERR("%s: ERROR: READ 1.\n", _devname);
+		      	core::mdelay(2);
+		      	continue;
+			}
+
+			x[calibration_counter] = mag_report.x;
+			y[calibration_counter] = mag_report.y;
+			z[calibration_counter] = mag_report.z;
+			calibration_counter++;
+
+			if (calibration_counter % (calibration_maxcount / 20) == 0) {
+				INF(CAL_PROGRESS_MSG, "mag_hmc5883", 20 + (calibration_counter * 50) / calibration_maxcount);
+			}
+            
+            if (poll_errcount > 1000) {
+                ERR(CAL_FAILED_SENSOR_MSG);
+                ret = ERROR;
+                break;
+            }
+		}
+	}
+
+	float sphere_x;
+	float sphere_y;
+	float sphere_z;
+	float sphere_radius;
+
+	if (ret == 0 && calibration_counter > (calibration_maxcount / 2)) {
+		/* sphere fit */
+		INF(CAL_PROGRESS_MSG, "mag_hmc5883", 70);
+		sphere_fit_least_squares(x, y, z, calibration_counter, 100, 0.0f, &sphere_x, &sphere_y, &sphere_z, &sphere_radius);
+		INF(CAL_PROGRESS_MSG, "mag_hmc5883", 80);
+
+		if (!isfinite(sphere_x) || !isfinite(sphere_y) || !isfinite(sphere_z)) {
+			ERR("ERROR: NaN in sphere fit");
+			ret = ERROR;
+		}
+	}
+
+	if (x != NULL) {
+		free(x);
+	}
+
+	if (y != NULL) {
+		free(y);
+	}
+
+	if (z != NULL) {
+		free(z);
+	}
+
+    struct mag_scale mag_scale;
+	if (ret == 0) {
+		/* apply calibration and set parameters */
+		mag_scale.x_offset = sphere_x;
+		mag_scale.y_offset = sphere_y;
+		mag_scale.z_offset = sphere_z;
+		memcpy(&_scale, &mag_scale, sizeof(mag_scale));
+	}
+
+#if 0
+		if (ret == 0) {
+
+			bool failed = false;
+			/* set parameters */
+			(void)sprintf(str, "CAL_MAG%u_ID", s);
+			failed |= (OK != param_set(param_find(str), &(device_id)));
+			(void)sprintf(str, "CAL_MAG%u_XOFF", s);
+			failed |= (OK != param_set(param_find(str), &(mscale.x_offset)));
+			(void)sprintf(str, "CAL_MAG%u_YOFF", s);
+			failed |= (OK != param_set(param_find(str), &(mscale.y_offset)));
+			(void)sprintf(str, "CAL_MAG%u_ZOFF", s);
+			failed |= (OK != param_set(param_find(str), &(mscale.z_offset)));
+			(void)sprintf(str, "CAL_MAG%u_XSCALE", s);
+			failed |= (OK != param_set(param_find(str), &(mscale.x_scale)));
+			(void)sprintf(str, "CAL_MAG%u_YSCALE", s);
+			failed |= (OK != param_set(param_find(str), &(mscale.y_scale)));
+			(void)sprintf(str, "CAL_MAG%u_ZSCALE", s);
+			failed |= (OK != param_set(param_find(str), &(mscale.z_scale)));
+
+			if (failed) {
+				res = ERROR;
+				ERR(CAL_FAILED_SET_PARAMS_MSG);
+			}
+
+			INF(CAL_PROGRESS_MSG, sensor_name, 90);
+		}
+#endif
+    INF("mag off: x:%.2f y:%.2f z:%.2f Ga.\n", (double)mag_scale.x_offset, (double)mag_scale.y_offset, (double)mag_scale.z_offset);
+    INF("mag scale: x:%.2f y:%.2f z:%.2f.\n", (double)mag_scale.x_scale, (double)mag_scale.y_scale, (double)mag_scale.z_scale);
+
+	return ret;
 }
 
 
