@@ -28,7 +28,7 @@
 
 #include "mathlib.h"
 #include "lowpassfilter2p.h"
-
+#include "rotation.h"
 
 #define MPUREG_SAMPLE_RATE_DIV     0x19
 #define MPUREG_CONFIG              0x1A
@@ -352,6 +352,7 @@ protected:
 	f32	    _last_temperature;
 	u8	    _product;	/** product code */
 
+	enum rotation	_rotation;
 
 	math::lowpassfilter2p	_accel_filter_x;
 	math::lowpassfilter2p	_accel_filter_y;
@@ -396,7 +397,7 @@ public:
     s32 read_accelerometer_avg(float (&accel_avg)[6][3], u32 orient, u32 samples_num);
     s32 mat_invert3(float src[3][3], float dst[3][3]);
     s32 calculate_calibration_values(float (&accel_ref)[6][3], float (&accel_T)[3][3], float (&accel_offs)[3], float g);
-    
+
 
 public:
 	s32 self_test(void);

@@ -3416,6 +3416,15 @@
   <group>
     <name>lib</name>
     <group>
+      <name>conversion</name>
+      <file>
+        <name>$PROJ_DIR$\..\src\lib\conversion\rotation.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\lib\conversion\rotation.h</name>
+      </file>
+    </group>
+    <group>
       <name>mathlib</name>
       <group>
         <name>filter</name>
@@ -3470,6 +3479,15 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\src\modules\commander\calibration_routines.h</name>
+      </file>
+    </group>
+    <group>
+      <name>imu</name>
+      <file>
+        <name>$PROJ_DIR$\..\src\modules\imu\imu.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\modules\imu\imu.h</name>
       </file>
     </group>
   </group>

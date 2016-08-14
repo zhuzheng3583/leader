@@ -18,7 +18,7 @@ autopilot::autopilot(void)
 {
 	_params.name = "receive";
 	_params.priority = 0;
-	_params.stacksize = 512;
+	_params.stacksize = 1024;
 	_params.func = (void *)thread::func;
 	_params.parg = this;
 }
@@ -47,9 +47,12 @@ void autopilot::run(void *parg)
 	memset(&mag, 0, sizeof(mag));
     struct baro_report baro;
 	memset(&baro, 0, sizeof(baro));
+    struct vehicle_attitude_s att;
+    memset(&att, 0, sizeof(att));
+    float euler[3] = { 0 };
 
     //mpu6000->calibrate_accel();
-    mpu6000->calibrate_gyro();
+    //mpu6000->calibrate_gyro();
 
 	for ( ; ;)
 	{
@@ -68,10 +71,13 @@ void autopilot::run(void *parg)
 		//DBG("%s: temperature=%f, pressure=%f, altitude=%f.\n",
 		//	_os_name, baro.temperature, baro.pressure, baro.altitude);
 
-        niming->report_status(NULL);
-        niming->report_sensor(true, &accel, &gyro, &mag);
+        imu_update(gyro.x, gyro.y, gyro.z,
+            accel.x, accel.y, accel.z, &att);
 
-        msleep(2);
+        niming->report_status(&att);
+        niming->report_sensor(false, &accel, &gyro, &mag);
+
+        msleep(1);
 
 		//DBG("%s: task is active[%u]...\n", _os_name, cnt++);
 

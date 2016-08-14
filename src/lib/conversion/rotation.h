@@ -1,5 +1,5 @@
 /*******************************Copyright (c)***************************
-** 
+**
 ** Porject name:	leader
 ** Created by:	zhuzheng<happyzhull@163.com>
 ** Created date:	2016/04/05
@@ -14,13 +14,13 @@
  */
 #pragma once
 
-#include <mathlib/mathlib.h>
+#include "mathlib.h"
 
 /**
  * Enum for board and external compass rotations.
  * This enum maps from board attitude to airframe attitude.
  */
-enum Rotation {
+enum rotation {
 	ROTATION_NONE                = 0,
 	ROTATION_YAW_45              = 1,
 	ROTATION_YAW_90              = 2,
@@ -90,11 +90,11 @@ const rot_lookup_t rot_lookup[] = {
 /**
  * Get the rotation matrix
  */
-void get_rot_matrix(enum Rotation rot, math::Matrix<3, 3> *rot_matrix);
+void get_rot_matrix(enum rotation rot, math::matrix<3, 3> *rot_matrix);
 
 
 /**
  * rotate a 3 element float vector in-place
  */
-void rotate_3f(enum Rotation rot, float &x, float &y, float &z);
+void rotate_3f(enum rotation rot, float &x, float &y, float &z);
 

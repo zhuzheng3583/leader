@@ -2141,7 +2141,7 @@
           <state>STM32F407xx</state>
           <state>USE_HAL_DRIVER</state>
           <state>USE_STM32F4_DISCO</state>
-          <state>__FPU_USED</state>
+          <state>__FPU_PRESENT</state>
           <state>ARM_MATH_CM4</state>
           <state>ARM_MATH_MATRIX_CHECK</state>
           <state>ARM_MATH_ROUNDING</state>
@@ -2291,8 +2291,11 @@
           <state>$PROJ_DIR$\..\src\lib\mathlib</state>
           <state>$PROJ_DIR$\..\src\lib\mathlib\filter</state>
           <state>$PROJ_DIR$\..\src\lib\mathlib\test</state>
+          <state>$PROJ_DIR$\..\src\lib\conversion</state>
           <state>$PROJ_DIR$\..\src\protocols</state>
+          <state>$PROJ_DIR$\..\src\modules</state>
           <state>$PROJ_DIR$\..\src\modules\commander</state>
+          <state>$PROJ_DIR$\..\src\modules\imu</state>
           <state>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Include</state>
           <state>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Device\ST\STM32F4xx\Include</state>
           <state>$PROJ_DIR$\..\src\platform\Drivers\STM32F4xx_HAL_Driver\Inc</state>
@@ -3224,6 +3227,15 @@
   <group>
     <name>lib</name>
     <group>
+      <name>conversion</name>
+      <file>
+        <name>$PROJ_DIR$\..\src\lib\conversion\rotation.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\lib\conversion\rotation.h</name>
+      </file>
+    </group>
+    <group>
       <name>mathlib</name>
       <group>
         <name>filter</name>
@@ -3278,6 +3290,15 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\src\modules\commander\calibration_routines.h</name>
+      </file>
+    </group>
+    <group>
+      <name>imu</name>
+      <file>
+        <name>$PROJ_DIR$\..\src\modules\imu\imu.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\modules\imu\imu.h</name>
       </file>
     </group>
   </group>

@@ -175,7 +175,7 @@ void niming::attach(uart *puart)
 }
 
 // 1：发送基本信息（姿态、锁定状态）
-void niming::report_status(data_attitude_t *atti)
+void niming::report_status(struct vehicle_attitude_s *att)
 {
 	u8 cnt = 0;
 	u8 data[50];
@@ -188,13 +188,13 @@ void niming::report_status(data_attitude_t *atti)
 	data[cnt++] = 0x01;
 	data[cnt++] = 0;
 
-	temp = (int)1;//(atti->roll * 100);
+	temp = att->roll * 100;
 	data[cnt++] = BYTE1(temp);
 	data[cnt++] = BYTE0(temp);
-	temp = (int)2;//(atti->pitch * 100);
+	temp = att->pitch * 100;
 	data[cnt++] = BYTE1(temp);
 	data[cnt++] = BYTE0(temp);
-	temp = (int)3;//(atti->yaw * 100);
+	temp = att->yaw * 100;
 	data[cnt++] = BYTE1(temp);
 	data[cnt++] = BYTE0(temp);
 

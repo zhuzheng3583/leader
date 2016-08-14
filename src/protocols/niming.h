@@ -19,6 +19,7 @@
 #include "gyro.h"
 #include "magn.h"
 #include "baro.h"
+#include "vehicle_attitude.h"
 
 using namespace driver;
 
@@ -37,7 +38,7 @@ public:
     void attach(uart *puart);
     void detach(void);
 
-    void report_status(data_attitude_t *atti);
+    void report_status(struct vehicle_attitude_s *att);
 	void report_sensor(bool type_raw, struct accel_report *accel,
 		struct gyro_report *gyro, struct mag_report *mag);
 

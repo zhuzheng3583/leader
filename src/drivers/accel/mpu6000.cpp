@@ -42,7 +42,7 @@ mpu6000::mpu6000(PCSTR devname, s32 devid) :
 
 	_dlpf_freq(MPU6000_DEFAULT_ONCHIP_FILTER_FREQ),
 	_sample_rate(1000),
-
+    _rotation(ROTATION_NONE),
     _accel_filter_x(MPU6000_ACCEL_DEFAULT_RATE, MPU6000_ACCEL_DEFAULT_DRIVER_FILTER_FREQ),
 	_accel_filter_y(MPU6000_ACCEL_DEFAULT_RATE, MPU6000_ACCEL_DEFAULT_DRIVER_FILTER_FREQ),
 	_accel_filter_z(MPU6000_ACCEL_DEFAULT_RATE, MPU6000_ACCEL_DEFAULT_DRIVER_FILTER_FREQ),
@@ -428,14 +428,20 @@ void mpu6000::measure(void)
 		return;
 	}
 
+#if 0
 	/*
 	 * Swap axes and negate y
 	 */
 	s16 accel_xt = report.accel_y;
-	s16 accel_yt = ((report.accel_x == -32768) ? 32767 : -report.accel_x);
+	s16 accel_yt = report.accel_x;//((report.accel_x == -32768) ? 32767 : -report.accel_x);
 	s16 gyro_xt = report.gyro_y;
-	s16 gyro_yt = ((report.gyro_x == -32768) ? 32767 : -report.gyro_x);
-
+	s16 gyro_yt = report.gyro_x;//((report.gyro_x == -32768) ? 32767 : -report.gyro_x);
+#else
+	s16 accel_xt = ((report.accel_x == -32768) ? 32767 : -report.accel_x);
+	s16 accel_yt = ((report.accel_y == -32768) ? 32767 : -report.accel_y);
+	s16 gyro_xt = report.gyro_x;//((report.gyro_x == -32768) ? 32767 : -report.gyro_x);
+	s16 gyro_yt = ((report.gyro_y == -32768) ? 32767 : -report.gyro_y);
+#endif
 	/*
 	 * Apply the swap
 	 */
@@ -443,6 +449,7 @@ void mpu6000::measure(void)
 	report.accel_y = accel_yt;
 	report.gyro_x = gyro_xt;
 	report.gyro_y = gyro_yt;
+
 
 	/*
 	 * Report buffers.
@@ -489,7 +496,7 @@ void mpu6000::measure(void)
 	arb.z = _accel_filter_z.apply(z_in_new);
 
 	// apply user specified rotation
-	//rotate_3f(_rotation, arb.x, arb.y, arb.z);
+	rotate_3f(ROTATION_NONE, arb.x, arb.y, arb.z);
 
 	arb.scaling = _accel_range_scale;
 	arb.range_m_s2 = _accel_range_m_s2;
@@ -509,7 +516,7 @@ void mpu6000::measure(void)
 	grb.z = _gyro_filter_z.apply(z_gyro_in_new);
 
 	// apply user specified rotation
-	//rotate_3f(_rotation, grb.x, grb.y, grb.z);
+	rotate_3f(ROTATION_NONE, grb.x, grb.y, grb.z);
 
 	grb.scaling = _gyro_range_scale;
 	grb.range_rad_s = _gyro_range_rad_s;
@@ -827,9 +834,9 @@ s32 mpu6000::calibrate_gyro(void)
 	memcpy(&_gyro_scale, &gyro_scale, sizeof(gyro_scale));
 
 	INF("%s: gyro_scale: \n"
-		"	X: x_offset = %f, x_scale = %f. \n"
-		"	Y: y_offset = %f, y_scale = %f. \n"
-		"	Z: z_offset = %f, z_scale = %f. \n",
+		" X: x_offset = %f, x_scale = %f. \n"
+		" Y: y_offset = %f, y_scale = %f. \n"
+		" Z: z_offset = %f, z_scale = %f. \n",
 		_devname,
 		_gyro_scale.x_offset, _gyro_scale.x_scale,
 		_gyro_scale.y_offset, _gyro_scale.y_scale,
@@ -890,15 +897,15 @@ s32 mpu6000::calibrate_accel(void)
 	int32_t board_rotation_int;
 	param_get(board_rotation_h, &(board_rotation_int));
 	enum Rotation board_rotation_id = (enum Rotation)board_rotation_int;
-	math::Matrix<3, 3> board_rotation;
+	math::matrix<3, 3> board_rotation;
 	get_rot_matrix(board_rotation_id, &board_rotation);
-	math::Matrix<3, 3> board_rotation_t = board_rotation.transposed();
+	math::matrix<3, 3> board_rotation_t = board_rotation.transposed();
 
 	/* handle individual sensors, one by one */
-	math::Vector<3> accel_offs_vec(accel_offs[i]);
-	math::Vector<3> accel_offs_rotated = board_rotation_t * accel_offs_vec;
-	math::Matrix<3, 3> accel_T_mat(accel_T[i]);
-	math::Matrix<3, 3> accel_T_rotated = board_rotation_t * accel_T_mat * board_rotation;
+	math::vector<3> accel_offs_vec(accel_offs[i]);
+	math::vector<3> accel_offs_rotated = board_rotation_t * accel_offs_vec;
+	math::matrix<3, 3> accel_T_mat(accel_T[i]);
+	math::matrix<3, 3> accel_T_rotated = board_rotation_t * accel_T_mat * board_rotation;
 
 	accel_scale.x_offset = accel_offs_rotated(0);
 	accel_scale.x_scale = accel_T_rotated(0, 0);
@@ -930,13 +937,13 @@ s32 mpu6000::calibrate_accel(void)
 		return ERROR;
 	}
 #endif
-		
+
 	memcpy(&_accel_scale, &accel_scale, sizeof(accel_scale));
 
 	/* TODO:auto-save to EEPROM */
 #if 0
 	if (ret == OK) {
-		
+
 		ret = param_save_default();
 
 		if (ret != OK) {
@@ -975,7 +982,7 @@ s32 mpu6000::calibratie_accel_measurements(float (&accel_offs)[3], float (&accel
 	float accel_ref[6][3];
 	bool data_collected[6] = { false, false, false, false, false, false };
 	const char *orientation_strs[6] = { "back", "front", "left", "right", "up", "down" };
-	
+
 	u32 done_count = 0;
 	s32 res = 0;
 
@@ -1036,24 +1043,19 @@ s32 mpu6000::calibratie_accel_measurements(float (&accel_offs)[3], float (&accel
 		//tune_neutral(true);
 	}
 
-
-
 	/* calculate offsets and transform matrix */
-	for (u32 i = 0; i < (*active_sensors); i++) {
-		res = calculate_calibration_values(accel_ref, accel_T, accel_offs, CONSTANTS_ONE_G);
+    res = calculate_calibration_values(accel_ref, accel_T, accel_offs, CONSTANTS_ONE_G);
+    /* verbose output on the console */
+    INF("accel_T transformation matrix:\n");
+    for (u32 j = 0; j < 3; j++) {
+	    INF("  %8.4f %8.4f %8.4f\n", (double)accel_T[j][0], (double)accel_T[j][1], (double)accel_T[j][2]);
+    }
+    INF("\n");
 
-		/* verbose output on the console */
-		INF("accel_T transformation matrix:\n");
-		for (u32 j = 0; j < 3; j++) {
-			INF("  %8.4f %8.4f %8.4f\n", (double)accel_T[j][0], (double)accel_T[j][1], (double)accel_T[j][2]);
-		}
-		INF("\n");
-
-		if (res != 0) {
-			ERR("ERROR: calibration values calculation error");
-			break;
-		}
-	}
+    if (res != 0) {
+		ERR("ERROR: calibration values calculation error");
+	    res = -1;
+    }
 
 	return res;
 }
@@ -1105,7 +1107,7 @@ s32 mpu6000::detect_orientation(void)
             core::mdelay(1);
             continue;
 		}
-		
+
 		t = hrt_absolute_time();
 		float dt = (t - t_prev) / 1000000.0f;
 		t_prev = t;
@@ -1221,7 +1223,7 @@ s32 mpu6000::detect_orientation(void)
 	return ERROR;	// Can't detect orientation
 #else
 	static s32 n = 0;
-	return n++;        
+	return n++;
 
 	//0: [ g, 0, 0 ]
 	//1: [ -g, 0, 0 ]
@@ -1261,7 +1263,7 @@ s32 mpu6000::read_accelerometer_avg(float (&accel_avg)[6][3], u32 orient, u32 sa
 		accel_sum[2] += accel_report.z;
 		counts++;
 
-		if (errcount > samples_num / 10) {
+		if (errcount > (samples_num*0.8)) {
 			return -1;
 		}
 	}

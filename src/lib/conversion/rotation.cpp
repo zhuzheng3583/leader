@@ -1,5 +1,5 @@
 /*******************************Copyright (c)***************************
-** 
+**
 ** Porject name:	leader
 ** Created by:	zhuzheng<happyzhull@163.com>
 ** Created date:	2016/04/05
@@ -18,7 +18,7 @@
 #include "rotation.h"
 
 
-void get_rot_matrix(enum Rotation rot, math::Matrix<3,3> *rot_matrix)
+void get_rot_matrix(enum rotation rot, math::matrix<3,3> *rot_matrix)
 {
 	float roll  = M_DEG_TO_RAD_F * (float)rot_lookup[rot].roll;
 	float pitch = M_DEG_TO_RAD_F * (float)rot_lookup[rot].pitch;
@@ -29,7 +29,7 @@ void get_rot_matrix(enum Rotation rot, math::Matrix<3,3> *rot_matrix)
 
 #define HALF_SQRT_2 0.70710678118654757f
 
-void rotate_3f(enum Rotation rot, float &x, float &y, float &z)
+void rotate_3f(enum rotation rot, float &x, float &y, float &z)
 {
     float tmp;
     switch (rot) {
