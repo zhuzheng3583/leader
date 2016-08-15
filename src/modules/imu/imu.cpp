@@ -68,40 +68,28 @@ void imu_update(float gx, float gy, float gz, float ax, float ay, float az, stru
     q2 = q2 / norm;
     q3 = q3 / norm;
 
-    //eulerAngles[0] = (real32_T)atan2(Rot_matrix[7], Rot_matrix[8]);
-    //eulerAngles[1] = -(real32_T)asin(Rot_matrix[6]);
-    //eulerAngles[2] = (real32_T)atan2(Rot_matrix[3], Rot_matrix[0]);
-
-    //att.roll = euler[0];
-    //att.pitch = euler[1];
-    //att.yaw = euler[2] + mag_decl;
-
+	//att->yaw = atan2(2*q1*q2 + 2*q0*q3, -2*q2*q2 - 2*q3*q3 + 1) * 57.3; 
+	//匿名四轴
     //angle->yaw += gyr->Z*Gyro_G*0.002f;
 	//angle->rol = asin(-2 * q1 * q3 + 2 * q0* q2)* 57.3 - AngleOffset_Pit; // pitch
 	//angle->pit = atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2* q2 + 1)* 57.3 - AngleOffset_Rol; // roll
 
-    //roll
-    //euler[0] = atan2 ( 2 * (q1 * q2 + 2 * q0 * q3), q0*q0 + q1*q1 - q2*q2 - q3*q3 )* 57.3; //roll
-    att->roll = atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2* q2 + 1)* 57.3; // rollv
-    //pitch
-    //euler[1] = asin(-2 * (q1 * q3 + 2 * q0* q2)) * 57.3; // pitch
-    att->pitch = asin(-2 * q1 * q3 + 2 * q0* q2)* 57.3; // pitch
-    //yaw
-    att->yaw = atan2f( 2 * (q0 * q1 + q2 * q3), q0*q0 - q1*q1 - q2*q2 + q3*q3 )*57.3;//yaw
+	//某论坛
+    //att->roll = atan2(2*(q1*q2 + 2*q0*q3), q0*q0 + q1*q1 - q2*q2 - q3*q3)*57.3; 
+    //att->pitch = asin(-2*(q1*q3 + 2*q0* q2))*57.3;
+    //att->yaw = atan2f(2*(q0*q1 + q2*q3), q0*q0 - q1*q1 - q2*q2 + q3*q3)*57.3;
 
-    //由计算四元数计算欧拉角
-    // Q_ANGLE.Z = atan2(2 * q1 * q2 + 2 * q0 * q3, -2 * q2*q2 - 2 * q3* q3 + 1)* Rad; //yaw
-    att->pitch = asin(-2 * q1 * q3 + 2 * q0* q2)* 57.3; // pitch
-    att->roll = atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2* q2 + 1) * 57.3; //roll
-    if(att->roll > 90 || att->roll < -90)
-    {
-        if(att->pitch > 0)
-            att->pitch = 180 - att->pitch;
-        if(att->pitch < 0)
-            att->pitch =- (180 + att->pitch);
-    }
-
-
+	//原子开发板MPU6050实验
+    att->roll = atan2(2*q2*q3 + 2*q0*q1, -2*q1*q1 - 2*q2*q2 + 1)*57.3;	
+    att->pitch = asin(-2*q1*q3 + 2*q0*q2)*57.3;	
+    att->yaw = atan2f(2*(q1*q2 + q0*q3), q0*q0 + q1*q1 - q2*q2 - q3*q3)*57.3;
+	
+	// ==>
+	// (z)
+	// X-----> (x)
+	// |
+	// |
+	// \/ (y)
 }
 
 #ifdef __cplusplus

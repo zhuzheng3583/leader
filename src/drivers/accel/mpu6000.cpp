@@ -850,6 +850,94 @@ out:
 	return -1;
 }
 
+/**
+ * @file accelerometer_calibration.cpp
+ *
+ * Implementation of accelerometer calibration.
+ *
+ * Transform acceleration vector to true orientation, scale and offset
+ *
+ * ===== Model =====
+ * accel_corr = accel_T * (accel_raw - accel_offs)
+ *
+ * accel_corr[3] - fully corrected acceleration vector in body frame
+ * accel_T[3][3] - accelerometers transform matrix, rotation and scaling transform
+ * accel_raw[3]  - raw acceleration vector
+ * accel_offs[3] - acceleration offset vector
+ *
+ * ===== Calibration =====
+ *
+ * Reference vectors
+ * accel_corr_ref[6][3] = [  g  0  0 ]     // nose up
+ *                        | -g  0  0 |     // nose down
+ *                        |  0  g  0 |     // left side down
+ *                        |  0 -g  0 |     // right side down
+ *                        |  0  0  g |     // on back
+ *                        [  0  0 -g ]     // level
+ * accel_raw_ref[6][3]
+ *
+ * accel_corr_ref[i] = accel_T * (accel_raw_ref[i] - accel_offs), i = 0...5
+ *
+ * 6 reference vectors * 3 axes = 18 equations
+ * 9 (accel_T) + 3 (accel_offs) = 12 unknown constants
+ *
+ * Find accel_offs
+ *
+ * accel_offs[i] = (accel_raw_ref[i*2][i] + accel_raw_ref[i*2+1][i]) / 2
+ *
+ * Find accel_T
+ *
+ * 9 unknown constants
+ * need 9 equations -> use 3 of 6 measurements -> 3 * 3 = 9 equations
+ *
+ * accel_corr_ref[i*2] = accel_T * (accel_raw_ref[i*2] - accel_offs), i = 0...2
+ *
+ * Solve separate system for each row of accel_T:
+ *
+ * accel_corr_ref[j*2][i] = accel_T[i] * (accel_raw_ref[j*2] - accel_offs), j = 0...2
+ *
+ * A * x = b
+ *
+ * x = [ accel_T[0][i] ]
+ *     | accel_T[1][i] |
+ *     [ accel_T[2][i] ]
+ *
+ * b = [ accel_corr_ref[0][i] ]	// One measurement per side is enough
+ *     | accel_corr_ref[2][i] |
+ *     [ accel_corr_ref[4][i] ]
+ *
+ * a[i][j] = accel_raw_ref[i][j] - accel_offs[j], i = 0;2;4, j = 0...2
+ *
+ * Matrix A is common for all three systems:
+ * A = [ a[0][0]  a[0][1]  a[0][2] ]
+ *     | a[2][0]  a[2][1]  a[2][2] |
+ *     [ a[4][0]  a[4][1]  a[4][2] ]
+ *
+ * x = A^-1 * b
+ *
+ * accel_T = A^-1 * g
+ * g = 9.80665
+ *
+ * ===== Rotation =====
+ *
+ * Calibrating using model:
+ * accel_corr = accel_T_r * (rot * accel_raw - accel_offs_r)
+ *
+ * Actual correction:
+ * accel_corr = rot * accel_T * (accel_raw - accel_offs)
+ *
+ * Known: accel_T_r, accel_offs_r, rot
+ * Unknown: accel_T, accel_offs
+ *
+ * Solution:
+ * accel_T_r * (rot * accel_raw - accel_offs_r) = rot * accel_T * (accel_raw - accel_offs)
+ * rot^-1 * accel_T_r * (rot * accel_raw - accel_offs_r) = accel_T * (accel_raw - accel_offs)
+ * rot^-1 * accel_T_r * rot * accel_raw - rot^-1 * accel_T_r * accel_offs_r = accel_T * accel_raw - accel_T * accel_offs)
+ * => accel_T = rot^-1 * accel_T_r * rot
+ * => accel_offs = rot^-1 * accel_offs_r
+ *
+ * @author Anton Babushkin <anton.babushkin@me.com>
+ */
 s32 mpu6000::calibrate_accel(void)
 {
 	static const char *accel_name = "accel";
