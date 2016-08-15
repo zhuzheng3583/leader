@@ -52,7 +52,7 @@ void autopilot::run(void *parg)
     float euler[3] = { 0 };
 
     //mpu6000->calibrate_accel();
-    //mpu6000->calibrate_gyro();
+    mpu6000->calibrate_gyro();
 
 	for ( ; ;)
 	{

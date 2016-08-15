@@ -140,6 +140,29 @@ s32 leader_system::init(void)
     while(1);
 #endif
 
+	_pwm = new pwm("timer-1", 1);
+	_pwm->probe();
+	_pwm->set_dutycycle(PWM_CHANNEL_1, 100);
+	_pwm->start(PWM_CHANNEL_1);
+	_pwm->set_dutycycle(PWM_CHANNEL_2, 100);
+	_pwm->start(PWM_CHANNEL_2);
+	_pwm->set_dutycycle(PWM_CHANNEL_3, 100);
+	_pwm->start(PWM_CHANNEL_3);
+	_pwm->set_dutycycle(PWM_CHANNEL_4, 100);
+	_pwm->start(PWM_CHANNEL_4);
+
+	pwm *_pwm4 = new pwm("timer-4", 4);
+	_pwm4->probe();
+	_pwm4->set_dutycycle(PWM_CHANNEL_1, 100);
+	_pwm4->start(PWM_CHANNEL_1);
+	_pwm4->set_dutycycle(PWM_CHANNEL_2, 100);
+	_pwm4->start(PWM_CHANNEL_2);
+	_pwm4->set_dutycycle(PWM_CHANNEL_3, 100);
+	_pwm4->start(PWM_CHANNEL_3);
+	_pwm4->set_dutycycle(PWM_CHANNEL_4, 100);
+	_pwm4->start(PWM_CHANNEL_4);
+
+//3,5,8
 	if(ret < 0) {
 		INF("failed to leader_system::init");
 		CAPTURE_ERR();

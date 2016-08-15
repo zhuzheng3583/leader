@@ -274,13 +274,13 @@ s32 mpu6000::reset(void)
 	while (--tries != 0) {
         taskDISABLE_INTERRUPTS();
 		write_reg8(MPUREG_PWR_MGMT_1, BIT_H_RESET);
-		core::mdelay(10);
+		core::mdelay(200);
 
 		// Wake up device and select GyroZ clock. Note that the
 		// MPU6000 starts up in sleep mode, and it can take some time
 		// for it to come out of sleep
 		write_checked_reg(MPUREG_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
-		core::mdelay(1);
+		core::mdelay(2);
 
 		// Disable I2C bus (recommended on datasheet)
 		write_checked_reg(MPUREG_USER_CTRL, BIT_I2C_IF_DIS);
@@ -428,25 +428,21 @@ void mpu6000::measure(void)
 		return;
 	}
 
-#if 0
 	/*
 	 * Swap axes and negate y
 	 */
-	s16 accel_xt = report.accel_y;
-	s16 accel_yt = report.accel_x;//((report.accel_x == -32768) ? 32767 : -report.accel_x);
+	s16 accel_xt = ((report.accel_y == -32768) ? 32767 : -report.accel_y);
+	s16 accel_yt = report.accel_x;
+    s16 accel_zt = ((report.accel_z == -32768) ? 32767 : -report.accel_z);
 	s16 gyro_xt = report.gyro_y;
-	s16 gyro_yt = report.gyro_x;//((report.gyro_x == -32768) ? 32767 : -report.gyro_x);
-#else
-	s16 accel_xt = ((report.accel_x == -32768) ? 32767 : -report.accel_x);
-	s16 accel_yt = ((report.accel_y == -32768) ? 32767 : -report.accel_y);
-	s16 gyro_xt = report.gyro_x;//((report.gyro_x == -32768) ? 32767 : -report.gyro_x);
-	s16 gyro_yt = ((report.gyro_y == -32768) ? 32767 : -report.gyro_y);
-#endif
+	s16 gyro_yt = report.gyro_x;
+
 	/*
 	 * Apply the swap
 	 */
 	report.accel_x = accel_xt;
 	report.accel_y = accel_yt;
+    report.accel_z = accel_zt;
 	report.gyro_x = gyro_xt;
 	report.gyro_y = gyro_yt;
 

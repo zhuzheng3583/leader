@@ -14,9 +14,9 @@ extern "C" {
 //先定义Kp，Ki，以及halfT 。
 //Kp，Ki，控制加速度计修正陀螺仪积分姿态的速度
 //halfT ，姿态解算时间的一半。此处解算姿态速度为500HZ，因此halfT 为0.001
-#define Kp 5.0f //1.6f //2.0f
-#define Ki 0.0005f //0.001f //0.002f
-#define halfT 0.001f
+#define Kp 15.0f //1.6f //2.0f
+#define Ki 0.0001f//0.000000001f //0.001f //0.002f
+#define halfT 0.0025f
 //初始化四元数
 float q0 = 1, q1 = 0, q2 = 0, q3 = 0;
 //定义姿态解算误差的积分
@@ -87,7 +87,7 @@ void imu_update(float gx, float gy, float gz, float ax, float ay, float az, stru
 	// ==>
 	// (z)
 	// X-----> (x)
-	// |
+	// |
 	// |
 	// \/ (y)
 }

@@ -1,5 +1,5 @@
 /*******************************Copyright (c)***************************
-** 
+**
 ** Porject name:	leader
 ** Created by:		zhuzheng<happyzhull@163.com>
 ** Created date:	2016/07/14
@@ -35,9 +35,9 @@ namespace driver {
 class pwm : public device
 {
 public:
-	pwm(PCSTR name, s32 id);
+	pwm(PCSTR devname, s32 devid);
 	~pwm(void);
-    
+
 public:
 	u32 _channel;
 	u32 _dutycycle;
@@ -49,7 +49,7 @@ public:
 public:
     s32 set_dutycycle(enum pwm_channel channel, u32 dutycycle);
     s32 start(enum pwm_channel channel);
-    
+
 public:
 	s32 self_test(void);
 };
