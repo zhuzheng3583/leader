@@ -107,6 +107,19 @@ ShowTimeLog=1
 SumEnabled=0
 ShowTimeSum=1
 SumSortOrder=0
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""
+[DriverProfiling]
+Enabled=0
+Mode=3
+Graph=0
+Symbiont=0
+Exclusions=
 [Disassemble mode]
 mode=0
 [Breakpoints2]
@@ -130,21 +143,8 @@ Bp16=_ 0 "EMUL_CODE" "0x0800881C" 0 0 1 "" 0 "" 0
 Bp17=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\accel\mpu6000.cpp}.32.1" 0 0 1 "" 0 "" 0
 Bp18=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\autopilot.cpp}.51.5" 0 0 1 "" 0 "" 0
 Count=19
-[Log file]
-LoggingEnabled=_ 0
-LogFile=_ ""
-Category=_ 0
-[TermIOLog]
-LoggingEnabled=_ 0
-LogFile=_ ""
 [Aliases]
 A0=_ "E:\code\SKYVIEW_H_SUB\LeaderUAV\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
 A1=_ "E:\code\leader\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
 Count=2
 SuppressDialog=0
-[DriverProfiling]
-Enabled=0
-Mode=3
-Graph=0
-Symbiont=0
-Exclusions=

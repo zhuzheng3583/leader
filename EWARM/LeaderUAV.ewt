@@ -3490,6 +3490,15 @@
         <name>$PROJ_DIR$\..\src\modules\imu\imu.h</name>
       </file>
     </group>
+    <group>
+      <name>topics</name>
+      <file>
+        <name>$PROJ_DIR$\..\src\modules\topics\vehicle_attitude.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\modules\topics\vehicle_gps_position.h</name>
+      </file>
+    </group>
   </group>
   <group>
     <name>os</name>

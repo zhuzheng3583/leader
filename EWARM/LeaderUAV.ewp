@@ -2296,6 +2296,7 @@
           <state>$PROJ_DIR$\..\src\modules</state>
           <state>$PROJ_DIR$\..\src\modules\commander</state>
           <state>$PROJ_DIR$\..\src\modules\imu</state>
+          <state>$PROJ_DIR$\..\src\modules\topics</state>
           <state>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Include</state>
           <state>$PROJ_DIR$\..\src\platform\Drivers\CMSIS\Device\ST\STM32F4xx\Include</state>
           <state>$PROJ_DIR$\..\src\platform\Drivers\STM32F4xx_HAL_Driver\Inc</state>
@@ -3299,6 +3300,15 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\src\modules\imu\imu.h</name>
+      </file>
+    </group>
+    <group>
+      <name>topics</name>
+      <file>
+        <name>$PROJ_DIR$\..\src\modules\topics\vehicle_attitude.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\modules\topics\vehicle_gps_position.h</name>
       </file>
     </group>
   </group>
