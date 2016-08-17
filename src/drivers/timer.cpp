@@ -148,8 +148,8 @@ s32 timer::probe(void)
 	timer::set_timeout(1000);
 	
 	/* Configure the NVIC for TIMx */
-	interrupt::request_irq(_irq, this);
-	interrupt::enable_irq(_irq); 	
+	device::request_irq(_irq, this);
+	device::enable_irq(_irq); 	
 	
 	timer::set_function(timer_func_test, (void *)1234);
 	INF("%s: probe success.\n", _name);

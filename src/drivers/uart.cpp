@@ -193,8 +193,8 @@ s32 uart::probe(void)
 #if (UART_MODE == UART_IT_MODE || UART_MODE == UART_DMA_MODE)
 	/*##-3- Configure the NVIC for UART ########################################*/
 	/* NVIC for USART */
-	interrupt::request_irq(_irq, this);
-	interrupt::enable_irq(_irq);
+	device::request_irq(_irq, this);
+	device::enable_irq(_irq);
 #endif
 
 	//INF("%s: probe success.\n", _name);
@@ -210,7 +210,7 @@ s32 uart::remove(void)
 {
 	UART_HandleTypeDef *huart = (UART_HandleTypeDef *)_handle;
 #if (UART_MODE == UART_IT_MODE || UART_MODE == UART_DMA_MODE)
-	interrupt::disable_irq(_irq);
+	device::disable_irq(_irq);
 #endif
 #if (UART_MODE == UART_DMA_MODE)
 	_dmatx->remove();

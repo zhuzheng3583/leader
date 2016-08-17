@@ -146,8 +146,8 @@ s32 gpio::set_gpio_to_irq(void)
 	
   	/* Enable and set EXTI0 Interrupt to the lowest priority */
 	_irq = irq_table[_index];
-	interrupt::request_irq(_irq, this);
-	interrupt::enable_irq(_irq); 	
+	device::request_irq(_irq, this);
+	device::enable_irq(_irq); 	
   
 	return 0;
 }

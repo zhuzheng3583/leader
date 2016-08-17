@@ -13,13 +13,12 @@
 #include "leader_misc.h"
 
 #include "core.h"
-#include "interrupt.h"
 #include "device.h"
 #include "dma.h"
 
 namespace driver {
 
-class uart : public device, public irq_handler
+class uart : public device
 {
 public:
     uart(PCSTR name, s32 id);

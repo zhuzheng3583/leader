@@ -3359,12 +3359,6 @@
       <name>$PROJ_DIR$\..\src\drivers\i2c.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\src\drivers\interrupt.cpp</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\src\drivers\interrupt.h</name>
-    </file>
-    <file>
       <name>$PROJ_DIR$\..\src\drivers\pwm.cpp</name>
     </file>
     <file>

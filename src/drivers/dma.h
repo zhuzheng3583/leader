@@ -13,7 +13,6 @@
 #include "leader_misc.h"
 
 #include "core.h"
-#include "interrupt.h"
 #include "device.h"
 #include "dma.h"
 
@@ -39,7 +38,7 @@ enum dma_pri {
 };
 
 
-class dma : public device, public irq_handler
+class dma : public device
 {
 public:
 	dma(PCSTR name, s32 id);

@@ -15,6 +15,8 @@
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_conf.h"
 
+#include "cmsis_os.h"
+
 namespace driver {
 
 /**
@@ -31,30 +33,21 @@ enum seek_mode
 enum ioctl_cmd
 {
     CMD_UART_BANUD      = 0x0000A010,	// 设置UART波特率，参数：u32 banud(如9600，115200)
-
     CMD_SPI_CLK         = 0x0000A020,	// 设置SPI时钟线频率，参数：u32 spiclk(如5000000)
-
     CMD_I2C_CLK         = 0x0000A030,	// 设置I2C时钟线频率，		参数：u32 i2cclk(如100000)
     CMD_I2C_SlAVE_ADDR  = 0x0000A031,	// 设置I2C丛机设备地址，	参数：u32 slaveaddr(7bit)
-
     CMD_MPU_TEMPERTURE  = 0x0000A052,
     CMD_MPU_FIFO_RATE   = 0x0000A053,
-
     CMD_GPS_UARTBANUD   = 0x0000A060,	// 设置GPS所依赖的设备UART波特率，  参数：u32 banud(如9600，115200)
-
     CMD_GPIO_SETDIR     = 0x0000A070,
     CMD_GPIO_OUT        = 0x0000A071,
     CMD_GPIO_IN         = 0x0000A072,
-
     CMD_LED_ON          = 0x0000A080,
     CMD_LED_OFF         = 0x0000A081,
-
     CMD_TIMER_FUNC      = 0x0000A090,
     CMD_TIMER_FUNC_ARG  = 0x0000A091,
     CMD_TIMER_OUT       = 0x0000A092,
-
     CMD_PWM_DUTY_CYCLE  = 0x0000A0A0,
-
     CMD_WDOG_TIMEOUTMS  = 0x0000A0B0,
 };
 
@@ -111,6 +104,17 @@ public:
     virtual s32 tell(void);
 
     virtual s32 flush(void);
+
+
+public:
+    static s32 irq_init(void);
+    static s32 request_irq(s32 irq, device *owner);
+    static void free_irq(s32 irq);
+    static void enable_irq(s32 irq);
+    static void disable_irq(s32 irq);
+    static void enable_all_irq(void);
+    static void disable_all_irq(void);
+    virtual void isr(void); 
 };
 
 #define EPERM   1   /* Operation not permitted */

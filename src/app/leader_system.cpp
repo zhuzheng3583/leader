@@ -83,7 +83,7 @@ s32 leader_system::init(void)
 
 	s32 ret = 0;
 	ret = core::init();
-	ret = interrupt::irq_init();
+	ret = device::irq_init();
 	kernel::systick_config();
 
 	_logger = new logger;

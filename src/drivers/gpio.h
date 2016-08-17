@@ -23,7 +23,7 @@
 
 namespace driver {
 
-class gpio : public device, public irq_handler
+class gpio : public device
 {
 public:
 	gpio(PCSTR name, s32 id);

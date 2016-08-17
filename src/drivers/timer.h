@@ -13,7 +13,6 @@
 #include "leader_misc.h"
 
 #include "core.h"
-#include "interrupt.h"
 #include "device.h"
 #include "dma.h"
 
@@ -21,7 +20,7 @@ typedef  void (*timer_func_t)(void *arg);
 
 namespace driver {
 
-class timer : public device, public irq_handler
+class timer : public device
 {
 public:
 	timer(PCSTR name, s32 id);

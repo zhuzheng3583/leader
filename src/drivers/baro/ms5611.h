@@ -67,7 +67,7 @@ union prom_u {
 using namespace os;
 namespace driver {
 
-class ms5611 : public device, public interrupt, public thread
+class ms5611 : public device, public thread
 {
 public:
     ms5611(PCSTR devname, s32 devid);

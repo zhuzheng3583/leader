@@ -224,8 +224,8 @@ s32 dma::probe(void)
 
 	/*  Configure the NVIC for DMA */
   	/* NVIC configuration for DMA transfer complete interrupt*/
-	interrupt::request_irq(_irq, this);
-	interrupt::enable_irq(_irq);
+	device::request_irq(_irq, this);
+	device::enable_irq(_irq);
 	//INF("%s: probe success.\n", _name);
 	return 0;
 
@@ -244,7 +244,7 @@ s32 dma::remove(void)
 		goto fail0;
 	}
 
-	interrupt::disable_irq(_irq);
+	device::disable_irq(_irq);
 
 	if(HAL_DMA_DeInit(hdma)!= HAL_OK) {
     		goto fail1;

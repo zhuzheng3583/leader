@@ -325,7 +325,7 @@ using namespace math;
 
 namespace driver {
 
-class mpu6000 : public device, public interrupt, public thread
+class mpu6000 : public device, public thread
 {
 public:
 	mpu6000(PCSTR devname, s32 devid);

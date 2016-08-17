@@ -42,7 +42,7 @@ struct spi_msg {
 
 namespace driver {
 
-class spi : public device, public interrupt
+class spi : public device
 {
 public:
 	spi(PCSTR name, s32 id);
