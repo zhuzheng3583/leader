@@ -10,10 +10,10 @@ LimitSize=0
 ByteLimit=50
 [StLinkDriver]
 CStepIntDis=_ 0
-stlinkserialNo=2798FD0D
+stlinkserialNo=037B5AB6
 stlinkfoundProbes=
 [DebugChecksum]
-Checksum=-925643712
+Checksum=1812504359
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -103,6 +103,20 @@ ShowTimeLog=1
 SumEnabled=0
 ShowTimeSum=1
 SumSortOrder=0
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
+[DriverProfiling]
+Enabled=0
+Mode=3
+Graph=0
+Symbiont=0
+Exclusions=
+[CallStackLog]
+Enabled=0
+[CallStackStripe]
+ShowTiming=1
 [Disassemble mode]
 mode=0
 [Breakpoints2]
@@ -118,32 +132,19 @@ Bp8=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.614.1" 0 0 1 "" 0 "
 Bp9=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.317.5" 0 0 1 "" 0 "" 0
 Bp10=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.517.2" 0 0 1 "" 0 "" 0
 Bp11=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.463.3" 0 0 1 "" 0 "" 0
-Bp12=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart.cpp}.303.9" 0 0 1 "" 0 "" 0
-Bp13=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\mutex.cpp}.71.3" 0 0 1 "" 0 "" 0
-Bp14=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\mutex.cpp}.58.3" 0 0 1 "" 0 "" 0
-Bp15=_ 0 "EMUL_CODE" "0x0800881C" 0 0 1 "" 0 "" 0
-Bp16=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\accel\mpu6000.cpp}.32.1" 0 0 1 "" 0 "" 0
-Bp17=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\autopilot.cpp}.51.5" 0 0 1 "" 0 "" 0
-Count=18
-[Log file]
-LoggingEnabled=_ 0
-LogFile=_ ""
-Category=_ 0
-[TermIOLog]
-LoggingEnabled=_ 0
-LogFile=_ ""
+Bp12=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart.cpp}.407.8" 0 0 1 "" 0 "" 0
+Bp13=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart.cpp}.303.9" 0 0 1 "" 0 "" 0
+Bp14=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\mutex.cpp}.71.3" 0 0 1 "" 0 "" 0
+Bp15=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\mutex.cpp}.58.3" 0 0 1 "" 0 "" 0
+Bp16=_ 0 "EMUL_CODE" "0x0800881C" 0 0 1 "" 0 "" 0
+Bp17=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\accel\mpu6000.cpp}.32.1" 0 0 1 "" 0 "" 0
+Bp18=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\autopilot.cpp}.51.5" 0 0 1 "" 0 "" 0
+Count=19
 [Aliases]
 A0=_ "E:\code\SKYVIEW_H_SUB\LeaderUAV\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
 A1=_ "E:\code\leader\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
 Count=2
 SuppressDialog=0
-[DriverProfiling]
-Enabled=0
-Mode=3
-Graph=0
-Symbiont=0
-Exclusions=
-[CallStackLog]
-Enabled=0
-[CallStackStripe]
-ShowTiming=1
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""

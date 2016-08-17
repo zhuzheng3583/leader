@@ -1,5 +1,5 @@
 /*******************************Copyright (c)***************************
-** 
+**
 ** Porject name:	leader
 ** Created by:		zhuzheng<happyzhull@163.com>
 ** Created date:	2016/04/05
@@ -12,7 +12,7 @@
 
 namespace driver {
 
-device::device(void) : 
+device::device(void) :
 	_name(NULL),
     _id(-1),
     _handle(NULL),
@@ -24,7 +24,7 @@ device::device(void) :
     _opened(0)
 {
 	/* TODO register*/
-	
+
 }
 
 device::device(PCSTR name, s32 id) :
@@ -38,7 +38,7 @@ device::device(PCSTR name, s32 id) :
     _probed(0),
     _opened(0)
 {
-	
+
 }
 
 device::~device(void)
@@ -49,10 +49,10 @@ device::~device(void)
 s32 device::probe(void)
 {
 	if (_probed != 0) {
-		ERR("%s: Has been probed.\n", _name);
+		ERR("%s: Has been probed.\n", _devname);
 		return -1;
 	}
-	
+
 	_probed = 1;
 	return 0;
 }
@@ -63,30 +63,30 @@ s32 device::is_probed(void)
 		return 0;
 	}
 
-	ERR("%s: Has no been probed.\n", _name);
+	ERR("%s: Has no been probed.\n", _devname);
 	return -1;
 }
 
 s32 device::remove(void)
 {
 	if (_probed == 0) {
-		ERR("%s: Has been removed.\n", _name);
+		ERR("%s: Has been removed.\n", _devname);
 		return -1;
 	}
 
 	_probed = 0;
 	_handle = NULL;
-	
+
 	return 0;
 }
 
 s32 device::open(s32 flags)
 {
 	if (_opened != 0) {
-		ERR("%s: Has been opened.\n", _name);
+		ERR("%s: Has been opened.\n", _devname);
 		return -1;
 	}
-	
+
 	_opened = 1;
 	return 0;
 }
@@ -94,13 +94,13 @@ s32 device::open(s32 flags)
 s32 device::close(void)
 {
 	if (_opened == 0) {
-		ERR("%s: Has been close.\n", _name);
+		ERR("%s: Has been close.\n", _devname);
 		return -1;
 	}
 
 	_opened = 0;
 	_handle = NULL;
-	
+
 	return 0;
 }
 
@@ -223,7 +223,7 @@ void device::disable_all_irq(void)
 
 void device::isr(void)
 {
-	
+
 }
 
 /*

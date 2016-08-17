@@ -17,6 +17,20 @@
 
 #include "cmsis_os.h"
 
+#define DEVICE_ERR(fmt, ...) ERR(("%s: " fmt), _devname, ##__VA_ARGS__)
+#define DEVICE_WRN(fmt, ...) WRN(("%s: " fmt), _devname, ##__VA_ARGS__)
+#define DEVICE_INF(fmt, ...) INF(("%s: " fmt), _devname, ##__VA_ARGS__)
+#define DEVICE_DBG(fmt, ...) DBG(("%s: " fmt), _devname, ##__VA_ARGS__)
+
+struct file {
+	struct file *next;
+	struct file *parent;
+	char *name;
+	int lineno;
+	int flags;
+};
+
+
 namespace driver {
 
 /**
@@ -106,6 +120,18 @@ public:
     virtual s32 flush(void);
 
 
+	virtual int open(struct file *filp);
+	virtual int close(struct file *filp);
+	virtual ssize_t read(struct file *filp, char *buffer, size_t buflen);
+	virtual ssize_t write(struct file *filp, const char *buffer, size_t buflen);
+	virtual off_t	seek(struct file *filp, off_t offset, int whence);
+	virtual int ioctl(struct file *filp, int cmd, unsigned long arg);
+	virtual int poll(struct file *filp, struct pollfd *fds, bool setup);
+	bool is_open() { return _open_count > 0; }
+
+
+
+
 public:
     static s32 irq_init(void);
     static s32 request_irq(s32 irq, device *owner);
@@ -114,85 +140,28 @@ public:
     static void disable_irq(s32 irq);
     static void enable_all_irq(void);
     static void disable_all_irq(void);
-    virtual void isr(void); 
-};
+    virtual void isr(void);
 
-#define EPERM   1   /* Operation not permitted */
-#define ENOENT  2   /* No such file or directory */
-#define ESRCH   3   /* No such process */
-#define EINTR   4   /* Interrupted system call */
-#define EIO     5   /* I/O error */
-#define ENXIO   6   /* No such device or address */
-#define E2BIG   7   /* Argument list too long */
-#define ENOEXEC 8   /* Exec format error */
-#define EBADF   9   /* Bad file number */
-#define ECHILD  10  /* No child processes */
-#define EAGAIN  11  /* Try again */
-#define ENOMEM  12  /* Out of memory */
-#define EACCES  13  /* Permission denied */
-#define EFAULT  14  /* Bad address */
-#define ENOTBLK 15  /* Block device required */
-#define EBUSY   16  /* Device or resource busy */
-#define EEXIST  17  /* File exists */
-#define EXDEV   18  /* Cross-device link */
-#define ENODEV  19  /* No such device */
-#define ENOTDIR 20  /* Not a directory */
-#define EISDIR  21  /* Is a directory */
-#define EINVAL  22  /* Invalid argument */
-#define ENFILE  23  /* File table overflow */
-#define EMFILE  24  /* Too many open files */
-#define ENOTTY  25  /* Not a typewriter */
-#define ETXTBSY 26  /* Text file busy */
-#define EFBIG   27  /* File too large */
-#define ENOSPC  28  /* No space left on device */
-#define ESPIPE  29  /* Illegal seek */
-#define EROFS   30  /* Read-only file system */
-#define EMLINK  31  /* Too many links */
-#define EPIPE   32  /* Broken pipe */
-#define EDOM    33  /* Math argument out of domain of func */
-#define ERANGE  34  /* Math result not representable */
+protected:
+	virtual pollevent_t poll_state(file_t *filp);
+	virtual void	poll_notify(pollevent_t events);
+	virtual void	poll_notify_one(px4_pollfd_struct_t *fds, pollevent_t events);
+	virtual int	open_first(file_t *filp);
+	virtual int	close_last(file_t *filp);
+	const char	*get_devname() { return _devname; }
 
-struct errormap {
-	char *name;
-	int val;
-};
+	bool	_pub_blocked;		/**< true if publishing should be blocked */
 
-/* FixMe - reduce to a reasonable size */
-static struct errormap errmap[] = {
-	{"Operation not permitted", EPERM},
-	{"wstat prohibited", EPERM},
-	{"No such file or directory", ENOENT},
-	{"directory entry not found", ENOENT},
-	{"file not found", ENOENT},
-	{"Interrupted system call", EINTR},
-	{"Input/output error", EIO},
-	{"No such device or address", ENXIO},
-	{"Argument list too long", E2BIG},
-	{"Bad file descriptor", EBADF},
-	{"Resource temporarily unavailable", EAGAIN},
-	{"Cannot allocate memory", ENOMEM},
-	{"Permission denied", EACCES},
-	{"Bad address", EFAULT},
-	{"Block device required", ENOTBLK},
-	{"Device or resource busy", EBUSY},
-	{"File exists", EEXIST},
-	{"Invalid cross-device link", EXDEV},
-	{"No such device", ENODEV},
-	{"Not a directory", ENOTDIR},
-	{"Is a directory", EISDIR},
-	{"Invalid argument", EINVAL},
-	{"Too many open files in system", ENFILE},
-	{"Too many open files", EMFILE},
-	{"Text file busy", ETXTBSY},
-	{"File too large", EFBIG},
-	{"No space left on device", ENOSPC},
-	{"Illegal seek", ESPIPE},
-	{"Read-only file system", EROFS},
-	{"Too many links", EMLINK},
-	{"Broken pipe", EPIPE},
-	{"Numerical argument out of domain", EDOM},
-	{"Numerical result out of range", ERANGE},
-	{NULL, -1}
+private:
+	static const unsigned _max_pollwaiters = 8;
+
+	const char	*_devname;		/**< device node name */
+	bool		_registered;		/**< true if device name was registered */
+	unsigned	_open_count;		/**< number of successful opens */
+
+	struct pollfd	*_pollset[_max_pollwaiters];
+	int		store_poll_waiter(px4_pollfd_struct_t *fds);
+	int		remove_poll_waiter(struct pollfd *fds);
 };
 
 }
