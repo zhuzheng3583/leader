@@ -24,13 +24,20 @@ device::device(PCSTR name, s32 id) :
 {
 	_lock = new semaphore;
 	_lock->create("dev_semaphore", 1);
+
+	_pollset.sem = new semaphore;
+	_pollset.sem->create("poll_semaphore", 1);
+	_pollset.events = 0;
+	_pollset.revents = 0;
 }
 
 device::~device(void)
 {
-	
 	_lock->s_delete();
 	delete _lock;
+
+	_pollset.sem->s_delete();
+	delete _pollset.sem;
 }
 
 s32 device::probe(void)
@@ -167,56 +174,21 @@ s32 device::flush(void)
 	return -ENOSYS;
 }
 
-#if 0
-int device::poll(file_t *filep, struct pollfd *fds, bool setup)
+s32 device::poll(struct pollfd *fds, s32 timeoutms)
 {
-	DEV_DBG("device::poll %s", setup ? "setup" : "teardown");
-	int ret = LD_OK;
-
-	/*
-	 * Lock against pollnotify() (and possibly other callers)
-	 */
+	s32 ret = LD_OK;
+	
+	_pollset.sem->pend(timeoutms);
+	
 	lock();
-
-	if (setup) {
-		/*
-		 * Save the file pointer in the pollfd for the subclass'
-		 * benefit.
-		 */
-		fds->priv = (void *)filep;
-		DEV_DBG("device::poll: fds->priv = %p", filep);
-
-		/*
-		 * Handle setup requests.
-		 */
-		ret = store_poll_waiter(fds);
-
-		if (ret == LD_OK) {
-
-			/*
-			 * Check to see whether we should send a poll notification
-			 * immediately.
-			 */
-			fds->revents |= fds->events & poll_state(filep);
-
-			/* yes? post the notification */
-			if (fds->revents != 0) {
-				px4_sem_post(fds->sem);
-			}
-
-		} else {
-			DEV_WRN("Store Poll Waiter error.");
-		}
-
+	if (fds->events & _pollset.revents) {
+		fds->revents & _pollset.revents;
+		ret = LD_OK;
 	} else {
-		/*
-		 * Handle a teardown request.
-		 */
-		ret = remove_poll_waiter(fds);
+		ret = LD_ERROR;
 	}
-
 	unlock();
-
+			
 	return ret;
 }
 
@@ -227,36 +199,21 @@ void device::poll_notify(pollevent_t events)
 	/* lock against poll() as well as other wakeups */
 	lock();
 
-	poll_notify_one(_pollset[i], events);
-
-	unlock();
-}
-
-void device::poll_notify_one(struct pollfd *fds, pollevent_t events)
-{
-	DEV_DBG("device::poll_notify_one");
-	int value;
-	px4_sem_getvalue(fds->sem, &value);
+	s32 value = -1;
+	//px4_sem_getvalue(_pollset->sem, &value);
 
 	/* update the reported event set */
-	fds->revents |= fds->events & events;
+	_pollset.revents |= _pollset.events & events;
+	DEV_DBG(" Events fds=%p %0x %0x %0x %d", _pollset, _pollset.revents, _pollset.events, events, value);
 
-	DEV_DBG(" Events fds=%p %0x %0x %0x %d", fds, fds->revents, fds->events, events, value);
-
+	unlock();
+	
 	/* if the state is now interesting, wake the waiter if it's still asleep */
 	/* XXX semcount check here is a vile hack; counting semphores should not be abused as cvars */
-	if ((fds->revents != 0) && (value <= 0)) {
-		px4_sem_post(fds->sem);
-	}
+	if ((_pollset.revents != 0) && (value <= 0)) {
+		_pollset.sem->post(OS_WAIT_FOREVER);
+	}	
 }
-
-pollevent_t device::poll_state(file_t *filep)
-{
-	DEV_DBG("device::poll_notify");
-	/* by default, no poll events to report */
-	return 0;
-}
-#endif
 
 
 /**

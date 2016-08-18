@@ -54,8 +54,13 @@ void autopilot::run(void *parg)
     //mpu6000->calibrate_accel();
     mpu6000->calibrate_gyro();
 
+	struct pollfd fds = {
+		.events = POLLIN,
+	};
+
 	for ( ; ;)
 	{
+		mpu6000->poll(&fds, 1000);
 		mpu6000->read_accel((u8 *)&accel, sizeof(accel_report));
 		mpu6000->read_gyro((u8 *)&gyro, sizeof(gyro_report));
 		//DBG("%s: accel.x_raw=%d, accel.y_raw=%d, accel.z_raw=%d, "

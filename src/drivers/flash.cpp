@@ -199,10 +199,9 @@ s32 flash::write(u8 *buf, u32 size)
 }
 
 
-
-s32 flash::seek(s32 offset, enum seek_mode mode)
+off_t flash::seek(off_t offset, s32 whence)
 {
-	switch (mode) {
+	switch (whence) {
 	case SEEK_SET_M:
 		_offset = offset;
 		break;

@@ -81,21 +81,13 @@ typedef struct file {
 #define POLLHUP      (0x08)
 #define POLLNVAL     (0x10)
 
-/* The number of poll descriptors (required by poll() specification */
-typedef u32 nfds_t;
-
-/* In the standard poll() definition, the size of the event set is 'short'.
- * Here we pick the smallest storage element that will contain all of the
- * poll events.
- */
-typedef u8 pollevent_t;
 
 /* This is the Nuttx variant of the standard pollfd structure. */
 
 struct pollfd
 {
   //int         fd;       /* The descriptor being polled */
-  //sem_t      *sem;      /* Pointer to semaphore used to post output event */
+  semaphore *sem;      /* Pointer to semaphore used to post output event */
   pollevent_t events;   /* The input event flags */
   pollevent_t revents;  /* The output event flags */
   //FAR void   *priv;     /* For use by drivers */
@@ -103,28 +95,16 @@ struct pollfd
 
 namespace driver {
 
-/**
- *  @enum  SeekMode
- *  @brief 文件寻址模式，对应C运行时库的三种寻址模式
- */
-enum seek_mode
-{
-    SEEK_SET_M          = 1,                // SEEK_SET
-    SEEK_CUR_M          = 2,                // SEEK_CUR
-    SEEK_END_M          = 3,                // SEEK_END
-};
+#define SEEK_SET_M      1               // SEEK_SET
+#define SEEK_CUR_M      2                // SEEK_CUR
+#define SEEK_END_M      3                // SEEK_END
 
-enum dir_rw
-{
-    DIR_READ            = 0x0000B000,
-    DIR_WRITE           = 0x0000B001,
-};
+#define DIR_READ        0x0000B000
+#define DIR_WRITE       0x0000B001
 
-enum wait_mode
-{
-    WAIT_FOREVER = ~(0),
-    DO_NOT_WAIT = 0,
-};
+#define WAIT_FOREVER    ~(0)
+#define DO_NOT_WAIT     0
+
 
 class device
 {
@@ -159,10 +139,8 @@ public:
 
 public:
     semaphore *_lock;
-
 	void    lock(void) { do {} while (_lock->pend(OS_WAIT_FOREVER) != true); }
 	void    unlock(void) { _lock->post(OS_WAIT_FOREVER); }
-
     
     virtual s32 open(void);
     virtual s32 close(void);
@@ -170,26 +148,24 @@ public:
     virtual s32 write(u8 *buf, u32 size);
     virtual off_t	seek(off_t offset, s32 whence);
     virtual s32 ioctl(s32 cmd, u64 arg);
-    //virtual int	poll(file_t *filep, struct pollfd *fds, bool setup, int timeoutms);
+    virtual s32 poll(struct pollfd *fds, s32 timeoutms);
     virtual s32 tell(void);
     virtual s32 flush(void);
     bool    is_open(void) { return _open_count > 0; }
     
-
+    
 protected:
-	//virtual pollevent_t poll_state(void);
-	//virtual void	poll_notify(pollevent_t events);
-	//virtual void	poll_notify_one(px4_pollfd_struct_t *fds, pollevent_t events);
-	virtual s32	open_first(void);
-	virtual s32	close_last(void);
+    virtual void	poll_notify(pollevent_t events);
+    virtual s32	open_first(void);
+    virtual s32	close_last(void);
 
-	bool	_pub_blocked;		/**< true if publishing should be blocked */
+    bool	_pub_blocked;		/**< true if publishing should be blocked */
 
 private:
-    bool    _registered;		/**< true if device name was registered */
-    u32     _open_count;		/**< number of successful opens */
+    bool _registered;		/**< true if device name was registered */
+    u32 _open_count;		/**< number of successful opens */
     s32 _probed;
-    struct pollfd	* _pollset;
+    struct pollfd _pollset;
 
 
 };

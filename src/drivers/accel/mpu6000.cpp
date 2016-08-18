@@ -336,12 +336,7 @@ s32 mpu6000::reset(void)
 	set_accel_range(8);
 	core::mdelay(10);
     DBG("%s: accel range = %d", read_reg8(MPUREG_ACCEL_CONFIG));
-#if 0
-    set_accel_fsr(8);
-    core::mdelay(10);
-    set_gyro_fsr(2000);
-    core::mdelay(10);
-#endif
+
 	// INT CFG => Interrupt on Data Ready
 	//write_checked_reg(MPUREG_INT_ENABLE, BIT_RAW_RDY_EN);        // INT: Raw data ready
 	//core::mdelay(1);
@@ -512,6 +507,9 @@ void mpu6000::measure(void)
 
 	_accel_reports->force(&arb);
 	_gyro_reports->force(&grb);
+
+	/* notify anyone waiting for data */
+	poll_notify(POLLIN);
 
     return;
 }

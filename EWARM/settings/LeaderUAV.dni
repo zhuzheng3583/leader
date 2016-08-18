@@ -13,7 +13,7 @@ CStepIntDis=_ 0
 stlinkserialNo=2798FD0D
 stlinkfoundProbes=
 [DebugChecksum]
-Checksum=-1784181893
+Checksum=27786786
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -123,11 +123,8 @@ Bp13=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\mutex.cpp}.68.3" 0 0 1 "" 0 "" 0
 Bp14=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\mutex.cpp}.56.3" 0 0 1 "" 0 "" 0
 Bp15=_ 0 "EMUL_CODE" "0x0800881C" 0 0 1 "" 0 "" 0
 Bp16=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\accel\mpu6000.cpp}.32.1" 0 0 1 "" 0 "" 0
-Bp17=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\autopilot.cpp}.51.5" 0 0 1 "" 0 "" 0
-Bp18=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\device.h}.174.15" 0 0 1 "" 0 "" 0
-Bp19=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\semaphore.cpp}.56.2" 0 0 1 "" 0 "" 0
-Bp20=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\semaphore.cpp}.68.2" 0 0 1 "" 0 "" 0
-Count=21
+Bp17=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\device.h}.174.1" 0 0 1 "" 0 "" 0
+Count=18
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
