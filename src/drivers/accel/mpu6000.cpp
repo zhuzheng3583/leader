@@ -104,15 +104,6 @@ fail0:
     return -1;
 }
 
-s32 mpu6000::open(s32 flags)
-{
-	return 0;
-}
-
-s32 mpu6000::close(void)
-{
-    return 0;
-}
 
 s32 mpu6000::read_accel(u8 *buf, u32 size)
 {

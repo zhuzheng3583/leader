@@ -79,16 +79,6 @@ fail0:
     return -1;
 }
 
-s32 ms5611::open(s32 flags)
-{
-    return 0;
-}
-
-s32 ms5611::close(void)
-{
-    return 0;
-}
-
 void ms5611::run(void *parg)
 {
     for (;;) {

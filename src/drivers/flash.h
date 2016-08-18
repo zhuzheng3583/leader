@@ -66,7 +66,7 @@ public:
     s32 self_test(void);
 
 public:
-    virtual s32 open(s32 flags);
+    virtual s32 open(void);
     virtual s32 read(u8 *buf, u32 size);
     virtual s32 write(u8 *buf, u32 size);
     virtual s32 close(void);

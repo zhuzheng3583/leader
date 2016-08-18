@@ -34,7 +34,7 @@ s32 bootloader::init(void)
 	_pflash = leader_system::get_instance()->get_flash();
 
 #if 1
-	_pflash->open(NULL);
+	_pflash->open();
 	bootloader::iap_upload_firmware(FLASH_APP_START_ADDR);
 #endif
 
@@ -45,7 +45,7 @@ void bootloader::start(void)
 {
 	INF("Starting LeaderUAV Bootloader...\n");
 
-	_pflash->open(NULL);
+	_pflash->open();
 	bootloader::iap_upload_firmware(FLASH_APP_START_ADDR);
 
 	_pflash->close();

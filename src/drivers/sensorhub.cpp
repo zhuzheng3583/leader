@@ -77,25 +77,14 @@ fail0:
     return -1;	
 }
 
-s32 sensorhub::open(s32 flags)
-{
-	return 0;
-}
-
-s32 sensorhub::close(void)
-{
-
-	return 0;
-}
-
-s32 sensorhub::read(u8 *buf, u32 count)
+s32 sensorhub::read(u8 *buf, u32 size)
 {
 	u32 readcnt = 0;
 
 	return readcnt;
 }
 
-s32 sensorhub::write(u8 *buf, u32 count)
+s32 sensorhub::write(u8 *buf, u32 size)
 {
     u32 writecnt = 0;
 
@@ -136,7 +125,7 @@ s32 sensorhub::report(void)
 
 s32 sensorhub::self_test(void)
 {	
-	sensorhub::open(NULL);
+	sensorhub::open();
 	while (1) {
 		sensorhub::read();
 		//core::mdelay(20);

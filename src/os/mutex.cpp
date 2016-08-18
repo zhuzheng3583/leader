@@ -28,12 +28,11 @@ BOOL mutex::create(PCSTR os_name)
     _os_name = os_name;
 	_os_handle =(HANDLE)osMutexCreate(NULL);
     if (_os_handle == NULL) {
-		ERR("%s: _handle = %d.\n", _os_name, _os_handle);
-		kernel::on_error(ERR_OPERATION_FAILED, this);
+		OS_ERR("_handle = %d.\n", _os_handle);
 		return false;
     }
 
-    DBG("%s: mutex create success.\n", _os_name);
+    OS_DBG("mutex create success.\n");
     return true;
 }
 
@@ -42,8 +41,7 @@ BOOL mutex::m_delete(void)
 	osStatus status = osOK;
 	status = osMutexDelete(osMutexId(_os_handle));
 	if (status != osOK) {
-		ERR("%s: status = %d.\n", _os_name, status);
-		kernel::on_error(ERR_OPERATION_FAILED, this);
+		OS_ERR("status = %d.\n", status);
 		return false;
 	}
 
@@ -55,8 +53,7 @@ BOOL mutex::pend(s32 timeoutms)
 	osStatus status = osOK;
 	status = (osStatus)osMutexWait(osMutexId(_os_handle), (uint32_t)timeoutms);
 	if (status != osOK) {
-		ERR("%s: status = %d.\n", _os_name, status);
-		kernel::on_error(ERR_OPERATION_FAILED, this);
+		OS_ERR("status = %d.\n", status);
 		return false;
 	}
 
@@ -68,8 +65,7 @@ BOOL mutex::post(s32 timeoutms)
 	osStatus status = osOK;
 	status = (osStatus)osMutexRelease(osMutexId(_os_handle));
 	if (status != osOK) {
-		ERR("%s: status = %d.\n", _os_name, status);
-		kernel::on_error(ERR_OPERATION_FAILED, this);
+		OS_ERR("status = %d.\n", status);
 		return false;
 	}
 

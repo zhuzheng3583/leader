@@ -81,15 +81,6 @@ fail0:
 	return -1;
 }
 
-s32 usb_dev::open(s32 flags)
-{
-	return 0; 
-}
-
-s32 usb_dev::close(void)
-{
-	return 0;
-}
 
 s32 usb_dev::read(u8 *buf, u32 size)
 {

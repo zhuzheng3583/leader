@@ -14,11 +14,11 @@
 
 namespace os {
 
-#define OS_ERR(fmt, ...) print(3, ("[OS_ERR] --%s--(%d)-<%s>: " fmt), \
-    __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
-#define OS_WRN(fmt, ...) print(2, ("[OS_WRN]<%s>: " fmt), __FUNCTION__, ##__VA_ARGS__)
-#define OS_INF(fmt, ...) print(1, ("[OS_INF]<%s>: " fmt), __FUNCTION__, ##__VA_ARGS__)
-#define OS_DBG(fmt, ...) print(0, ("[OS_DBG]<%s>: " fmt), __FUNCTION__, ##__VA_ARGS__)
+#define OS_ERR(fmt, ...) print(3, ("[OS_ERR] --%s--(%d)-<%s>: %s: " fmt), \
+    __FILE__, __LINE__, __FUNCTION__, _os_name, ##__VA_ARGS__)
+#define OS_WRN(fmt, ...) print(2, ("[OS_WRN]<%s>: %s: " fmt), __FUNCTION__, _os_name, ##__VA_ARGS__)
+#define OS_INF(fmt, ...) print(1, ("[OS_INF]<%s>: %s: " fmt), __FUNCTION__, _os_name, ##__VA_ARGS__)
+#define OS_DBG(fmt, ...) print(0, ("[OS_DBG]<%s>: %s: " fmt), __FUNCTION__, _os_name, ##__VA_ARGS__)
 
 /**
  *  @enum  os_error_code
@@ -38,11 +38,8 @@ enum os_error_code
 	ERR_APPLICATION,
 };
 
-enum wait_mode
-{
-	WAIT_FOREVER = ~(0),
-	DO_NOT_WAIT = 0,
-};
+#define OS_WAIT_FOREVER  -1
+#define OS_DNOT_WAIT    0
 
 
 class os_object

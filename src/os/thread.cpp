@@ -56,12 +56,11 @@ BOOL thread::create(struct thread_params *pparams)
 	/* Start thread */
 	_os_handle = (HANDLE)osThreadCreate(&params, (void *)(_params.parg));
     if (_os_handle == NULL) {
-		ERR("%s: _handle = %d.\n", _os_name, _os_handle);
-		kernel::on_error(ERR_OPERATION_FAILED, this);
+		OS_ERR("_handle = %d.\n", _os_handle);
 		return false;
     }
 
-    DBG("%s: thread create success.\n", _os_name);
+    OS_DBG("thread create success.\n");
     return true;
 }
 
@@ -71,8 +70,7 @@ BOOL thread::t_delete(void)
 
 	status = osThreadTerminate (osThreadId(_os_handle));
 	if (status != osOK) {
-		ERR("%s: status = %d.\n", _os_name, status);
-		kernel::on_error(ERR_OPERATION_FAILED, this);
+		OS_ERR("status = %d.\n", status);
 		return false;
 	}
 
@@ -100,8 +98,7 @@ void thread::msleep(s32 timeoutms)
 	}
 	status = osDelay (millisec);
 	if (status != osOK) {
-		ERR("%s: status = %d.\n", _os_name, status);
-		kernel::on_error(ERR_OPERATION_FAILED, this);
+		OS_ERR("status = %d.\n", status);
 		return;
 	}
 
@@ -125,7 +122,7 @@ BOOL thread::func(thread* pthread)
 
 void thread::run(void *parg)
 {
-	ERR("Pure virtual function called: %s(...).\n", __FUNCTION__);
+	OS_ERR("Pure virtual function called: %s(...).\n", __FUNCTION__);
 	ASSERT(0);
 }
 

@@ -56,7 +56,7 @@ fail0:
 
 
 
-s32 flash::open(s32 flags)
+s32 flash::open(void)
 {
 	/* Unlock the Program memory */
 	HAL_FLASH_Unlock();
@@ -228,7 +228,7 @@ s32 flash::self_test(void)
 			0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0xAB };
 	u8 rbuf[16] = { 0 };
 
-	flash::open(NULL);
+	flash::open();
 	flash::seek(ADDR_FLASH_SECTOR_TO_OFFSET(ADDR_FLASH_SECTOR_10), SEEK_SET_M);
 	flash::write(wbuf, 16);
 	flash::seek(ADDR_FLASH_SECTOR_TO_OFFSET(ADDR_FLASH_SECTOR_10), SEEK_SET_M);

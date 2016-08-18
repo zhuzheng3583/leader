@@ -3153,6 +3153,12 @@
       <name>$PROJ_DIR$\..\src\drivers\dma.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\src\drivers\driver_type.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\drivers\errno.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\src\drivers\flash.cpp</name>
     </file>
     <file>

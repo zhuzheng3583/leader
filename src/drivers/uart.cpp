@@ -342,7 +342,7 @@ s32 uart::send(u8 *buf, u32 count)
 
 s32 uart::self_test(void)
 {
-	uart::open(NULL);
+	uart::open();
 #if 1
 	u8 wbuf[16] = "hello world!";
 	u8 rbuf[16] = { 0 };
@@ -367,29 +367,15 @@ s32 uart::self_test(void)
 	uart::close();
 }
 
-s32 uart::open(s32 flags)
+s32 uart::read(u8 *buf, u32 size)
 {
-
-	return 0;
+	return recv(buf, size);
 }
 
-s32 uart::close(void)
+s32 uart::write(u8 *buf, u32 size)
 {
-
-	return 0;
+	return send(buf, size);
 }
-
-s32 uart::read(u8 *buf, u32 count)
-{
-	return recv(buf, count);
-}
-
-s32 uart::write(u8 *buf, u32 count)
-{
-	return send(buf, count);
-}
-
-
 
 void uart::isr(void)
 {

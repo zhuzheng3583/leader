@@ -16,20 +16,90 @@
 #include "stm32f4xx_hal_conf.h"
 
 #include "cmsis_os.h"
+#include "errno.h"
+#include "driver_type.h"
 
-#define DEVICE_ERR(fmt, ...) ERR(("%s: " fmt), _devname, ##__VA_ARGS__)
-#define DEVICE_WRN(fmt, ...) WRN(("%s: " fmt), _devname, ##__VA_ARGS__)
-#define DEVICE_INF(fmt, ...) INF(("%s: " fmt), _devname, ##__VA_ARGS__)
-#define DEVICE_DBG(fmt, ...) DBG(("%s: " fmt), _devname, ##__VA_ARGS__)
+#include "kernel.h"
+#include "semaphore.h"
 
-struct file {
+
+using namespace os;
+
+#define DEV_ERR(fmt, ...) print(3, ("[DEV_ERR] --%s--(%d)-<%s>: %s: " fmt), \
+    __FILE__, __LINE__, __FUNCTION__, _devname, ##__VA_ARGS__)
+#define DEV_WRN(fmt, ...) print(2, ("[DEV_WRN]<%s>: %s: " fmt), __FUNCTION__, _devname, ##__VA_ARGS__)
+#define DEV_INF(fmt, ...) print(1, ("[DEV_INF]<%s>: %s: " fmt), __FUNCTION__, _devname, ##__VA_ARGS__)
+#define DEV_DBG(fmt, ...) print(0, ("[DEV_DBG]<%s>: %s: " fmt), __FUNCTION__, _devname, ##__VA_ARGS__)
+
+#define NO_PARAMS   0
+
+typedef struct file {
 	struct file *next;
 	struct file *parent;
 	char *name;
 	int lineno;
 	int flags;
-};
+} file_t;
 
+
+/* Poll event definitions:
+ *
+ *   POLLIN
+ *     Data other than high-priority data may be read without blocking.
+ *   POLLRDNORM
+ *     Normal data may be read without blocking.
+ *   POLLRDBAND
+ *     Priority data may be read without blocking.
+ *   POLLPRI
+ *     High priority data may be read without blocking.
+ *
+ *   POLLOUT
+ *     Normal data may be written without blocking.
+ *   POLLWRNORM
+ *     Equivalent to POLLOUT.
+ *   POLLWRBAND
+ *     Priority data may be written.
+ *
+ *   POLLERR
+ *     An error has occurred (revents only).
+ *   POLLHUP
+ *     Device has been disconnected (revents only).
+ *   POLLNVAL
+ *     Invalid fd member (revents only).
+ */
+
+#define POLLIN       (0x01) 
+#define POLLRDNORM   (0x01)
+#define POLLRDBAND   (0x01)
+#define POLLPRI      (0x01)
+
+#define POLLOUT      (0x02) 
+#define POLLWRNORM   (0x02)
+#define POLLWRBAND   (0x02)
+
+#define POLLERR      (0x04)
+#define POLLHUP      (0x08)
+#define POLLNVAL     (0x10)
+
+/* The number of poll descriptors (required by poll() specification */
+typedef u32 nfds_t;
+
+/* In the standard poll() definition, the size of the event set is 'short'.
+ * Here we pick the smallest storage element that will contain all of the
+ * poll events.
+ */
+typedef u8 pollevent_t;
+
+/* This is the Nuttx variant of the standard pollfd structure. */
+
+struct pollfd
+{
+  //int         fd;       /* The descriptor being polled */
+  //sem_t      *sem;      /* Pointer to semaphore used to post output event */
+  pollevent_t events;   /* The input event flags */
+  pollevent_t revents;  /* The output event flags */
+  //FAR void   *priv;     /* For use by drivers */
+};
 
 namespace driver {
 
@@ -42,27 +112,6 @@ enum seek_mode
     SEEK_SET_M          = 1,                // SEEK_SET
     SEEK_CUR_M          = 2,                // SEEK_CUR
     SEEK_END_M          = 3,                // SEEK_END
-};
-
-enum ioctl_cmd
-{
-    CMD_UART_BANUD      = 0x0000A010,	// 设置UART波特率，参数：u32 banud(如9600，115200)
-    CMD_SPI_CLK         = 0x0000A020,	// 设置SPI时钟线频率，参数：u32 spiclk(如5000000)
-    CMD_I2C_CLK         = 0x0000A030,	// 设置I2C时钟线频率，		参数：u32 i2cclk(如100000)
-    CMD_I2C_SlAVE_ADDR  = 0x0000A031,	// 设置I2C丛机设备地址，	参数：u32 slaveaddr(7bit)
-    CMD_MPU_TEMPERTURE  = 0x0000A052,
-    CMD_MPU_FIFO_RATE   = 0x0000A053,
-    CMD_GPS_UARTBANUD   = 0x0000A060,	// 设置GPS所依赖的设备UART波特率，  参数：u32 banud(如9600，115200)
-    CMD_GPIO_SETDIR     = 0x0000A070,
-    CMD_GPIO_OUT        = 0x0000A071,
-    CMD_GPIO_IN         = 0x0000A072,
-    CMD_LED_ON          = 0x0000A080,
-    CMD_LED_OFF         = 0x0000A081,
-    CMD_TIMER_FUNC      = 0x0000A090,
-    CMD_TIMER_FUNC_ARG  = 0x0000A091,
-    CMD_TIMER_OUT       = 0x0000A092,
-    CMD_PWM_DUTY_CYCLE  = 0x0000A0A0,
-    CMD_WDOG_TIMEOUTMS  = 0x0000A0B0,
 };
 
 enum dir_rw
@@ -80,9 +129,7 @@ enum wait_mode
 class device
 {
 public:
-    device(void);
     device(PCSTR name, s32 id);
-
     ~device(void);
 
 public:
@@ -90,47 +137,15 @@ public:
     s32 _id;
     s32 _irq;
     u32 _handle;
-    s32 _probed;
-    s32 _opened;
-
+    
 	PCSTR _devname;
 	s32 _devid;
 	u32 _devhandle;
-
 
 public:
     s32 probe(void);
     s32 is_probed(void);
     s32 remove(void);
-
-public:
-    virtual s32 open(s32 flags);
-    virtual s32 read(u8 *buf, u32 size);
-    virtual s32 write(u8 *buf, u32 size);
-    virtual s32 close(void);
-
-    /* TODO 阻塞非阻塞接口 */
-    /* TODO 实现Linux的poll函数，pendio类似于poll */
-    //virtual s32 poll(enum dir_rw dir, s32 timeout); // 时间单位由子类决定
-    virtual s32 ioctl(enum ioctl_cmd cmd, u32 arg);
-
-    virtual s32 seek(s32 offset, enum seek_mode mode);
-    virtual s32 tell(void);
-
-    virtual s32 flush(void);
-
-
-	virtual int open(struct file *filp);
-	virtual int close(struct file *filp);
-	virtual ssize_t read(struct file *filp, char *buffer, size_t buflen);
-	virtual ssize_t write(struct file *filp, const char *buffer, size_t buflen);
-	virtual off_t	seek(struct file *filp, off_t offset, int whence);
-	virtual int ioctl(struct file *filp, int cmd, unsigned long arg);
-	virtual int poll(struct file *filp, struct pollfd *fds, bool setup);
-	bool is_open() { return _open_count > 0; }
-
-
-
 
 public:
     static s32 irq_init(void);
@@ -142,26 +157,41 @@ public:
     static void disable_all_irq(void);
     virtual void isr(void);
 
+public:
+    semaphore *_lock;
+
+	void    lock(void) { do {} while (_lock->pend(OS_WAIT_FOREVER) != true); }
+	void    unlock(void) { _lock->post(OS_WAIT_FOREVER); }
+
+    
+    virtual s32 open(void);
+    virtual s32 close(void);
+    virtual s32 read(u8 *buf, u32 size);
+    virtual s32 write(u8 *buf, u32 size);
+    virtual off_t	seek(off_t offset, s32 whence);
+    virtual s32 ioctl(s32 cmd, u64 arg);
+    //virtual int	poll(file_t *filep, struct pollfd *fds, bool setup, int timeoutms);
+    virtual s32 tell(void);
+    virtual s32 flush(void);
+    bool    is_open(void) { return _open_count > 0; }
+    
+
 protected:
-	virtual pollevent_t poll_state(file_t *filp);
-	virtual void	poll_notify(pollevent_t events);
-	virtual void	poll_notify_one(px4_pollfd_struct_t *fds, pollevent_t events);
-	virtual int	open_first(file_t *filp);
-	virtual int	close_last(file_t *filp);
-	const char	*get_devname() { return _devname; }
+	//virtual pollevent_t poll_state(void);
+	//virtual void	poll_notify(pollevent_t events);
+	//virtual void	poll_notify_one(px4_pollfd_struct_t *fds, pollevent_t events);
+	virtual s32	open_first(void);
+	virtual s32	close_last(void);
 
 	bool	_pub_blocked;		/**< true if publishing should be blocked */
 
 private:
-	static const unsigned _max_pollwaiters = 8;
+    bool    _registered;		/**< true if device name was registered */
+    u32     _open_count;		/**< number of successful opens */
+    s32 _probed;
+    struct pollfd	* _pollset;
 
-	const char	*_devname;		/**< device node name */
-	bool		_registered;		/**< true if device name was registered */
-	unsigned	_open_count;		/**< number of successful opens */
 
-	struct pollfd	*_pollset[_max_pollwaiters];
-	int		store_poll_waiter(px4_pollfd_struct_t *fds);
-	int		remove_poll_waiter(struct pollfd *fds);
 };
 
 }

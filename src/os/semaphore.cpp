@@ -30,12 +30,11 @@ BOOL semaphore::create(PCSTR os_name, u32 semcnt)
 	//osSemaphoreDef(name);
 	_os_handle = (HANDLE)osSemaphoreCreate (NULL, (int32_t)semcnt);
     if (_os_handle == NULL) {
-		ERR("%s: _handle = %d.\n", _os_name, _os_handle);
-		kernel::on_error(ERR_OPERATION_FAILED, this);
+		OS_ERR("_handle = %d.\n", _os_handle);
 		return false;
     }
 
-    DBG("%s: semaphore create success.\n", _os_name);
+    OS_DBG("semaphore create success.\n");
     return true;
 }
 
@@ -44,8 +43,7 @@ BOOL semaphore::s_delete(void)
 	osStatus status = osOK;
 	status = osSemaphoreDelete(osSemaphoreId(_os_handle));
 	if (status != osOK) {
-		ERR("%s: status = %d.\n", _os_name, status);
-		kernel::on_error(ERR_OPERATION_FAILED, this);
+		OS_ERR("status = %d.\n", status);
 		return false;
 	}
 
@@ -57,8 +55,7 @@ BOOL semaphore::pend(s32 timeoutms)
 	osStatus status = osOK;
 	status = (osStatus)osSemaphoreWait(osSemaphoreId(_os_handle), (uint32_t)timeoutms);
 	if (status != osOK) {
-		ERR("%s: status = %d.\n", _os_name, status);
-		kernel::on_error(ERR_OPERATION_FAILED, this);
+		OS_ERR("status = %d.\n", status);
 		return false;
 	}
 
@@ -70,8 +67,7 @@ BOOL semaphore::post(s32 timeoutms)
 	osStatus status = osOK;
 	status = osSemaphoreRelease(osSemaphoreId(_os_handle));
 	if (status != osOK) {
-		ERR("%s: status = %d.\n", _os_name, status);
-		kernel::on_error(ERR_OPERATION_FAILED, this);
+		OS_ERR("status = %d.\n", status);
 		return false;
 	}
 

@@ -10,46 +10,10 @@
 ***********************************************************************/
 #pragma once
 
-/************************************************************************
- * Definitions
- ************************************************************************/
-
-/* Convenience/compatibility definition.
- *
- * For a flat, all kernel-mode build, the error can be read and written
- * from all code using a simple pointer.
- */
-
-#ifndef CONFIG_NUTTX_KERNEL
-
-#  define errno *get_errno_ptr()
-#  define set_errno(e) do { errno = (int)(e); } while (0)
-#  define get_errno(e) errno
-
-#else
-
-/* We doing separate user-/kernel-mode builds, then the errno has to be
- * a little differently. In kernel-mode, the TCB errno value can still be
- * read and written using a pointer.
- */
-
-#ifdef __KERNEL__
-#  define errno *get_errno_ptr()
-#else
-
-/* But in user-mode, the errno can only be read using the name 'errno'.
- * The non-standard API set_errno() must be explicity be used from user-
- * mode code in order to set the errno value.
- */
-
-#  define errno get_errno()
-
-#endif /* __KERNEL__ */
-#endif /* CONFIG_NUTTX_KERNEL */
-
-/* Definitions of error numbers and the string that would be
- * returned by strerror().
- */
+#define errno *get_errno_ptr()
+#define set_errno(e) do { errno = (int)(e); } while (0)
+#define get_errno(e) errno
+#define errno get_errno()
 
 #define EPERM               1
 #define EPERM_STR           "Operation not permitted"
@@ -297,45 +261,6 @@
 #define ENOMEDIUM_STR       "No medium found"
 #define EMEDIUMTYPE         124
 #define EMEDIUMTYPE_STR     "Wrong medium type"
-
-/************************************************************************
- * Type Declarations
- ************************************************************************/
-
-/************************************************************************
- * Global Function Prototypes
- ************************************************************************/
-
-#undef EXTERN
-#if defined(__cplusplus)
-#define EXTERN extern "C"
-extern "C" {
-#else
-#define EXTERN extern
-#endif
-
-/* Return a pointer to the thread specific errno.  NOTE:  When doing a
- * kernel-/user-mode build, this function can only be used within the
- * kernel-mode space.
- *
- * In the user-mode space, set_errno() and get_errno() are always available,
- * either as macros or via syscalls.
- */
-
-EXTERN FAR int *get_errno_ptr(void);
-
-#ifdef CONFIG_NUTTX_KERNEL
-EXTERN void set_errno(int errcode);
-EXTERN int  get_errno(void);
-#endif
-
-#undef EXTERN
-#if defined(__cplusplus)
-}
-#endif
-
-#endif /* __INCLUDE_ERRNO_H */
-
 
 /***********************************************************************
 ** End of file

@@ -13,7 +13,6 @@
 #include "leader_misc.h"
 
 #include "core.h"
-#include "interrupt.h"
 #include "device.h"
 
 #define GPIO_PIN_NUM_PER_BANK       16

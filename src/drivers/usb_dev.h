@@ -13,7 +13,6 @@
 #include "leader_misc.h"
 
 #include "core.h"
-#include "interrupt.h"
 #include "device.h"
 
 #include "usbd_conf.h"
@@ -40,10 +39,8 @@ public:
     s32 self_test(void);
 
 public:
-    virtual s32 open(s32 flags);
     virtual s32 read(u8 *buf, u32 size);
     virtual s32 write(u8 *buf, u32 size);
-    virtual s32 close(void);
 };
 
 }

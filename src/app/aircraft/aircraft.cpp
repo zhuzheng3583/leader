@@ -38,7 +38,7 @@ s32 aircraft::init(void)
 
 	_puart1 = new uart("uart-1", 1);
 	_puart1->probe();
-	_puart1->open(NULL);
+	_puart1->open();
 	// _puart1->self_test();
 	gps *pgps = new gps("gps", -1);
 	//pgps->probe(_puart1);

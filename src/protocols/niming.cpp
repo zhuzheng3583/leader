@@ -171,7 +171,7 @@ niming::~niming(void)
 void niming::attach(uart *puart)
 {
 	_uart = puart;
-	_uart->open(NULL);
+	_uart->open();
 }
 
 // 1：发送基本信息（姿态、锁定状态）

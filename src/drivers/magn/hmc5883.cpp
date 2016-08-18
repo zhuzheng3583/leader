@@ -62,7 +62,7 @@ fail0:
 
 
 
-s32 hmc5883::open(s32 flags)
+s32 hmc5883::open(void)
 {
     return 0;
 }

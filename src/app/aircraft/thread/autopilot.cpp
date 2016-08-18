@@ -33,11 +33,11 @@ void autopilot::run(void *parg)
     niming *niming = leader_system::get_instance()->get_niming();
 
 	mpu6000 *mpu6000 = leader_system::get_instance()->get_mpu6000();
-	mpu6000->open(NULL);
+	mpu6000->open();
 	ms5611 *ms5611 = leader_system::get_instance()->get_ms5611();
-	ms5611->open(NULL);
+	ms5611->open();
 	hmc5883 *hmc5883 = leader_system::get_instance()->get_hmc5883();
-	hmc5883->open(NULL);
+	hmc5883->open();
 
 	struct accel_report accel;
 	memset(&accel, 0, sizeof(accel));

@@ -13,7 +13,6 @@
 #include "leader_misc.h"
 
 #include "core.h"
-#include "interrupt.h"
 #include "device.h"
 #include "dma.h"
 #include "i2c.h"
@@ -122,7 +121,7 @@ public:
     s32 remove(void);
 
 public:
-	virtual s32 open(s32 flags);
+	virtual s32 open(void);
 	virtual s32 read(u8 *buf, u32 size);
 	virtual s32 close(void);
 public:

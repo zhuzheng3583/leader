@@ -326,7 +326,7 @@ fail0:
 
 s32 gps::init(void)
 {
-	_uart->open(NULL);
+	_uart->open();
 #if 0
 	u8 key = 0xff;
 	//设置定位信息更新速度为1000ms,顺便判断GPS模块是否在位.

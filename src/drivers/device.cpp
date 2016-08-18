@@ -12,21 +12,6 @@
 
 namespace driver {
 
-device::device(void) :
-	_name(NULL),
-    _id(-1),
-    _handle(NULL),
-    _devname(NULL),
-    _devid(-1),
-    _devhandle(NULL),
-    _irq(-1),
-    _probed(0),
-    _opened(0)
-{
-	/* TODO register*/
-
-}
-
 device::device(PCSTR name, s32 id) :
 	_name(name),
     _id(id),
@@ -35,15 +20,17 @@ device::device(PCSTR name, s32 id) :
     _devid(id),
     _devhandle(NULL),
     _irq(-1),
-    _probed(0),
-    _opened(0)
+    _probed(0)
 {
-
+	_lock = new semaphore;
+	_lock->create("dev_semaphore", 1);
 }
 
 device::~device(void)
 {
-	/* TODO unregister*/
+	
+	_lock->s_delete();
+	delete _lock;
 }
 
 s32 device::probe(void)
@@ -80,68 +67,196 @@ s32 device::remove(void)
 	return 0;
 }
 
-s32 device::open(s32 flags)
+/*
+ * Default implementations of the character device interface
+ */
+s32 device::open(void)
 {
-	if (_opened != 0) {
-		ERR("%s: Has been opened.\n", _devname);
-		return -1;
+	DEV_DBG("device::open.\n");
+	int ret = LD_OK;
+
+	lock();
+	/* increment the open count */
+	_open_count++;
+
+	if (_open_count == 1) {
+
+		/* first-open callback may decline the open */
+		ret = open_first();
+
+		if (ret != LD_OK) {
+			_open_count--;
+		}
 	}
 
-	_opened = 1;
-	return 0;
+	unlock();
+
+	return ret;
 }
 
-s32 device::close(void)
+s32 device::open_first(void)
 {
-	if (_opened == 0) {
-		ERR("%s: Has been close.\n", _devname);
-		return -1;
+	DEV_DBG("device::open_first.\n");
+	return LD_OK;
+}
+
+int device::close(void)
+{
+	DEV_DBG("device::close.\n");
+	int ret = LD_OK;
+
+	lock();
+
+	if (_open_count > 0) {
+		/* decrement the open count */
+		_open_count--;
+
+		/* callback cannot decline the close */
+		if (_open_count == 0) {
+			ret = close_last();
+		}
+
+	} else {
+		ret = -EBADF;
 	}
 
-	_opened = 0;
-	_handle = NULL;
+	unlock();
 
-	return 0;
+	return ret;
+}
+
+int device::close_last(void)
+{
+	DEV_DBG("device::close_last.\n");
+	return LD_OK;
 }
 
 s32 device::read(u8 *buf, u32 size)
 {
-	WRN("Called to device base class, Please check...\n");
-	return 0;
+	DEV_DBG("device::read.\n");
+	return -ENOSYS;
 }
 
 s32 device::write(u8 *buf, u32 size)
 {
-	WRN("Called to device base class, Please check...\n");
-	return 0;
+	DEV_DBG("device::write.\n");
+	return -ENOSYS;
 }
 
-
-
-s32 device::ioctl(enum ioctl_cmd cmd, u32 arg)
+off_t device::seek(off_t offset, s32 whence)
 {
-	WRN("Called to device base class, Please check...\n");
-	return 0;
+	DEV_DBG("device::seek.\n");
+	return -ENOSYS;
 }
 
-s32 device::seek(s32 offset, enum seek_mode mode)
+s32 device::ioctl(s32 cmd, u64 arg)
 {
-	WRN("Called to device base class, Please check...\n");
-	return 0;
+	DEV_DBG("device::ioctl.\n");
+	return -ENOSYS;
 }
 
 s32 device::tell(void)
 {
-	WRN("Called to device base class, Please check...\n");
-	return 0;
+	DEV_DBG("device::tell.\n");
+	return -ENOSYS;
 }
 
 s32 device::flush(void)
 {
-	WRN("Called to device base class, Please check...\n");
-	return 0;
-
+	DEV_DBG("device::flush.\n");
+	return -ENOSYS;
 }
+
+#if 0
+int device::poll(file_t *filep, struct pollfd *fds, bool setup)
+{
+	DEV_DBG("device::poll %s", setup ? "setup" : "teardown");
+	int ret = LD_OK;
+
+	/*
+	 * Lock against pollnotify() (and possibly other callers)
+	 */
+	lock();
+
+	if (setup) {
+		/*
+		 * Save the file pointer in the pollfd for the subclass'
+		 * benefit.
+		 */
+		fds->priv = (void *)filep;
+		DEV_DBG("device::poll: fds->priv = %p", filep);
+
+		/*
+		 * Handle setup requests.
+		 */
+		ret = store_poll_waiter(fds);
+
+		if (ret == LD_OK) {
+
+			/*
+			 * Check to see whether we should send a poll notification
+			 * immediately.
+			 */
+			fds->revents |= fds->events & poll_state(filep);
+
+			/* yes? post the notification */
+			if (fds->revents != 0) {
+				px4_sem_post(fds->sem);
+			}
+
+		} else {
+			DEV_WRN("Store Poll Waiter error.");
+		}
+
+	} else {
+		/*
+		 * Handle a teardown request.
+		 */
+		ret = remove_poll_waiter(fds);
+	}
+
+	unlock();
+
+	return ret;
+}
+
+void device::poll_notify(pollevent_t events)
+{
+	DEV_DBG("device::poll_notify events = %0x", events);
+
+	/* lock against poll() as well as other wakeups */
+	lock();
+
+	poll_notify_one(_pollset[i], events);
+
+	unlock();
+}
+
+void device::poll_notify_one(struct pollfd *fds, pollevent_t events)
+{
+	DEV_DBG("device::poll_notify_one");
+	int value;
+	px4_sem_getvalue(fds->sem, &value);
+
+	/* update the reported event set */
+	fds->revents |= fds->events & events;
+
+	DEV_DBG(" Events fds=%p %0x %0x %0x %d", fds, fds->revents, fds->events, events, value);
+
+	/* if the state is now interesting, wake the waiter if it's still asleep */
+	/* XXX semcount check here is a vile hack; counting semphores should not be abused as cvars */
+	if ((fds->revents != 0) && (value <= 0)) {
+		px4_sem_post(fds->sem);
+	}
+}
+
+pollevent_t device::poll_state(file_t *filep)
+{
+	DEV_DBG("device::poll_notify");
+	/* by default, no poll events to report */
+	return 0;
+}
+#endif
 
 
 /**
