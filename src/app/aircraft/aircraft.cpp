@@ -62,6 +62,66 @@ s32 aircraft::init(void)
     _hmc5883->probe(_i2c2, HMC5883_SLAVE_ADDRESS);
 
 
+	_pwm1 = new pwm("timer-1", 1);
+	_pwm1->probe();
+	_motor1 = new motor("motor-1", 1);
+	_motor1->probe(_pwm1, PWM_CHANNEL_4);
+	_motor2 = new motor("motor-2", 2);
+	_motor2->probe(_pwm1, PWM_CHANNEL_3);
+	_motor3 = new motor("motor-3", 3);
+	_motor3->probe(_pwm1, PWM_CHANNEL_2);
+	_motor4 = new motor("motor-4", 4);
+	_motor4->probe(_pwm1, PWM_CHANNEL_1);
+
+	_pwm4 = new pwm("timer-4", 4);
+	_pwm4->probe();
+	_motor5 = new motor("motor-5", 5);
+	_motor5->probe(_pwm4, PWM_CHANNEL_4);
+	_motor6 = new motor("motor-6", 6);
+	_motor6->probe(_pwm4, PWM_CHANNEL_3);
+	_motor7 = new motor("motor-7", 7);
+	_motor7->probe(_pwm4, PWM_CHANNEL_2);
+	_motor8 = new motor("motor-8", 8);
+	_motor8->probe(_pwm4, PWM_CHANNEL_1);
+
+#if 1
+	_motor1->set_lock(false);
+	_motor1->set_throttle(50);
+	_motor2->set_lock(false);
+	_motor2->set_throttle(50);
+	_motor3->set_lock(false);
+	_motor3->set_throttle(50);
+	_motor4->set_lock(false);
+	_motor4->set_throttle(50);
+	_motor5->set_lock(false);
+	_motor5->set_throttle(50);
+	_motor6->set_lock(false);
+	_motor6->set_throttle(50);
+	_motor7->set_lock(false);
+	_motor7->set_throttle(50);
+	_motor8->set_lock(false);
+	_motor8->set_throttle(50);
+#else
+	_pwm1->set_dutycycle(PWM_CHANNEL_1, 100);
+	_pwm1->start(PWM_CHANNEL_1);
+	_pwm1->set_dutycycle(PWM_CHANNEL_2, 100);
+	_pwm1->start(PWM_CHANNEL_2);
+	_pwm1->set_dutycycle(PWM_CHANNEL_3, 100);
+	_pwm1->start(PWM_CHANNEL_3);
+	_pwm1->set_dutycycle(PWM_CHANNEL_4, 100);
+	_pwm1->start(PWM_CHANNEL_4);
+
+	_pwm4->set_dutycycle(PWM_CHANNEL_1, 100);
+	_pwm4->start(PWM_CHANNEL_1);
+	_pwm4->set_dutycycle(PWM_CHANNEL_2, 100);
+	_pwm4->start(PWM_CHANNEL_2);
+	_pwm4->set_dutycycle(PWM_CHANNEL_3, 100);
+	_pwm4->start(PWM_CHANNEL_3);
+	_pwm4->set_dutycycle(PWM_CHANNEL_4, 100);
+	_pwm4->start(PWM_CHANNEL_4);
+#endif
+	
+
 	_heartbeat = new heartbeat;
 	_terminal = new terminal;
 	_autopilot = new autopilot;

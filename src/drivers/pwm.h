@@ -22,12 +22,11 @@
 #define  PULSE3_VALUE       (u32)(PERIOD_VALUE*25/100) 	/* Capture Compare 3 Value 25% */
 #define  PULSE4_VALUE       (u32)(PERIOD_VALUE*12.5/100) /* Capture Compare 4 Value 12.5% */
 
-enum pwm_channel {
-    PWM_CHANNEL_1   = 0,
-    PWM_CHANNEL_2   = 1,
-    PWM_CHANNEL_3   = 2,
-    PWM_CHANNEL_4   = 3,
-};
+
+#define PWM_CHANNEL_1       0
+#define PWM_CHANNEL_2       1
+#define PWM_CHANNEL_3       2
+#define PWM_CHANNEL_4       3
 
 namespace driver {
 
@@ -46,8 +45,8 @@ public:
     s32 remove(void);
 
 public:
-    s32 set_dutycycle(enum pwm_channel channel, u32 dutycycle);
-    s32 start(enum pwm_channel channel);
+    s32 set_dutycycle(u32 channel, u32 dutycycle);
+    s32 start(u32 channel);
 
 public:
 	s32 self_test(void);

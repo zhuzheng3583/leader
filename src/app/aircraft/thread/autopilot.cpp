@@ -68,21 +68,20 @@ void autopilot::run(void *parg)
 		//	_os_name, accel.x_raw, accel.y_raw, accel.z_raw,
 		//	gyro.x_raw, gyro.y_raw, gyro.z_raw);
 
-        hmc5883->read((u8 *)&mag, sizeof(mag_report));
+		hmc5883->read((u8 *)&mag, sizeof(mag_report));
 		//DBG("%s: mag.x_raw=%d, mag.y_raw=%d, mag.z_raw=%d.\n",
 		//	_os_name, mag.x_raw, mag.y_raw, mag.z_raw);
 
-        ms5611->read((u8 *)&baro, sizeof(baro_report));
+		ms5611->read((u8 *)&baro, sizeof(baro_report));
 		//DBG("%s: temperature=%f, pressure=%f, altitude=%f.\n",
 		//	_os_name, baro.temperature, baro.pressure, baro.altitude);
 
-        imu_update(gyro.x, gyro.y, gyro.z,
-            accel.x, accel.y, accel.z, &att);
+		imu_update(gyro.x, gyro.y, gyro.z, accel.x, accel.y, accel.z, &att);
 
-        niming->report_status(&att);
-        niming->report_sensor(false, &accel, &gyro, &mag);
+		niming->report_status(&att);
+        	niming->report_sensor(false, &accel, &gyro, &mag);
 
-        //msleep(1);
+        	//msleep(1);
 
 		//DBG("%s: task is active[%u]...\n", _os_name, cnt++);
 

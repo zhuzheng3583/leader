@@ -189,8 +189,9 @@ s32 pwm::probe(void)
 	switch(_devid)
     	{
 	case 1:
+		/*TODO TIM1CLK = SystemCoreClock*2 */
 		__HAL_RCC_TIM1_CLK_ENABLE();
-        __HAL_RCC_GPIOE_CLK_ENABLE();
+ 		__HAL_RCC_GPIOE_CLK_ENABLE();
 		break;
 	case 2:
 		__HAL_RCC_TIM2_CLK_ENABLE();
@@ -279,7 +280,7 @@ fail0:
 }
 
 #if 1
-s32 pwm::set_dutycycle(enum pwm_channel channel, u32 dutycycle)
+s32 pwm::set_dutycycle(u32 channel, u32 dutycycle)
 {
 	TIM_HandleTypeDef *htim = (TIM_HandleTypeDef *)_handle;
 	//sConfig.Pulse = PULSE1_VALUE;
@@ -311,7 +312,7 @@ s32 pwm::set_dutycycle(enum pwm_channel channel, u32 dutycycle)
 	return 0;
 }
 
-s32 pwm::start(enum pwm_channel channel)
+s32 pwm::start(u32 channel)
 {
   	/* 3- Start PWM signals generation */
   	/* Start channel 1 */

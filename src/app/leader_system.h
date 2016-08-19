@@ -28,6 +28,7 @@
 #include "drivers/baro/ms5611.h"
 #include "drivers/magn/hmc5883.h"
 #include "drivers/gps/gps.h"
+#include "drivers/motor.h"
 
 #include "demo_main.h"
 
@@ -83,10 +84,22 @@ public:
 
     gpio                    *_mpu6000_gpio_cs;
     gpio                    *_ms5611_gpio_cs;
-    mpu6000					*_mpu6000;
+    mpu6000		            *_mpu6000;
     ms5611					*_ms5611;
 	hmc5883					*_hmc5883;
 
+    pwm                     *_pwm1;
+    pwm                     *_pwm4;
+
+    motor                   *_motor1;
+    motor                   *_motor2;
+    motor                   *_motor3;
+    motor                   *_motor4; 
+    motor                   *_motor5;
+    motor                   *_motor6;
+    motor                   *_motor7;
+    motor                   *_motor8;   
+    
     flash                   *_pflash;
 
     usb_dev                 *_usb_dev;
@@ -96,7 +109,6 @@ public:
     gpio                    *_gpio_irq;
 
     timer                   *_timer;
-    pwm                     *_pwm;
 
     logger                  *_logger;
     heartbeat               *_heartbeat;

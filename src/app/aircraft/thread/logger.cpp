@@ -79,6 +79,7 @@ BOOL logger::t_delete(void)
 #endif
 s32 logger::vprintf(PCSTR fmt, va_list ap)
 {
+
 	static u8 str[FMT_MAX_CNT];
 	s32 count = 0;
 
@@ -144,7 +145,9 @@ void logger::run(void *parg)
 {
 	for ( ; ; )
 	{
+		taskENTER_CRITICAL();
 		logger::flush();
+		taskEXIT_CRITICAL();
         msleep(100);
 	}
 
