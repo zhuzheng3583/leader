@@ -178,6 +178,7 @@ s32 device::poll(struct pollfd *fds, s32 timeoutms)
 {
 	s32 ret = LD_OK;
 	
+    _pollset.events = fds->events;
 	_pollset.sem->pend(timeoutms);
 	
 	lock();
@@ -194,7 +195,7 @@ s32 device::poll(struct pollfd *fds, s32 timeoutms)
 
 void device::poll_notify(pollevent_t events)
 {
-	DEV_DBG("device::poll_notify events = %0x", events);
+	//DEV_DBG("device::poll_notify events = %0x", events);
 
 	/* lock against poll() as well as other wakeups */
 	lock();
@@ -204,7 +205,7 @@ void device::poll_notify(pollevent_t events)
 
 	/* update the reported event set */
 	_pollset.revents |= _pollset.events & events;
-	DEV_DBG(" Events fds=%p %0x %0x %0x %d", _pollset, _pollset.revents, _pollset.events, events, value);
+	//DEV_DBG(" Events fds=%p %0x %0x %0x %d", _pollset, _pollset.revents, _pollset.events, events, value);
 
 	unlock();
 	
