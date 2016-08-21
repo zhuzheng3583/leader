@@ -1,9 +1,9 @@
 #include "CONTROL.h"
-#include "IMU1.h"       
+#include "IMU1.h"
 #include "moto.h"
 #include "RFdate.h"
 #include <math.h>
-extern T_RC_Data                         Rc_D;                //Ò£¿ØÍ¨µÀÊı¾İ;
+extern T_RC_Data                         rc_d;                //Ò£¿ØÍ¨µÀÊı¾İ;
 
 extern u8 txbuf[4];         //·¢ËÍ»º³å
 extern u8 rxbuf[4];         //½ÓÊÕ»º³å
@@ -12,7 +12,7 @@ extern S_INT16_XYZ ACC_F,GYRO_F;
 
 PID PID_ROL,PID_PIT,PID_YAW;
 
-extern S_INT16_XYZ        MPU6050_ACC_LAST,MPU6050_GYRO_LAST;       
+extern S_INT16_XYZ        MPU6050_ACC_LAST,MPU6050_GYRO_LAST;
 
 
 int Motor_Ele=0;                                           //¸©ÑöÆÚÍû
@@ -26,33 +26,33 @@ float thr=0;
 S_FLOAT_XYZ EXP_ANGLE ,DIF_ANGLE;
 PID1 PID_Motor;
 /*********************************/
-float Pitch_i,Roll_i,Yaw_i;                         //»ı·ÖÏî
-float Pitch_old,Roll_old,Yaw_old;                   //½Ç¶È±£´æ
-float Pitch_d,Roll_d,Yaw_d;                         //Î¢·ÖÏî
-float RC_Pitch,RC_Roll,RC_Yaw;                      //×ËÌ¬½Ç
+float pitch_i,roll_i,Yaw_i;                         //»ı·ÖÏî
+float pitch_old,roll_old,yaw_old;                   //½Ç¶È±£´æ
+float pitch_d,roll_d,yaw_d;                         //Î¢·ÖÏî
+float rc_pitch,rc_roll,rc_yaw;                      //×ËÌ¬½Ç
 
 //Íâ»·PID²ÎÊı
-float Pitch_shell_kp=280;//30 140
-float Pitch_shell_kd=0;//
-float Pitch_shell_ki=0;//
-float Roll_shell_kp=250;//30
-float Roll_shell_kd=0;//10                 
-float Roll_shell_ki=0;//0.08
-float Yaw_shell_kp=1.5;//10;//30
-float Yaw_shell_kd=0;//10                 
-float Yaw_shell_ki=0;//0.08;//0.08
-float Pitch_shell_out,Roll_shell_out,Yaw_shell_out; //Íâ»·×ÜÊä³ö
-       
+float pitch_shell_kp=280;//30 140
+float pitch_shell_kd=0;//
+float pitch_shell_ki=0;//
+float roll_shell_kp=250;//30
+float roll_shell_kd=0;//10
+float roll_shell_ki=0;//0.08
+float yaw_shell_kp=1.5;//10;//30
+float yaw_shell_kd=0;//10
+float yaw_shell_ki=0;//0.08;//0.08
+float pitch_shell_out,roll_shell_out,yaw_shell_out; //Íâ»·×ÜÊä³ö
+
 //ÄÚ»·PID²ÎÊı
-float Pitch_core_kp=0.040;
+float pitch_core_kp=0.040;
 float Pitch_core_kd=0.002;////0.007;//0.07;0.008;
 float Roll_core_kp=0.040;//;
 float Roll_core_kd=0.002;////0.007;//06;//0.07;
 float Yaw_core_kp=0.046;//;
 float Yaw_core_kd=0.012;////0.007;//06;//0.07;
 float Gyro_radian_old_x,Gyro_radian_old_y,Gyro_radian_old_z;//ÍÓÂİÒÇ±£´æ
-float pitch_core_kp_out,pitch_core_kd_out,Roll_core_kp_out,Roll_core_kd_out,Yaw_core_kp_out,Yaw_core_kd_out;//ÄÚ»·µ¥ÏîÊä³ö
-float Pitch_core_out,Roll_core_out,Yaw_core_out;//ÄÚ»·×ÜÊä³ö     
+float pitch_core_kp_out,pitch_core_kd_out,Roll_core_kp_out,Roll_core_kd_out,yaw_core_kp_out,Yaw_core_kd_out;//ÄÚ»·µ¥ÏîÊä³ö
+float pitch_core_out,Roll_core_out,Yaw_core_out;//ÄÚ»·×ÜÊä³ö
 
 int16_t moto1=0,moto2=0,moto3=0,moto4=0;
 
@@ -60,90 +60,89 @@ float tempjd=0;
 void CONTROL(float rol, float pit, float yaw)
 {
     ////////////////////////Íâ»·½Ç¶È»·(PID)///////////////////////////////
-    RC_Pitch = (Rc_D.PITCH - 1500) / 20;
-    Pitch_i += (Q_ANGLE.Pitch - RC_Pitch);
+    rc_pitch = (rc_d.pitch - 1500) / 20;
+    pitch_i += (q_angle.pitch - rc_pitch);
     //-------------Pitch»ı·ÖÏŞ·ù----------------//
-    if(Pitch_i > 300) Pitch_i = 300;
-    else if(Pitch_i < -300) Pitch_i = -300;
+    if(pitch_i > 300) pitch_i = 300;
+    else if(pitch_i < -300) pitch_i = -300;
     //-------------PitchÎ¢·Ö--------------------//
-    Pitch_d = Q_ANGLE.Pitch - Pitch_old;
-    //-------------Pitch  PID-------------------//
-    Pitch_shell_out = Pitch_shell_kp*(Q_ANGLE.Pitch - RC_Pitch) + Pitch_shell_ki*Pitch_i + Pitch_shell_kd*Pitch_d;
+    pitch_d = q_angle.pitch - pitch_old;
+    //-------------pitch  PID-------------------//
+    pitch_shell_out = pitch_shell_kp*(q_angle.pitch - rc_pitch) + pitch_shell_ki*pitch_i + pitch_shell_kd*pitch_d;
     //½Ç¶È±£´æ
-    Pitch_old = Q_ANGLE.Pitch;      
-       
-    RC_Roll = (Rc_D.ROLL - 1500) / 20;
-    Roll_i += (Q_ANGLE.Rool - RC_Roll); 
+    pitch_old = q_angle.pitch;
+
+    rc_roll = (rc_d.roll - 1500) / 20;
+    roll_i += (q_angle.roll - rc_roll);
     //-------------Roll»ı·ÖÏŞ·ù----------------//
-    if(Roll_i > 300) Roll_i = 300;
-    else if(Roll_i < -300) Roll_i = -300;
+    if(roll_i > 300) roll_i = 300;
+    else if(roll_i < -300) roll_i = -300;
     //-------------RollÎ¢·Ö--------------------//
-    Roll_d = Q_ANGLE.Rool - Roll_old;
+    roll_d = q_angle.roll - roll_old;
     //-------------Roll  PID-------------------//
-    Roll_shell_out = Roll_shell_kp*(Q_ANGLE.Rool - RC_Roll) + Roll_shell_ki*Roll_i + Roll_shell_kd*Roll_d;
+    roll_shell_out = roll_shell_kp*(q_angle.roll - rc_roll) + roll_shell_ki*roll_i + roll_shell_kd*roll_d;
     //------------Roll½Ç¶È±£´æ------------------//
-    Roll_old = Q_ANGLE.Rool;
-       
-       
-    RC_Yaw=(Rc_D.YAW-1500)*10;
+    roll_old = q_angle.roll;
+
+
+    rc_yaw=(rc_d.yaw-1500)*10;
     //-------------YawÎ¢·Ö--------------------//
-    Yaw_d=MPU6050_GYRO_LAST.Z-Yaw_old;
+    yaw_d=MPU6050_GYRO_LAST.Z - yaw_old;
     //-------------Roll  PID-------------------//
-    Yaw_shell_out  = Yaw_shell_kp*(MPU6050_GYRO_LAST.Z-RC_Yaw) + Yaw_shell_ki*Yaw_i + Yaw_shell_kd*Yaw_d;
+    yaw_shell_out  = yaw_shell_kp*(MPU6050_GYRO_LAST.Z-rc_yaw) + yaw_shell_ki*Yaw_i + yaw_shell_kd*yaw_d;
     //------------Roll½Ç¶È±£´æ------------------//
-    Yaw_old=MPU6050_GYRO_LAST.Z;
-       
-       
-    ////////////////////////ÄÚ»·½ÇËÙ¶È»·(PD)///////////////////////////////       
-    pitch_core_kp_out = Pitch_core_kp * (Pitch_shell_out + MPU6050_GYRO_LAST.Y * 3.5);
+    yaw_old=MPU6050_GYRO_LAST.Z;
+
+    ////////////////////////ÄÚ»·½ÇËÙ¶È»·(PD)///////////////////////////////
+    pitch_core_kp_out = pitch_core_kp * (pitch_shell_out + MPU6050_GYRO_LAST.Y * 3.5);
     pitch_core_kd_out = Pitch_core_kd * (MPU6050_GYRO_LAST.Y   - Gyro_radian_old_y);
-    Roll_core_kp_out  = Roll_core_kp  * (Roll_shell_out  + MPU6050_GYRO_LAST.X *3.5);
+    Roll_core_kp_out  = Roll_core_kp  * (roll_shell_out  + MPU6050_GYRO_LAST.X *3.5);
     Roll_core_kd_out  = Roll_core_kd  * (MPU6050_GYRO_LAST.X   - Gyro_radian_old_x);
-    Yaw_core_kp_out  = Yaw_core_kp  * (Yaw_shell_out  + MPU6050_GYRO_LAST.Z * 1);
+    yaw_core_kp_out  = Yaw_core_kp  * (yaw_shell_out  + MPU6050_GYRO_LAST.Z * 1);
     Yaw_core_kd_out  = Yaw_core_kd  * (MPU6050_GYRO_LAST.Z   - Gyro_radian_old_z);
-       
-    Pitch_core_out = pitch_core_kp_out + pitch_core_kd_out;
+
+    pitch_core_out = pitch_core_kp_out + pitch_core_kd_out;
     Roll_core_out  = Roll_core_kp_out  + Roll_core_kd_out;
-    Yaw_core_out   = Yaw_core_kp_out   + Yaw_core_kd_out;
+    Yaw_core_out   = yaw_core_kp_out   + Yaw_core_kd_out;
 
     Gyro_radian_old_y = MPU6050_GYRO_LAST.X;
     Gyro_radian_old_x = MPU6050_GYRO_LAST.Y;
     Gyro_radian_old_z = MPU6050_GYRO_LAST.Z;   //´¢´æÀúÊ·Öµ
-       
+
 //--------------------½«Êä³öÖµÈÚºÏµ½ËÄ¸öµç»ú--------------------------------//
 
-       
-        if(Rc_D.THROTTLE>1020)
-        {
-  thr=Rc_D.THROTTLE- 1000;
 
-//                if(Rc_D.THROTTLE<=2000)
+        if(rc_d.THROTTLE>1020)
+        {
+  thr=rc_d.THROTTLE- 1000;
+
+//                if(rc_d.THROTTLE<=2000)
 //                {
-//  moto1=(int16_t)(thr  - Pitch_core_out);//- yaw);
-//        moto2=(int16_t)(thr  - Pitch_core_out);//+ yaw);       
-//        moto3=(int16_t)(thr  + Pitch_core_out);// - yaw);
-//        moto4=(int16_t)(thr  + Pitch_core_out);//+ yaw);       
-   
+//  moto1=(int16_t)(thr  - pitch_core_out);//- yaw);
+//        moto2=(int16_t)(thr  - pitch_core_out);//+ yaw);
+//        moto3=(int16_t)(thr  + pitch_core_out);// - yaw);
+//        moto4=(int16_t)(thr  + pitch_core_out);//+ yaw);
+
 //  moto1=(int16_t)(thr  - Roll_core_out);//- yaw);
-//        moto2=(int16_t)(thr  + Roll_core_out);//+ yaw);       
+//        moto2=(int16_t)(thr  + Roll_core_out);//+ yaw);
 //        moto3=(int16_t)(thr  + Roll_core_out);// - yaw);
 //        moto4=(int16_t)(thr  - Roll_core_out);//+ yaw);
 
 //  moto1=(int16_t)(thr  - Yaw_core_out);//- yaw);
-//        moto2=(int16_t)(thr  + Yaw_core_out);//+ yaw);       
+//        moto2=(int16_t)(thr  + Yaw_core_out);//+ yaw);
 //        moto3=(int16_t)(thr  - Yaw_core_out);// - yaw);
-//        moto4=(int16_t)(thr  + Yaw_core_out);//+ yaw);                       
-                       
-//moto1=(int16_t)(thr - Roll_core_out - Pitch_core_out);
-//moto2=(int16_t)(thr + Roll_core_out - Pitch_core_out);       
-//moto3=(int16_t)(thr + Roll_core_out + Pitch_core_out);
-//moto4=(int16_t)(thr - Roll_core_out + Pitch_core_out);       
-//                       
-  moto1=(int16_t)(thr - Roll_core_out - Pitch_core_out- Yaw_core_out);
-        moto2=(int16_t)(thr + Roll_core_out - Pitch_core_out+ Yaw_core_out);       
-        moto3=(int16_t)(thr + Roll_core_out + Pitch_core_out- Yaw_core_out);
-        moto4=(int16_t)(thr - Roll_core_out + Pitch_core_out+ Yaw_core_out);                       
-                       
+//        moto4=(int16_t)(thr  + Yaw_core_out);//+ yaw);
+
+//moto1=(int16_t)(thr - Roll_core_out - pitch_core_out);
+//moto2=(int16_t)(thr + Roll_core_out - pitch_core_out);
+//moto3=(int16_t)(thr + Roll_core_out + pitch_core_out);
+//moto4=(int16_t)(thr - Roll_core_out + pitch_core_out);
+//
+  moto1=(int16_t)(thr - Roll_core_out - pitch_core_out- Yaw_core_out);
+        moto2=(int16_t)(thr + Roll_core_out - pitch_core_out+ Yaw_core_out);
+        moto3=(int16_t)(thr + Roll_core_out + pitch_core_out- Yaw_core_out);
+        moto4=(int16_t)(thr - Roll_core_out + pitch_core_out+ Yaw_core_out);
+
 //                }
   }
         else
@@ -203,7 +202,7 @@ ANO_FlyControl::ANO_FlyControl()
 void ANO_FlyControl:ID_Reset(void)
 {
     //ÒòÎªYAW½Ç¶È»áÆ¯ÒÆ£¬ËùÒÔ²ÎÊıºÍROLL¡¢PITCH²»Ò»Ñù
-    pid[PIDROLL].set_pid(70, 15, 120, 2000000); //ROLL½Ç¶ÈµÄÄÚ»·¿ØÖÆÏµÊı,20000:»ı·ÖÉÏÏŞ 
+    pid[PIDROLL].set_pid(70, 15, 120, 2000000); //ROLL½Ç¶ÈµÄÄÚ»·¿ØÖÆÏµÊı,20000:»ı·ÖÉÏÏŞ
     pid[PIDPITCH].set_pid(70, 30, 120, 2000000);//PITCH½Ç¶ÈµÄÄÚ»·¿ØÖÆÏµÊı
     pid[PIDYAW].set_pid(100, 50, 0, 2000000); //YAW½Ç¶ÈµÄÄÚ»·¿ØÖÆÏµÊı
 
@@ -211,26 +210,26 @@ void ANO_FlyControl:ID_Reset(void)
     pid[PIDMAG].set_pid(15, 0, 0, 0); //µç×ÓÂŞÅÌ¿ØÖÆÏµÊı
 }
 
-/* 
-¡¾É¨Ã¤ÖªÊ¶¡¿ 
-´®¼¶PID£º²ÉÓÃµÄ½Ç¶ÈPºÍ½ÇËÙ¶ÈPIDµÄË«±Õ»·PIDËã·¨------>½Ç¶ÈµÄÎó²î±»×÷ÎªÆÚÍûÊäÈëµ½½ÇËÙ¶È¿ØÖÆÆ÷ÖĞ £¨½Ç¶ÈµÄÎ¢·Ö¾ÍÊÇ½ÇËÙ¶È£© 
+/*
+¡¾É¨Ã¤ÖªÊ¶¡¿
+´®¼¶PID£º²ÉÓÃµÄ½Ç¶ÈPºÍ½ÇËÙ¶ÈPIDµÄË«±Õ»·PIDËã·¨------>½Ç¶ÈµÄÎó²î±»×÷ÎªÆÚÍûÊäÈëµ½½ÇËÙ¶È¿ØÖÆÆ÷ÖĞ £¨½Ç¶ÈµÄÎ¢·Ö¾ÍÊÇ½ÇËÙ¶È£©
 ¶ÔÓÚ±¾ÏµÍ³Ôò²ÉÓÃÁË½«½Ç¶È¿ØÖÆÓë½ÇËÙ¶È¿ØÖÆ¼¶ÁªµÄ·½Ê½×é³ÉÕû¸ö´®¼¶ PID ¿ØÖÆÆ÷¡£
 
 ´®¼¶ PID Ëã·¨ÖĞ£¬½ÇËÙ¶ÈÄÚ»·Õ¼×Å¼«ÎªÖØÒªµÄµØÎ»¡£ÔÚ¶ÔËÄĞıÒí·ÉĞĞµÄÎïÀíÄ£ĞÍ½ø
 ĞĞ·ÖÎöºó£¬¿ÉÒÔÖªµÀÔì³ÉÏµÍ³²»ÎÈ¶¨µÄÎïÀí±íÏÖÖ®Ò»¾ÍÊÇ²»ÎÈ¶¨µÄ½ÇËÙ¶È¡£
 Òò´Ë£¬ÈôÄÜ¹»Ö±½Ó¶ÔÏµÍ³µÄ½ÇËÙ¶È½øĞĞ½ÏºÃµÄ±Õ»·¿ØÖÆ£¬±ØÈ»»á¸ÄÉÆÏµÍ³µÄ¶¯Ì¬ÌØĞÔ
 ¼°ÆäÎÈ¶¨ĞÔ£¬Í¨³£Ò²°Ñ½ÇËÙ¶ÈÄÚ»·³ÆÎªÔöÎÈ»·½Ú¡£¶ø½Ç¶ÈÍâ»·µÄ×÷ÓÃÔòÌåÏÖÔÚ¶ÔËÄĞıÒí·É
-ĞĞÆ÷µÄ×ËÌ¬½ÇµÄ¾«È·¿ØÖÆ¡£ 
+ĞĞÆ÷µÄ×ËÌ¬½ÇµÄ¾«È·¿ØÖÆ¡£
 Íâ»·£ºÊäÈëÎª½Ç¶È,Êä³öÎª½ÇËÙ¶È
 ÄÚ»·£ºÊäÈëÎª½ÇËÙ¶È£¬Êä³öÎªPWMÔöÁ¿
 Ê¹ÓÃ´®¼¶pid£¬·ÖÎª£º½Ç¶È»·¿ØÖÆpid»·£¬ºÍ½ÇËÙ¶È¿ØÖÆ»·ÎÈ¶¨»·¡£Ö÷µ÷Îª½Ç¶È»·£¨Íâ»·£©£¬¸±µ÷Îª½ÇËÙ¶È»·£¨ÄÚ»·£©¡£
 ²ÎÊıÕû¶¨Ô­ÔòÎªÏÈÄÚºóÍâ£¬¹ÊÔÚÕû¶¨ÄÚ»·Ê±½«Íâ»·µÄPID¾ùÉèÎª0
-ËùÎ½Íâ»·¾ÍÊÇÖ»ÊÇÒ»¸öPÔÚÆğ×÷ÓÃ£¬Ò²¾ÍÊÇ±ÈÀıÔÚÆğ×÷ÓÃ£»PÒ²¾ÍÊÇĞŞÕıÁ¦¶È£¬Ô½´óÔ½ÈİÒ×Ê¹·É»úÕğµ´¡£ 
+ËùÎ½Íâ»·¾ÍÊÇÖ»ÊÇÒ»¸öPÔÚÆğ×÷ÓÃ£¬Ò²¾ÍÊÇ±ÈÀıÔÚÆğ×÷ÓÃ£»PÒ²¾ÍÊÇĞŞÕıÁ¦¶È£¬Ô½´óÔ½ÈİÒ×Ê¹·É»úÕğµ´¡£
 Õğµ´µÄÌØµãÊÇ£ºÆµÂÊĞ¡¡¢·ù¶È´ó
 */
 
 /*
-¡¾ºá¹ö£¨Roll£©ºÍ¸©Ñö£¨Pitch£©µÄ¿ØÖÆËã·¨¡¿ 
+¡¾ºá¹ö£¨Roll£©ºÍ¸©Ñö£¨Pitch£©µÄ¿ØÖÆËã·¨¡¿
 ºá¹ö£¨Roll£©ºÍ¸©Ñö£¨Pitch£©µÄ¿ØÖÆËã·¨ÊÇÒ»ÑùµÄ£¬¿ØÖÆ²ÎÊıÒ²±È½Ï½Ó½ü¡£
 
 Ê×ÏÈµÃµ½Öá×ËÌ¬µÄ½Ç¶È²î£¨angle error£©£¬½«Õâ¸öÖµ³ËÒÔ½Ç¶ÈÏµÊıp
@@ -240,42 +239,42 @@ rate_errorÓëiÖµÒìºÅÊ±½«rate_errorÀÛ¼Óµ½IÖĞ¡£Ç°ºóÁ½´Îrate_errorµÄ²î×÷ÎªDÏî£¬ÖµµÃ×
 £¨Ò²¿ÉÒÔ²ÉÓÃÆäËüºÏÊÊÆµÂÊ£©ÂË²¨£¬ÒÔ±ÜÃâÕğµ´¡£½«P,I,DÈıÕßÏà¼Ó²¢ÏŞ·ù£¨50%ÓÍÃÅ£©µÃµ½×îÖÕPIDÊä³ö¡£
 */
 
-//´®»·PIDµ÷½ÚÏêÇé²Î¼û£ºhttp://blog.csdn.net/super_mic ... 36723 
+//´®»·PIDµ÷½ÚÏêÇé²Î¼û£ºhttp://blog.csdn.net/super_mic ... 36723
 
 //·ÉĞĞÆ÷×ËÌ¬Íâ»·¿ØÖÆ
-void ANO_FlyControl::Attitude_Outter_Loop(void)
+void control::attitude_outter_loop(void)
 {
     int32_t errorAngle[2];
     Vector3f Gyro_ADC;
 
-    //¼ÆËã½Ç¶ÈÎó²îÖµ, ½Ç¶ÈÎó²îÖµ=ÆÚÍûÖµ-´Ë¿Ì×ËÌ¬Öµ 
+    //¼ÆËã½Ç¶ÈÎó²îÖµ, ½Ç¶ÈÎó²îÖµ=ÆÚÍûÖµ-´Ë¿Ì×ËÌ¬Öµ
     //constrain_int32×÷ÓÃ£º32Î»ÕûĞÍÊıÏŞ·ù£¬Ê¹Æä¿ØÖÆÊäÈëµÄ×î´ó·ÉĞĞÇã½Ç²»´óÓÚ25¶È£¨Èç¹û¿ØÖÆÁ¿±È25¶È´ó£¬·É»úÔç¾Í×¹»ÙÁË£©
-    //rc.Command[ROLL]£ºÒ£¿ØÊı¾İ imu.angle.x £º´Ë¿Ì×ËÌ¬(½Ç¶È)
+    //rc.Command[roll]£ºÒ£¿ØÊı¾İ imu.angle.x £º´Ë¿Ì×ËÌ¬(½Ç¶È)
     //1.µÃµ½Öá×ËÌ¬µÄ½Ç¶È²î£¨errorAngle£©
     //2.Õâ¸ö½Ç¶È²îÖµ½øĞĞÏŞ·ù(constrain_int32)£¨Õı¸ºFLYANGLE_MAX£©
-    //£¨ÏŞ·ù±ØĞëÓĞ£¬·ñÔò¾çÁÒ´ò¶æÊ±ÈİÒ×Òı·¢Õğµ´£©×÷Îª½ÇËÙ¶È¿ØÖÆÆ÷ÆÚÍûÖµ£¨target_rate£© 
-    errorAngle[ROLL] = constrain_int32((rc.Command[ROLL] * 2) , -((int)FLYANGLE_MAX), +FLYANGLE_MAX) - imu.angle.x * 10; 
-    errorAngle[PITCH] = constrain_int32((rc.Command[PITCH] * 2) , -((int)FLYANGLE_MAX), +FLYANGLE_MAX) - imu.angle.y * 10; 
+    //£¨ÏŞ·ù±ØĞëÓĞ£¬·ñÔò¾çÁÒ´ò¶æÊ±ÈİÒ×Òı·¢Õğµ´£©×÷Îª½ÇËÙ¶È¿ØÖÆÆ÷ÆÚÍûÖµ£¨target_rate£©
+    errorAngle[roll] = constrain_int32((rc.Command[roll] * 2) , -((int)FLYANGLE_MAX), +FLYANGLE_MAX) - imu.angle.x * 10;
+    errorAngle[pitch] = constrain_int32((rc.Command[pitch] * 2) , -((int)FLYANGLE_MAX), +FLYANGLE_MAX) - imu.angle.y * 10;
 
-    //»ñÈ¡´ËÊ±ÍÓÂİÒÇÉÏµÄ½ÇËÙ¶È£¬È¡½ÇËÙ¶ÈµÄËÄ´ÎÆ½¾ùÖµ 
+    //»ñÈ¡´ËÊ±ÍÓÂİÒÇÉÏµÄ½ÇËÙ¶È£¬È¡½ÇËÙ¶ÈµÄËÄ´ÎÆ½¾ùÖµ
     Gyro_ADC = mpu6050.Get_Gyro() / 4;
-    /* 
-    µÃµ½Íâ»·PIDÊä³ö£¨½ÇËÙ¶ÈµÄ²îÖµ£©(ÊµÖÊÊÇÏàµ±ÓÚÄÚ»·µÄP±ÈÀıÏî)--------> 
+    /*
+    µÃµ½Íâ»·PIDÊä³ö£¨½ÇËÙ¶ÈµÄ²îÖµ£©(ÊµÖÊÊÇÏàµ±ÓÚÄÚ»·µÄP±ÈÀıÏî)-------->
     3.target_rateÓëÍÓÂİÒÇµÃµ½µÄµ±Ç°½ÇËÙ¶È×÷²î£¬µÃµ½½ÇËÙ¶ÈÎó²î£¨RateError£©³ËÒÔkp£¨Íâ»·¿ØÖÆÏµÊı pid[PIDLEVEL]--->(280, 0, 0
     , 0)£©µÃµ½¸øÄÚ»·µÄP¡£
-    */ 
+    */
 
-    //ºá¹öroll£ºÍâ»·¿ØÖÆ¡£ÊäÈëÎª½Ç¶È,Êä³öÎª½ÇËÙ¶È¡£RateError[ROLL] ×÷ÎªÄÚ»·µÄÊäÈë¡£
-    RateError[ROLL] = pid[PIDLEVEL].get_p(errorAngle[ROLL]) - Gyro_ADC.x; //Gyro_ADC.x:ÍÓÂİÒÇXÖáµÄÖµ 
-    //¸©Ñöpitch£ºÍâ»·¿ØÖÆ¡£ÊäÈëÎª½Ç¶È,Êä³öÎª½ÇËÙ¶È¡£RateError[PITCH] ×÷ÎªÄÚ»·µÄÊäÈë¡£
-    RateError[PITCH] = pid[PIDLEVEL].get_p(errorAngle[PITCH]) - Gyro_ADC.y;//Gyro_ADC.y:ÍÓÂİÒÇYÖáµÄÖµ
+    //ºá¹öroll£ºÍâ»·¿ØÖÆ¡£ÊäÈëÎª½Ç¶È,Êä³öÎª½ÇËÙ¶È¡£RateError[roll] ×÷ÎªÄÚ»·µÄÊäÈë¡£
+    RateError[roll] = pid[PIDLEVEL].get_p(errorAngle[roll]) - Gyro_ADC.x; //Gyro_ADC.x:ÍÓÂİÒÇXÖáµÄÖµ
+    //¸©Ñöpitch£ºÍâ»·¿ØÖÆ¡£ÊäÈëÎª½Ç¶È,Êä³öÎª½ÇËÙ¶È¡£RateError[pitch] ×÷ÎªÄÚ»·µÄÊäÈë¡£
+    RateError[pitch] = pid[PIDLEVEL].get_p(errorAngle[pitch]) - Gyro_ADC.y;//Gyro_ADC.y:ÍÓÂİÒÇYÖáµÄÖµ
 
     /*
-    Æ«º½£¨Yaw£©µÄ¿ØÖÆËã·¨ºÍÇ°Á½ÕßÂÔÓĞ²»Í¬£¬ÊÇ½«´ò¶æÁ¿£¨Ò£¿ØÊı¾İÁ¿rc.Command[YAW]£©ºÍ½Ç¶ÈÎó²îµÄºÍ×÷Îª½ÇËÙ¶ÈÄÚ»·µÄÆÚÍûÖµ£¬
+    Æ«º½£¨Yaw£©µÄ¿ØÖÆËã·¨ºÍÇ°Á½ÕßÂÔÓĞ²»Í¬£¬ÊÇ½«´ò¶æÁ¿£¨Ò£¿ØÊı¾İÁ¿rc.Command[yaw]£©ºÍ½Ç¶ÈÎó²îµÄºÍ×÷Îª½ÇËÙ¶ÈÄÚ»·µÄÆÚÍûÖµ£¬
     ÕâÑù¿ÉÒÔ»ñµÃ¸üºÃµÄ¶¯Ì¬ÏìÓ¦¡£½ÇËÙ¶ÈÄÚ»·ºÍºá¹öÓë¸©ÑöµÄ¿ØÖÆ·½·¨Ò»ÖÂ£¬²ÎÊı£¨»ı·ÖÏŞ·ùÖµ»áºÜĞ¡£¬Ä¬ÈÏÖ»ÓĞÍò·ÖÖ®8£©ÉÏÓĞ²»Í¬¡£*/
 
-    //º½Ïòyaw£ºÍâ»·¿ØÖÆ¡£ÊäÈëÎª½Ç¶È,Êä³öÎª½ÇËÙ¶È¡£ RateError[YAW] ×÷ÎªÄÚ»·µÄÊäÈë¡£
-    RateError[YAW] = ((int32_t)(yawRate) * rc.Command[YAW]) / 32 - Gyro_ADC.z; //Gyro_ADC.z:ÍÓÂİÒÇZÖáµÄÖµ
+    //º½Ïòyaw£ºÍâ»·¿ØÖÆ¡£ÊäÈëÎª½Ç¶È,Êä³öÎª½ÇËÙ¶È¡£ RateError[yaw] ×÷ÎªÄÚ»·µÄÊäÈë¡£
+    RateError[yaw] = ((int32_t)(yawRate) * rc.Command[yaw]) / 32 - Gyro_ADC.z; //Gyro_ADC.z:ÍÓÂİÒÇZÖáµÄÖµ
 
 }
 
@@ -296,21 +295,21 @@ void ANO_FlyControl::Attitude_Inner_Loop(void)
             pid.reset_I();
 
         //get_pidº¯Êı£ºreturn get_p(error) + get_i(error, dt) + get_d(error, dt);-------->ÕâÀïÊµ¼Ê¾ÍÊÇÒ»¸öÍêÕûµÄPID
-        //PID_INNER_LOOP_TIME£º2000us--->0.2ms »ı·ÖÎ¢·ÖÊ±¼ä£¬Ã¿¸ô0.2ms²Ù×÷»ı·ÖºÍÎ¢·Ö,RateErrorÊÇÍâ»·¼ÆËãµÄ½á¹û£¨´ÓÍâ»·Ëã³ö£© 
-        //µÃµ½ÄÚ»·PIDÊä³ö£¬Ö±½ÓÊä³ö×ªÎªµç»ú¿ØÖÆÁ¿ 
+        //PID_INNER_LOOP_TIME£º2000us--->0.2ms »ı·ÖÎ¢·ÖÊ±¼ä£¬Ã¿¸ô0.2ms²Ù×÷»ı·ÖºÍÎ¢·Ö,RateErrorÊÇÍâ»·¼ÆËãµÄ½á¹û£¨´ÓÍâ»·Ëã³ö£©
+        //µÃµ½ÄÚ»·PIDÊä³ö£¬Ö±½ÓÊä³ö×ªÎªµç»ú¿ØÖÆÁ¿
         PIDTerm = pid.get_pid(RateError, PID_INNER_LOOP_TIME);
     }
 
-    //¶ÔYAW½Ç¼ÌĞø´¦Àí£¬¼ÓÈëÒ£¿Ø¿ØÖÆ 
+    //¶ÔYAW½Ç¼ÌĞø´¦Àí£¬¼ÓÈëÒ£¿Ø¿ØÖÆ
     //ÔÚIÖµĞ¡ÓÚÏŞ·ùÖµ£¨Õâ¸öÖµ´ó¸ÅÔÚ5%ÓÍÃÅ£©»òÕßrate_errorÓëiÖµÒìºÅÊ±½«rate_errorÀÛ¼Óµ½IÖĞ¡£
-    PIDTerm[YAW] = -constrain_int32(PIDTerm[YAW], -300 - abs(rc.Command[YAW]), +300 + abs(rc.Command[YAW])); 
+    PIDTerm[yaw] = -constrain_int32(PIDTerm[yaw], -300 - abs(rc.Command[yaw]), +300 + abs(rc.Command[yaw]));
 
     //PIDÊä³ö×ªÎªµç»ú¿ØÖÆÁ¿
-    motor.writeMotor(rc.Command[THROTTLE], PIDTerm[ROLL], PIDTerm[PITCH], PIDTerm[YAW]);
+    motor.writeMotor(rc.Command[THROTTLE], PIDTerm[roll], PIDTerm[pitch], PIDTerm[yaw]);
 }
 
 /*
-¡¾µ÷½Ú´®»·PID´ó¸Å¹ı³Ì£¨×¢ÒâĞŞÕı·´Ïò£©¡¿ 
+¡¾µ÷½Ú´®»·PID´ó¸Å¹ı³Ì£¨×¢ÒâĞŞÕı·´Ïò£©¡¿
 
 1¡¢¹À¼Æ´ó¸ÅµÄÆğ·ÉÓÍÃÅ¡£
 2¡¢µ÷Õû½ÇËÙ¶ÈÄÚ»·²ÎÊı¡£
@@ -319,7 +318,7 @@ void ANO_FlyControl::Attitude_Inner_Loop(void)
 Á·É»úÔÚÊÖÖĞ²»»á³é´¤¡£
 5¡¢´ó¸ÅÉèÖÃÆ«º½²ÎÊı£¨²»×·Çó¶¯Ì¬ÏìÓ¦£¬Æğ·ÉºóÍ·²»Æ«¼´¿É£©£¬Æğ·ÉºóÔÙ¹Û²ìºá¹öºÍ¸©ÑöÖáÏò´ò¶æµÄ·´Ó¦£¬ÈçÓĞÎÊÌâ»Øµ½¡°¿¾ËÄÖá¡±¡£
 6¡¢ºá¹öºÍ¸©ÑöokÒÔºó£¬ÔÙµ÷ÕûÆ«º½Öá²ÎÊıÒÔ´ïµ½ºÃµÄ¶¯Ì¬Ğ§¹û¡£
-*/ 
+*/
 
 /*
 ¡¾¹ı³ÌÏê½â¡¿

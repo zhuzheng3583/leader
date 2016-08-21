@@ -68,22 +68,29 @@ void imu_update(float gx, float gy, float gz, float ax, float ay, float az, stru
     q2 = q2 / norm;
     q3 = q3 / norm;
 
-	//att->yaw = atan2(2*q1*q2 + 2*q0*q3, -2*q2*q2 - 2*q3*q3 + 1) * 57.3; 
+	//att->yaw = atan2(2*q1*q2 + 2*q0*q3, -2*q2*q2 - 2*q3*q3 + 1) * 57.3;
 	//匿名四轴
     //angle->yaw += gyr->Z*Gyro_G*0.002f;
 	//angle->rol = asin(-2 * q1 * q3 + 2 * q0* q2)* 57.3 - AngleOffset_Pit; // pitch
 	//angle->pit = atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2* q2 + 1)* 57.3 - AngleOffset_Rol; // roll
 
 	//某论坛
-    //att->roll = atan2(2*(q1*q2 + 2*q0*q3), q0*q0 + q1*q1 - q2*q2 - q3*q3)*57.3; 
+    //att->roll = atan2(2*(q1*q2 + 2*q0*q3), q0*q0 + q1*q1 - q2*q2 - q3*q3)*57.3;
     //att->pitch = asin(-2*(q1*q3 + 2*q0* q2))*57.3;
     //att->yaw = atan2f(2*(q0*q1 + q2*q3), q0*q0 - q1*q1 - q2*q2 + q3*q3)*57.3;
 
 	//原子开发板MPU6050实验
-    att->roll = atan2(2*q2*q3 + 2*q0*q1, -2*q1*q1 - 2*q2*q2 + 1)*57.3;	
-    att->pitch = asin(-2*q1*q3 + 2*q0*q2)*57.3;	
+    att->roll = atan2(2*q2*q3 + 2*q0*q1, -2*q1*q1 - 2*q2*q2 + 1)*57.3;
+    att->pitch = asin(-2*q1*q3 + 2*q0*q2)*57.3;
     att->yaw = atan2f(2*(q1*q2 + q0*q3), q0*q0 + q1*q1 - q2*q2 - q3*q3)*57.3;
-	
+
+    att->rollspeed = gx;
+    att->pitchspeed = gy;
+    att->yawspeed = gz;
+
+    att->rollacc = ax;
+	att->pitchacc = ay;
+	att->yawacc = az;
 	// ==>
 	// (z)
 	// X-----> (x)
