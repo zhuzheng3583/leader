@@ -421,7 +421,7 @@ void mpu6000::measure(void)
 	s16 accel_yt = report.accel_x;
     s16 accel_zt = ((report.accel_z == -32768) ? 32767 : -report.accel_z);
 	s16 gyro_xt = report.gyro_y;
-	s16 gyro_yt = report.gyro_x;
+	s16 gyro_yt = ((report.gyro_x == -32768) ? 32767 : -report.gyro_x);
 
 	/*
 	 * Apply the swap

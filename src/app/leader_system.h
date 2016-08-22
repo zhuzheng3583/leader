@@ -75,35 +75,34 @@ public:
     uart                    *_puart3;
 
     i2c                     *_i2c1;
-    i2c                     *_i2c2;
 
     spi                     *_spi1;
-
     gpio                    *_mpu6000_gpio_cs;
     gpio                    *_ms5611_gpio_cs;
     mpu6000		            *_mpu6000;
     ms5611					*_ms5611;
+	i2c                     *_i2c2;
 	hmc5883					*_hmc5883;
 
     pwm                     *_pwm1;
     pwm                     *_pwm4;
-
     motor                   *_motor1;
     motor                   *_motor2;
     motor                   *_motor3;
-    motor                   *_motor4; 
+    motor                   *_motor4;
     motor                   *_motor5;
     motor                   *_motor6;
     motor                   *_motor7;
-    motor                   *_motor8;   
-    
+    motor                   *_motor8;
+
+    gpio                    *_led_blue;
+	gpio                    *_led_amber;
+    gpio                    *_gpio_irq;
+
     flash                   *_pflash;
 
     usb_dev                 *_usb_dev;
     sensorhub               *_sensorhub;
-
-    gpio                    *_led;
-    gpio                    *_gpio_irq;
 
     timer                   *_timer;
 
@@ -112,7 +111,7 @@ public:
     terminal				*_terminal;
     autopilot			    *_autopilot;
     calibration             *_calibration;
-        
+
     niming                  *_niming;
 
 public:
@@ -132,6 +131,9 @@ public:
     mpu6000   	*get_mpu6000(void)        	{ return _mpu6000; }
 	ms5611		*get_ms5611(void)        	{ return _ms5611; }
 	hmc5883		*get_hmc5883(void)        	{ return _hmc5883; }
+
+	gpio 		*get_led_blue(void)			{ return _led_blue; }
+	gpio		*get_led_amber(void) 		{ return _led_amber; }
 
     logger		*get_logger(void)        	{ return _logger; }
 

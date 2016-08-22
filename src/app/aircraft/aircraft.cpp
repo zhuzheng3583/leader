@@ -30,6 +30,17 @@ s32 aircraft::init(void)
 
 	kernel::init();
 
+	// ³õÊ¼»¯led
+	// P2 Pro v1.1: PE12(76):LED_BLUE PE15(79):LED_AMBER
+    _led_blue = new gpio("led_blue", 76);
+    _led_amber = new gpio("led_amber", 79);
+    _led_blue->probe();
+    _led_amber->probe();
+    _led_blue->set_direction_output();
+    _led_amber->set_direction_output();
+    _led_blue->set_value(VHIGH);
+    _led_amber->set_value(VHIGH);
+
     _puart3 = new uart("uart-3", 3);
 	_puart3->probe();
 	//_puart3->self_test();
@@ -120,7 +131,7 @@ s32 aircraft::init(void)
 	_pwm4->set_dutycycle(PWM_CHANNEL_4, 100);
 	_pwm4->start(PWM_CHANNEL_4);
 #endif
-	
+
 
 	_heartbeat = new heartbeat;
 	_terminal = new terminal;

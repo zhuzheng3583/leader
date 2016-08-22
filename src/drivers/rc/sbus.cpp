@@ -10,12 +10,13 @@
 ***********************************************************************/
 #include "sbus.h"
 
+//38
 namespace driver {
 
 sbus::sbus(PCSTR devname, s32 devid) :
 	device(devname, devid)
 {
-	
+
 }
 
 sbus::~sbus(void)
@@ -50,6 +51,11 @@ void sbus::measure(void)
 {
 
 }
+
+//void sbus::read_byte(void)
+//{
+
+//}
 
 }
 

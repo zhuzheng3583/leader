@@ -123,19 +123,6 @@ s32 leader_system::init(void)
 	_timer->set_timeout(1000);
 	_timer->set_function(timer_func, (void *)1111);
 //	_timer->start();
-	//while(1);
-
-	_pwm = new pwm("timer-3", 3);
-	_pwm->probe();
-	_pwm->set_dutycycle(PWM_CHANNEL_1, 50);
-	_pwm->start(PWM_CHANNEL_1);
-	_pwm->set_dutycycle(PWM_CHANNEL_2, 25);
-	_pwm->start(PWM_CHANNEL_2);
-	_pwm->set_dutycycle(PWM_CHANNEL_3, 10);
-	_pwm->start(PWM_CHANNEL_3);
-	_pwm->set_dutycycle(PWM_CHANNEL_4, 0);
-	_pwm->start(PWM_CHANNEL_4);
-
     while(1);
 #endif
 
