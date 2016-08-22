@@ -3313,6 +3313,15 @@
         <name>$PROJ_DIR$\..\src\drivers\magn\magn.h</name>
       </file>
     </group>
+    <group>
+      <name>rc</name>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\rc\sbus.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\rc\sbus.h</name>
+      </file>
+    </group>
     <file>
       <name>$PROJ_DIR$\..\src\drivers\core.cpp</name>
     </file>

@@ -2284,6 +2284,7 @@
           <state>$PROJ_DIR$\..\src\drivers\magn</state>
           <state>$PROJ_DIR$\..\src\drivers\gps</state>
           <state>$PROJ_DIR$\..\src\drivers\gyro</state>
+          <state>$PROJ_DIR$\..\src\drivers\rc</state>
           <state>$PROJ_DIR$\..\src\dsp</state>
           <state>$PROJ_DIR$\..\src\os</state>
           <state>$PROJ_DIR$\..\src\lib\conversion</state>
@@ -3123,6 +3124,15 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\src\drivers\magn\magn.h</name>
+      </file>
+    </group>
+    <group>
+      <name>rc</name>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\rc\sbus.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\rc\sbus.h</name>
       </file>
     </group>
     <file>
