@@ -17,7 +17,6 @@
 #include "dma.h"
 #include "spi.h"
 
-#include "packet.h"
 #include "ringbuffer.h"
 #include "accel.h"
 #include "gyro.h"

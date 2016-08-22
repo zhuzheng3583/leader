@@ -3144,44 +3144,23 @@
     <name>app</name>
     <group>
       <name>aircraft</name>
-      <group>
-        <name>thread</name>
-        <file>
-          <name>$PROJ_DIR$\..\src\app\aircraft\thread\autopilot.cpp</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\app\aircraft\thread\autopilot.h</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\app\aircraft\thread\calibration.cpp</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\app\aircraft\thread\calibration.h</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\app\aircraft\thread\heartbeat.cpp</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\app\aircraft\thread\heartbeat.h</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\app\aircraft\thread\logger.cpp</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\app\aircraft\thread\logger.h</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\app\aircraft\thread\terminal.cpp</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\src\app\aircraft\thread\terminal.h</name>
-        </file>
-      </group>
       <file>
         <name>$PROJ_DIR$\..\src\app\aircraft\aircraft.cpp</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\src\app\aircraft\aircraft.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\app\aircraft\autopilot.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\app\aircraft\autopilot.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\app\aircraft\calibration.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\app\aircraft\calibration.h</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\src\app\aircraft\circbuf.cpp</name>
@@ -3190,10 +3169,22 @@
         <name>$PROJ_DIR$\..\src\app\aircraft\circbuf.h</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\src\app\aircraft\packet.cpp</name>
+        <name>$PROJ_DIR$\..\src\app\aircraft\heartbeat.cpp</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\src\app\aircraft\packet.h</name>
+        <name>$PROJ_DIR$\..\src\app\aircraft\heartbeat.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\app\aircraft\logger.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\app\aircraft\logger.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\app\aircraft\terminal.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\app\aircraft\terminal.h</name>
       </file>
     </group>
     <group>

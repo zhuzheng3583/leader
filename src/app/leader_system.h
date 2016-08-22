@@ -43,9 +43,6 @@
 #include "os/msgque.h"
 #include "os/semaphore.h"
 
-
-#include "packet.h"
-
 #include "niming.h"
 
 using namespace driver;

@@ -17,7 +17,6 @@
 #include "dma.h"
 #include "i2c.h"
 
-#include "packet.h"
 #include "ringbuffer.h"
 #include "magn.h"
 

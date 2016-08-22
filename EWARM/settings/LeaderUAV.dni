@@ -10,10 +10,10 @@ LimitSize=0
 ByteLimit=50
 [StLinkDriver]
 CStepIntDis=_ 0
-stlinkserialNo=2798FD0D
+stlinkserialNo=7EC57775
 stlinkfoundProbes=
 [DebugChecksum]
-Checksum=-1808343371
+Checksum=1377180660
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -113,18 +113,19 @@ Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\kernel.cpp}.56.2" 0 0 1 "" 0 "" 0
 Bp4=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\receive.cpp}.1.1" 0 0 1 "" 0 "" 0
 Bp5=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\receive.cpp}.1.1" 0 0 1 "" 0 "" 0
 Bp6=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\thread.cpp}.50.5" 0 0 1 "" 0 "" 0
-Bp7=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\msgque.cpp}.71.2" 0 0 1 "" 0 "" 0
+Bp7=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\msgque.cpp}.69.2" 0 0 1 "" 0 "" 0
 Bp8=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.614.1" 0 0 1 "" 0 "" 0
 Bp9=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.317.5" 0 0 1 "" 0 "" 0
 Bp10=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.517.2" 0 0 1 "" 0 "" 0
 Bp11=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.463.3" 0 0 1 "" 0 "" 0
-Bp12=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart.cpp}.408.8" 0 0 1 "" 0 "" 0
-Bp13=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart.cpp}.303.9" 0 0 1 "" 0 "" 0
-Bp14=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\mutex.cpp}.71.3" 0 0 1 "" 0 "" 0
-Bp15=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\mutex.cpp}.58.3" 0 0 1 "" 0 "" 0
-Bp16=_ 0 "EMUL_CODE" "0x0800881C" 0 0 1 "" 0 "" 0
-Bp17=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\accel\mpu6000.cpp}.32.1" 0 0 1 "" 0 "" 0
-Count=18
+Bp12=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart.cpp}.303.9" 0 0 1 "" 0 "" 0
+Bp13=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\mutex.cpp}.68.3" 0 0 1 "" 0 "" 0
+Bp14=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\mutex.cpp}.56.3" 0 0 1 "" 0 "" 0
+Bp15=_ 0 "EMUL_CODE" "0x0800881C" 0 0 1 "" 0 "" 0
+Bp16=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\accel\mpu6000.cpp}.32.1" 0 0 1 "" 0 "" 0
+Bp17=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\device.h}.174.1" 0 0 1 "" 0 "" 0
+Bp18=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\aircraft.cpp}.89.2" 0 0 1 "" 0 "" 0
+Count=19
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""

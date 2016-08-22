@@ -13,7 +13,6 @@
 #include "leader_misc.h"
 
 #include "uart.h"
-#include "packet.h"
 
 #include "accel.h"
 #include "gyro.h"
@@ -42,7 +41,7 @@ public:
 	void report_sensor(bool type_raw, struct accel_report *accel,
 		struct gyro_report *gyro, struct mag_report *mag);
 
-    void report_rc(data_rc_t *rc);
+    //void report_rc(data_rc_t *rc);
 };
 
 }

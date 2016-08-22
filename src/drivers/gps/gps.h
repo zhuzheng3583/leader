@@ -17,7 +17,6 @@
 #include "dma.h"
 #include "uart.h"
 
-#include "packet.h"
 
 //GPS NMEA-0183协议重要参数结构体定义
 //卫星信息

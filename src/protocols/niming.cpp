@@ -306,6 +306,7 @@ void niming::report_sensor(bool type_raw, struct accel_report *accel,
 	_uart->write(data, cnt);
 }
 
+#if 0
 void niming::report_rc(data_rc_t *rc)
 {
 	u8 cnt = 0;
@@ -346,6 +347,7 @@ void niming::report_rc(data_rc_t *rc)
 
 	_uart->write(data, cnt);
 }
+#endif
 
 #if 0
 void Data_Send_MotoPWM(void)
