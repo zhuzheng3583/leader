@@ -10,6 +10,7 @@
 ***********************************************************************/
 #pragma once
 #include "device.h"
+#include "gpio.h"
 
 namespace driver {
 
@@ -20,6 +21,10 @@ public:
     ~sbus(void);
 
 public:
+	gpio *_rx;
+	gpio *_tx;
+
+public:
     s32 probe(void);
     s32 remove(void);
 
@@ -27,6 +32,7 @@ public:
     s32 init(void);
     s32 reset(void);
     void measure(void);
+	void write_byte(s8 c);
 };
 
 }

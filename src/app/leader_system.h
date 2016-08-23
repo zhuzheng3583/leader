@@ -29,6 +29,7 @@
 #include "drivers/magn/hmc5883.h"
 #include "drivers/gps/gps.h"
 #include "drivers/motor.h"
+#include "drivers/rc/sbus.h"
 
 #include "demo_main.h"
 

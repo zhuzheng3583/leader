@@ -38,8 +38,11 @@ s32 aircraft::init(void)
     _led_amber->probe();
     _led_blue->set_direction_output();
     _led_amber->set_direction_output();
-    _led_blue->set_value(VHIGH);
-    _led_amber->set_value(VHIGH);
+    _led_blue->set_value(VLOW);
+    _led_amber->set_value(VLOW);
+
+    sbus *_sbus = new sbus("sbus", -1);
+    _sbus->probe();
 
     _puart3 = new uart("uart-3", 3);
 	_puart3->probe();
