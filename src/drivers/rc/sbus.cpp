@@ -31,7 +31,7 @@ s32 sbus::probe(void)
     _tx->set_direction_output();
 
     while (1) {
-        sbus::write_byte(0xA5);
+        sbus::write_byte(0xFF);
     }
 
 	return 0;
@@ -61,29 +61,31 @@ void sbus::measure(void)
 
 void sbus::write_byte(s8 c)
 {
-    timestamp_t end = 0;
+    timestamp_t timeout = 0;
+    timestamp_t inc = 104 * core::s_freq_mhz;
     //发送启始位
     
-    //end = core::get_timestamp() + 104 * core::s_freq_mhz;
+    timeout = core::get_timestamp() + inc;
     _tx->set_value(VLOW);
-    //core::udelay(104);
-    while (time_after(end, core::get_timestamp()));
+    while (time_after(timeout, core::get_timestamp()));
 
     //发送8位数据位
-    for (u8 i = 0; i < 8; i++) {
-        //end = core::get_timestamp() + 104 * core::s_freq_mhz;
-        _tx->set_value(c & (0x01>>i));//先传低位
-        //core::udelay(104);
-        while (time_after(end, core::get_timestamp()));
+    u8 i = 0;
+loop:
+    timeout = core::get_timestamp() + inc;
+    _tx->set_value((c>>i) & 0x01);//先传低位
+    if (i < 8) {
+        i++;
+        goto loop;
     }
+    while (time_after(timeout, core::get_timestamp()));
 
     //发送校验位(无)
 
     //发送结束位
-    //end = core::get_timestamp() + 104 * core::s_freq_mhz;
+    timeout = core::get_timestamp() + inc;
     _tx->set_value(VHIGH);
-    //core::udelay(104);
-    while (time_after(end, core::get_timestamp()));
+    while (time_after(timeout, core::get_timestamp()));
 }
 
 #if 0

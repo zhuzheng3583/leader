@@ -10,10 +10,10 @@ LimitSize=0
 ByteLimit=50
 [StLinkDriver]
 CStepIntDis=_ 0
-stlinkserialNo=EE5626A6
+stlinkserialNo=2798FD0D
 stlinkfoundProbes=
 [DebugChecksum]
-Checksum=319373033
+Checksum=967959126
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -110,36 +110,26 @@ mode=0
 Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\dma.cpp}.94.2" 0 0 1 "" 0 "" 0
 Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\spi.cpp}.377.1" 0 0 1 "" 0 "" 0
 Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\spi.cpp}.355.3" 0 0 1 "" 0 "" 0
-Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\receive.cpp}.1.1" 0 0 1 "" 0 "" 0
+Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\kernel.cpp}.56.2" 0 0 1 "" 0 "" 0
 Bp4=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\receive.cpp}.1.1" 0 0 1 "" 0 "" 0
-Bp5=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\thread.cpp}.50.5" 0 0 1 "" 0 "" 0
-Bp6=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\msgque.cpp}.69.2" 0 0 1 "" 0 "" 0
-Bp7=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.614.1" 0 0 1 "" 0 "" 0
-Bp8=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.317.5" 0 0 1 "" 0 "" 0
-Bp9=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.517.2" 0 0 1 "" 0 "" 0
-Bp10=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.463.3" 0 0 1 "" 0 "" 0
-Bp11=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart.cpp}.303.9" 0 0 1 "" 0 "" 0
-Bp12=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\mutex.cpp}.68.3" 0 0 1 "" 0 "" 0
-Bp13=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\mutex.cpp}.56.3" 0 0 1 "" 0 "" 0
-Bp14=_ 0 "EMUL_CODE" "0x0800881C" 0 0 1 "" 0 "" 0
-Bp15=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\accel\mpu6000.cpp}.32.1" 0 0 1 "" 0 "" 0
-Bp16=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\device.h}.174.1" 0 0 1 "" 0 "" 0
-Bp17=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\aircraft.cpp}.90.2" 0 0 1 "" 0 "" 0
-Bp18=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\core.cpp}.247.1" 0 0 1 "" 0 "" 0
-Bp19=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\core.cpp}.256.2" 0 0 1 "" 0 "" 0
-Bp20=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\core.cpp}.247.5" 0 0 1 "" 0 "" 0
-Bp21=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\core.cpp}.241.5" 0 0 1 "" 0 "" 0
-Bp22=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\rc\sbus.cpp}.64.17" 0 0 1 "" 0 "" 0
-Bp23=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\rc\sbus.cpp}.69.7" 0 0 1 "" 0 "" 0
-Bp24=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\rc\sbus.cpp}.85.7" 0 0 1 "" 0 "" 0
-Count=25
+Bp5=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\thread\receive.cpp}.1.1" 0 0 1 "" 0 "" 0
+Bp6=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\thread.cpp}.50.5" 0 0 1 "" 0 "" 0
+Bp7=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\msgque.cpp}.71.2" 0 0 1 "" 0 "" 0
+Bp8=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.614.1" 0 0 1 "" 0 "" 0
+Bp9=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.317.5" 0 0 1 "" 0 "" 0
+Bp10=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.517.2" 0 0 1 "" 0 "" 0
+Bp11=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\gps.cpp}.463.3" 0 0 1 "" 0 "" 0
+Bp12=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart.cpp}.408.8" 0 0 1 "" 0 "" 0
+Bp13=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart.cpp}.303.9" 0 0 1 "" 0 "" 0
+Bp14=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\mutex.cpp}.71.3" 0 0 1 "" 0 "" 0
+Bp15=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\mutex.cpp}.58.3" 0 0 1 "" 0 "" 0
+Bp16=_ 0 "EMUL_CODE" "0x0800881C" 0 0 1 "" 0 "" 0
+Bp17=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\accel\mpu6000.cpp}.32.1" 0 0 1 "" 0 "" 0
+Count=18
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
 Category=_ 0
-[TermIOLog]
-LoggingEnabled=_ 0
-LogFile=_ ""
 [Aliases]
 A0=_ "E:\code\SKYVIEW_H_SUB\LeaderUAV\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
 A1=_ "E:\code\leader\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
@@ -155,3 +145,6 @@ Exclusions=
 Enabled=0
 [CallStackStripe]
 ShowTiming=1
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""
