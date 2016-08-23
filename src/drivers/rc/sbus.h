@@ -12,6 +12,12 @@
 #include "device.h"
 #include "gpio.h"
 
+#define BAUD9600_DELAY_US       ((1*1000*1000) / 9600)
+#define BAUD100000_DELAY_US     ((1*1000*1000) / 100000)
+#define BAUD115200_DELAY_US     ((1*1000*1000) / 115200)
+
+#define DEFAULT_BAUD_DELAY_US   (BAUD9600_DELAY_US)      
+
 namespace driver {
 
 class sbus : public device
@@ -33,6 +39,7 @@ public:
     s32 reset(void);
     void measure(void);
 	void write_byte(s8 c);
+    s8 read_byte(void);
 };
 
 }
