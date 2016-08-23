@@ -10,12 +10,6 @@
 ***********************************************************************/
 #include "core.h"
 
-
-#define time_after(a,b)		((s64)(b) - (s64)(a) < 0)
-#define time_before(a,b)		time_after(b,a)
-#define time_after_eq(a,b) 	((s64)(a) - (s64)(b) >= 0)
-#define time_before_eq(a,b)	time_after_eq(b,a)
-
 namespace driver {
 
 u32 core::s_freq_khz = 0;
@@ -147,7 +141,7 @@ void core::system_clock_config(void)
  */
 void core::mdelay(u32 ms)
 {
-#if 1
+#if 0
 	u32 t0 = 0;
 	while (ms--) {
 		t0 = DWT->CYCCNT;
@@ -156,8 +150,9 @@ void core::mdelay(u32 ms)
 #elif 0
 	HAL_Delay(ms);
 #else
-	u32 timeout = SysTick->VAL + ms * s_freq_khz;
-	while (time_after(SysTick->VAL, timeout));
+	timestamp_t timeout = DWT->CYCCNT + ms * s_freq_khz;
+	while (time_after(timeout, DWT->CYCCNT));
+    //while (((s32)(DWT->CYCCNT) - (s32)(timeout) < 0));
 #endif
 }
 
@@ -167,15 +162,16 @@ void core::mdelay(u32 ms)
  */
 void core::udelay(u32 us)
 {
-#if 1
+#if 0
 	u32 t0 = 0;
 	while (us--) {
 		t0 = DWT->CYCCNT;
 		while (((u32)(DWT->CYCCNT - t0)) < s_freq_mhz);
 	}
 #else
-	u32 timeout = SysTick->VAL + us * s_freq_mhz;
-	while (time_after(SysTick->VAL, timeout));
+	timestamp_t timeout = DWT->CYCCNT + us * s_freq_mhz;
+	while (time_after(timeout, DWT->CYCCNT));
+    //while (((s32)(DWT->CYCCNT) - (s32)(timeout) < 0));
 #endif
 }
 
@@ -197,34 +193,26 @@ u32 core::get_cpu_freq(void)
  * return 当前CPU时间戳
  * note 根据CPU运行频率(默认168M)进行计数(32位计数器)
  */
-u32 core::get_timestamp(void)
+timestamp_t core::get_timestamp(void)
 {
-	return DWT->CYCCNT;
+	return (timestamp_t)(DWT->CYCCNT);
 }
 
-#if 0
-s32  timestamp_to_us (u32 ts_cnts)
+timestamp_t core::get_elapsed_timestamp(const volatile timestamp_t *then)
 {
-    CPU_INT64U  ts_us;
-    CPU_INT64U  fclk_freq;
-
-    fclk_freq = BSP_CPU_ClkFreq();
-    ts_us     = ts_cnts / (fclk_freq / DEF_TIME_NBR_uS_PER_SEC);
-
-    return (ts_us);
+	timestamp_t elapsed = core::get_timestamp() - *then;
+	return elapsed;
 }
 
-CPU_INT64U  CPU_TS64_to_uSec (CPU_TS64  ts_cnts)
+u32 core::convert_timestamp_to_us (timestamp_t timestamp)
 {
-    CPU_INT64U  ts_us;
-    CPU_INT64U  fclk_freq;
-
-    fclk_freq = BSP_CPU_ClkFreq();
-    ts_us     = ts_cnts / (fclk_freq / DEF_TIME_NBR_uS_PER_SEC);
-
-    return (ts_us);
+	return (u32)(timestamp / s_freq_mhz);
 }
-#endif
+
+u32 core::convert_timestamp_to_ms (timestamp_t timestamp)
+{
+	return (u32)(timestamp / s_freq_khz);
+}
 
 
 void core::self_test(void)
@@ -248,6 +236,19 @@ void core::self_test(void)
         core::mdelay(ms);
         STOP_PROFILE(str);
     }
+  
+#if 1
+    core::mdelay(10000);
+    for (cnt = 0; cnt < 30; cnt++) {
+        core::mdelay(1000);
+    }
+#endif
+    //core::udelay(30000000);//溢出
+    core::udelay(10000000);
+    for (cnt = 0; cnt < 30; cnt++) {
+        core::udelay(1000000);
+    }
+    
     INF("End test PROFILE....\n");
 
 

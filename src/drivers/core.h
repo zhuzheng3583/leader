@@ -13,19 +13,24 @@
 #include "leader_misc.h"
 
 #include "device.h"
+
+#define time_after(a,b)		((s32)(b) - (s32)(a) < 0)
+#define time_before(a,b)		time_after(b, a)
+#define time_after_eq(a,b) 	((s32)(a) - (s32)(b) >= 0)
+#define time_before_eq(a,b)	time_after_eq(b, a)
+
 /*
  * 时间探测器，用于测量指定起始位运行到指定末尾位置之间所消耗的时间
  * note 时间戳为32位计数器，在168MHz下，溢出周期 = (0xFFFFFFFF+1) / 168M = 25.6s
  * 		因此测量中难免遇到t1 < t0,这将导致测到的时间概率性的出错
  * TODO:使用64位时间戳
  */
-#define START_PROFILE()                     { u32 __fc = driver::core::get_cpu_freq();              \
-                                              u32 __t0 = driver::core::get_timestamp();
+#define START_PROFILE()                     { u64 __fc = driver::core::get_cpu_freq();              \
+                                              u64 __t0 = driver::core::get_timestamp();
 
-#define STOP_PROFILE(title)                   u32 __t1 = driver::core::get_timestamp();              \
-                                              u32 __t  = 1000000u * (__t1 - __t0) / __fc;          \
+#define STOP_PROFILE(title)                   u64 __t1 = driver::core::get_timestamp();              \
+                                              u64 __t  = 1000000ul * (__t1 - __t0) / __fc;          \
                                               INF("PROFILE[%s] = %d us.\n", (title), ((u32)__t)); }
-
 
 /*
  * 设备超时操作宏定义
@@ -78,6 +83,8 @@
 
 namespace driver {
 
+typedef  u32    timestamp_t;
+
 class core
 {
 public:
@@ -93,15 +100,16 @@ public:
     static void mdelay(u32 ms);
     static void udelay(u32 us);
 
-    static u32 get_cpu_freq(void);
-    static u32 get_timestamp(void);
-
     static void system_clock_config(void);
     static void dwt_config(void);
 
+    inline static u32 get_cpu_freq(void);
+    static timestamp_t get_timestamp(void);
+    inline static timestamp_t get_elapsed_timestamp(const volatile timestamp_t *then);
+    inline static u32 convert_timestamp_to_us (u32 timestamp);
+    inline static u32 convert_timestamp_to_ms (u32 timestamp);
+    
     static void self_test(void);
-
-
 };
 
 }

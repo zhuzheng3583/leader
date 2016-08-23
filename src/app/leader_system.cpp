@@ -95,6 +95,8 @@ s32 leader_system::init(void)
 	_logger->attach(_puart2);
 	//_logger->self_test();
 	//在此之前不能使用log输出
+    
+    //core::self_test();
 #if 0
 
 	_pflash = new flash("flash", -1);

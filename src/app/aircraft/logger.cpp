@@ -83,7 +83,7 @@ s32 logger::vprintf(PCSTR fmt, va_list ap)
 	static u8 str[FMT_MAX_CNT];
 	s32 count = 0;
 
-    if (_task_created == true) { taskENTER_CRITICAL(); }
+    taskENTER_CRITICAL();
     //taskDISABLE_INTERRUPTS();
 	//ENTER_CRITICAL_SECTION();
 	//Interrupt::disable_all_irq();
@@ -98,7 +98,7 @@ s32 logger::vprintf(PCSTR fmt, va_list ap)
     //Interrupt::enable_all_irq();
 	//EXIT_CRITICAL_SECTION();
     //taskENABLE_INTERRUPTS();
-    if (_task_created == true) { taskEXIT_CRITICAL(); }
+    taskEXIT_CRITICAL();
 	return count;
 }
 
