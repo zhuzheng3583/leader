@@ -46,7 +46,7 @@ ms5611::ms5611(PCSTR devname, s32 devid) :
 
     _params.name = "ms5611_thread";
 	_params.priority = 0;
-	_params.stacksize = 1024;
+	_params.stacksize = 256;
 	_params.func = (void *)thread::func;
 	_params.parg = (thread *)this;
 }
@@ -83,7 +83,7 @@ void ms5611::run(void *parg)
 {
     for (;;) {
         measure();
-        msleep(0);
+        msleep(3);
     }
 }
 

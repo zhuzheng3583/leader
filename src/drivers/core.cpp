@@ -214,6 +214,17 @@ u32 core::convert_timestamp_to_ms (timestamp_t timestamp)
 	return (u32)(timestamp / s_freq_khz);
 }
 
+timestamp_t core::convert_us_to_timestamp (u32 us)
+{
+	return (timestamp_t)(us * s_freq_mhz);
+}
+
+timestamp_t core::convert_ms_to_timestamp (u32 ms)
+{
+	return (timestamp_t)(ms * s_freq_khz);
+}
+
+
 
 void core::self_test(void)
 {

@@ -289,12 +289,6 @@ gps::~gps(void)
 s32 gps::probe(uart *puart)
 {
     ASSERT(puart != NULL);
-
-	if (device::probe() < 0) {
-		ERR("%s: failed to probe.\n", _name);
-		goto fail0;
-	}
-
     _uart = puart;
 
     u8 buf[] = {

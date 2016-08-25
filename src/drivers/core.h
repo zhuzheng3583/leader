@@ -106,9 +106,10 @@ public:
     inline static u32 get_cpu_freq(void);
     static timestamp_t get_timestamp(void);
     inline static timestamp_t get_elapsed_timestamp(const volatile timestamp_t *then);
-    inline static u32 convert_timestamp_to_us (u32 timestamp);
-    inline static u32 convert_timestamp_to_ms (u32 timestamp);
-    
+    inline static u32 convert_timestamp_to_us(u32 timestamp);
+    inline static u32 convert_timestamp_to_ms(u32 timestamp);
+    static timestamp_t convert_us_to_timestamp(u32 us);
+	static timestamp_t convert_ms_to_timestamp(u32 ms);
     static void self_test(void);
 };
 

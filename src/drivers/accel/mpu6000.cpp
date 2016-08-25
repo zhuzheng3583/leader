@@ -69,10 +69,9 @@ mpu6000::mpu6000(PCSTR devname, s32 devid) :
 
 	_params.name = "mpu6000_thread";
 	_params.priority = 0;
-	_params.stacksize = 2048;
+	_params.stacksize = 256;
 	_params.func = (void *)thread::func;
 	_params.parg = (thread *)this;
-
 }
 
 mpu6000::~mpu6000(void)
@@ -178,7 +177,7 @@ void mpu6000::run(void *parg)
 	for (;;)
 	{
         mpu6000::measure();
-        //msleep(1);
+        msleep(2);
 	}
 }
 

@@ -67,7 +67,7 @@ BOOL semaphore::post(s32 timeoutms)
 	osStatus status = osOK;
 	status = osSemaphoreRelease(osSemaphoreId(_os_handle));
 	if (status != osOK) {
-		OS_ERR("status = %d.\n", status);
+		//OS_ERR("status = %d.\n", status);
 		return false;
 	}
 

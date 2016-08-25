@@ -3302,6 +3302,12 @@
       </file>
     </group>
     <group>
+      <name>gyro</name>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\gyro\gyro.h</name>
+      </file>
+    </group>
+    <group>
       <name>magn</name>
       <file>
         <name>$PROJ_DIR$\..\src\drivers\magn\hmc5883.cpp</name>
@@ -3320,6 +3326,33 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\src\drivers\rc\sbus.h</name>
+      </file>
+    </group>
+    <group>
+      <name>uart</name>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\uart\uart.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\uart\uart.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\uart\uart_dma.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\uart\uart_dma.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\uart\uart_int.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\uart\uart_int.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\uart\uart_polling.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\uart\uart_polling.h</name>
       </file>
     </group>
     <file>
@@ -3392,9 +3425,6 @@
       <name>$PROJ_DIR$\..\src\drivers\sensorhub_type.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\src\drivers\sensors.h</name>
-    </file>
-    <file>
       <name>$PROJ_DIR$\..\src\drivers\spi.cpp</name>
     </file>
     <file>
@@ -3405,12 +3435,6 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\src\drivers\timer.h</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\src\drivers\uart.cpp</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\src\drivers\uart.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\src\drivers\usb_dev.cpp</name>

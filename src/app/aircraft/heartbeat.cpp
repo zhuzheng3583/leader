@@ -30,19 +30,16 @@ heartbeat::~heartbeat(void)
 
 void heartbeat::run(void *parg)
 {
-    gpio *led_blue = leader_system::get_instance()->get_led_blue();
     gpio *led_amber = leader_system::get_instance()->get_led_amber();
 
 	for (u32 cnt = 0; ;cnt++)
 	{
 		INF("%s: LEADER_UAV_HEART_BEAT[%u sec]...\n", _os_name, cnt);
-		// »ñÈ¡CPUÊ¹ÓÃÂÊ
-        
-        
-        led_blue->set_value(VLOW);
+		
+        // TODOèŽ·å–CPUä½¿ç”¨çŽ‡
+
         led_amber->set_value(VHIGH);
         msleep(500);
-        led_blue->set_value(VHIGH);
         led_amber->set_value(VLOW);
         msleep(500);
 	}

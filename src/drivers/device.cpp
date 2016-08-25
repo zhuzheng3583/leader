@@ -12,12 +12,12 @@
 
 namespace driver {
 
-device::device(PCSTR name, s32 id) :
-	_name(name),
-    _id(id),
+device::device(PCSTR devname, s32 devid) :
+	_name(devname),
+    _id(devid),
     _handle(NULL),
-    _devname(name),
-    _devid(id),
+    _devname(devname),
+    _devid(devid),
     _devhandle(NULL),
     _irq(-1),
     _probed(0)

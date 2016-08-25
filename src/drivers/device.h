@@ -109,7 +109,7 @@ namespace driver {
 class device
 {
 public:
-    device(PCSTR name, s32 id);
+    device(PCSTR devname, s32 devid);
     ~device(void);
 
 public:
@@ -117,7 +117,7 @@ public:
     s32 _id;
     s32 _irq;
     u32 _handle;
-    
+
 	PCSTR _devname;
 	s32 _devid;
 	u32 _devhandle;
@@ -146,16 +146,16 @@ public:
     virtual s32 close(void);
     virtual s32 read(u8 *buf, u32 size);
     virtual s32 write(u8 *buf, u32 size);
-    virtual off_t	seek(off_t offset, s32 whence);
+    virtual off_t seek(off_t offset, s32 whence);
     virtual s32 ioctl(s32 cmd, u64 arg);
     virtual s32 poll(struct pollfd *fds, s32 timeoutms);
     virtual s32 tell(void);
     virtual s32 flush(void);
     bool    is_open(void) { return _open_count > 0; }
-    
-    
-protected:
-    virtual void	poll_notify(pollevent_t events);
+
+
+public:
+    virtual void poll_notify(pollevent_t events);
     virtual s32	open_first(void);
     virtual s32	close_last(void);
 

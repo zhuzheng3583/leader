@@ -18,7 +18,7 @@
 #define UART_POLLING_MODE			(1 << 0)
 #define UART_IT_MODE				(1 << 1)
 #define UART_DMA_MODE				(1 << 2)
-#define UART_MODE 				UART_DMA_MODE
+#define UART_MODE 				UART_POLLING_MODE
 
 
 namespace driver {

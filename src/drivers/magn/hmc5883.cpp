@@ -31,7 +31,7 @@ hmc5883::hmc5883(PCSTR devname, s32 devid) :
 
 	_params.name = "hmc5883_thread";
 	_params.priority = 0;
-	_params.stacksize = 1024;
+	_params.stacksize = 256;
 	_params.func = (void *)thread::func;
 	_params.parg = (thread *)this;
 }

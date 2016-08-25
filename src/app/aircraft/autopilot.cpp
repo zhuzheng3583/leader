@@ -16,7 +16,7 @@ namespace app {
 
 autopilot::autopilot(void)
 {
-	_params.name = "receive";
+	_params.name = "autopilot";
 	_params.priority = 0;
 	_params.stacksize = 1024;
 	_params.func = (void *)thread::func;
@@ -30,6 +30,9 @@ autopilot::~autopilot(void)
 
 void autopilot::run(void *parg)
 {
+    u32 cnt = 0;
+    u8 led_on = 0;
+    gpio *led_blue = leader_system::get_instance()->get_led_blue();
     niming *niming = leader_system::get_instance()->get_niming();
 
 	mpu6000 *mpu6000 = leader_system::get_instance()->get_mpu6000();
@@ -58,9 +61,9 @@ void autopilot::run(void *parg)
 		.events = POLLIN,
 	};
 
-	for ( ; ;)
+	for (; ;)
 	{
-		mpu6000->poll(&fds, 1000);
+		//mpu6000->poll(&fds, 1000);
 		mpu6000->read_accel((u8 *)&accel, sizeof(accel_report));
 		mpu6000->read_gyro((u8 *)&gyro, sizeof(gyro_report));
 		//DBG("%s: accel.x_raw=%d, accel.y_raw=%d, accel.z_raw=%d, "
@@ -81,9 +84,9 @@ void autopilot::run(void *parg)
 		niming->report_status(&att);
         niming->report_sensor(false, &accel, &gyro, &mag);
 
+        led_blue->set_value((led_on = !led_on) ? VHIGH : VLOW);
         //msleep(1);
-
-		//DBG("%s: task is active[%u]...\n", _os_name, cnt++);
+		DBG("%s: task is active[%u]...\n", _os_name, cnt++);
 
 	}
 }

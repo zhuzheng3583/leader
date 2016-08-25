@@ -15,7 +15,10 @@
 #include "drivers/device.h"
 #include "drivers/core.h"
 #include "drivers/flash.h"
-#include "drivers/uart.h"
+#include "drivers/uart/uart.h"
+#include "drivers/uart/uart_polling.h"
+#include "drivers/uart/uart_int.h"
+#include "drivers/uart/uart_dma.h"
 #include "drivers/i2c.h"
 #include "drivers/usb_dev.h"
 #include "drivers/sensorhub.h"
@@ -72,8 +75,8 @@ public:
 public:
     enum leader_system_mode _mode;
     uart                    *_puart1;
-    uart                    *_puart2;
-    uart                    *_puart3;
+    uart                	*_puart2;
+    uart                	*_puart3;
 
     i2c                     *_i2c1;
 
