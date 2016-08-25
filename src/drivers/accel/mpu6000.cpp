@@ -806,11 +806,12 @@ s32 mpu6000::calibrate_gyro(void)
 		gyro_scale.z_offset += gyro_report.z;
 		good_count++;
 	}
-
+#if 0
 	if (good_count < (counter * 0.8)) {
 		ret = -EIO;
 		goto out;
 	}
+#endif
 	gyro_scale.x_offset /= good_count;
 	gyro_scale.y_offset /= good_count;
 	gyro_scale.z_offset /= good_count;

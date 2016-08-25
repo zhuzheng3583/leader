@@ -3292,6 +3292,12 @@
     <group>
       <name>gps</name>
       <file>
+        <name>$PROJ_DIR$\..\src\drivers\gps\ashtech.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\src\drivers\gps\ashtech.h</name>
+      </file>
+      <file>
         <name>$PROJ_DIR$\..\src\drivers\gps\drv_gps.h</name>
       </file>
       <file>

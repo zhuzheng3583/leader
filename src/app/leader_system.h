@@ -31,8 +31,10 @@
 #include "drivers/baro/ms5611.h"
 #include "drivers/magn/hmc5883.h"
 #include "drivers/gps/gps.h"
+#include "drivers/gps/ashtech.h"
 #include "drivers/motor.h"
 #include "drivers/rc/sbus.h"
+
 
 #include "demo_main.h"
 
@@ -75,8 +77,8 @@ public:
 public:
     enum leader_system_mode _mode;
     uart                    *_puart1;
-    uart                	*_puart2;
-    uart                	*_puart3;
+    uart                    *_puart2;
+    uart                    *_puart3;
 
     i2c                     *_i2c1;
 
@@ -102,6 +104,9 @@ public:
     gpio                    *_led_blue;
 	gpio                    *_led_amber;
     gpio                    *_gpio_irq;
+
+    ashtech                 *_pashtech;
+    gps                     *_pgps;
 
     flash                   *_pflash;
 
@@ -136,6 +141,8 @@ public:
 	ms5611		*get_ms5611(void)        	{ return _ms5611; }
 	hmc5883		*get_hmc5883(void)        	{ return _hmc5883; }
 
+    ashtech		*get_ashtech(void)        	{ return _pashtech; }
+    
 	gpio 		*get_led_blue(void)			{ return _led_blue; }
 	gpio		*get_led_amber(void) 		{ return _led_amber; }
 

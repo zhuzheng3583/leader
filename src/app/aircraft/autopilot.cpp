@@ -50,6 +50,10 @@ void autopilot::run(void *parg)
 	memset(&mag, 0, sizeof(mag));
     struct baro_report baro;
 	memset(&baro, 0, sizeof(baro));
+    struct vehicle_gps_position_s gps_position;
+    memset(&gps_position, 0, sizeof(gps_position));
+	struct satellite_info_s satellite_info;
+	memset(&satellite_info, 0, sizeof(satellite_info));   
     struct vehicle_attitude_s att;
     memset(&att, 0, sizeof(att));
     float euler[3] = { 0 };
@@ -78,7 +82,12 @@ void autopilot::run(void *parg)
 		ms5611->read((u8 *)&baro, sizeof(baro_report));
 		//DBG("%s: temperature=%f, pressure=%f, altitude=%f.\n",
 		//	_os_name, baro.temperature, baro.pressure, baro.altitude);
-
+        
+        //ashtech->read_gps_position((u8 *)&gps_position, sizeof(gps_position));
+        //ashtech->read_satellite_info((u8 *)&satellite_info, sizeof(satellite_info));
+        //DBG("%s: lat=%d, lon=%d, alt=%d.\n",
+		//	_os_name, gps_position.lat, gps_position.lon, gps_position.alt);
+        
 		imu_update(gyro.x, gyro.y, gyro.z, accel.x, accel.y, accel.z, &att);
 
 		niming->report_status(&att);

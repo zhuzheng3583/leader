@@ -66,8 +66,8 @@ s32 aircraft::init(void)
 	// _puart1->self_test();
 	//_pgps = new gps("gps", -1);
 	//_pgps->probe(_puart1);
-	//_pashtech = new ashtech("ashtech", -1);
-	//_pashtech->probe(_puart1);
+	_pashtech = new ashtech("ashtech", -1);
+	_pashtech->probe(_puart1);
 
 	/*
 	 * 初始化SPI1,用于访问mpu6000和ms5611(accel, gyro, baro)
@@ -150,7 +150,7 @@ s32 aircraft::init(void)
 	_calibration = new calibration;
 
 	_logger->create(NULL);
-	//_pashtech->create(NULL);
+	_pashtech->create(NULL);
 	_mpu6000->create(NULL);
     _hmc5883->create(NULL);
     _ms5611->create(NULL);
