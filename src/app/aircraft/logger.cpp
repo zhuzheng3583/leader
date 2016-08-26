@@ -26,7 +26,7 @@ logger::logger(void)
 	_params.priority = osPriorityAboveNormal;
 	_params.stacksize = 512;
 	_params.func = (void *)thread::func;
-	_params.parg = this;
+	_params.parg = (thread *)this;
 
 	_level = -1;
 	_buf_threshold = 128;
@@ -145,9 +145,9 @@ void logger::run(void *parg)
 {
 	for ( ; ; )
 	{
-		taskENTER_CRITICAL();
+		//taskENTER_CRITICAL();
 		logger::flush();
-		taskEXIT_CRITICAL();
+		//taskEXIT_CRITICAL();
         msleep(100);
 	}
 

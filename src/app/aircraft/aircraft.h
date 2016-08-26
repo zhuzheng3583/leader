@@ -16,7 +16,7 @@
 
 namespace app {
 
-class aircraft : public leader_system
+class aircraft : public leader_system, public thread
 {
 public:
 	aircraft(void);
@@ -29,6 +29,9 @@ public:
 	s32 init(void);
 	void start(void);
 	s32 exit(void);
+    
+public:
+	virtual void run(void *parg);
 };
 
 }

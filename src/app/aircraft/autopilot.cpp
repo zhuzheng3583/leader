@@ -20,7 +20,7 @@ autopilot::autopilot(void)
 	_params.priority = 0;
 	_params.stacksize = 1024;
 	_params.func = (void *)thread::func;
-	_params.parg = this;
+	_params.parg = (thread *)this;
 }
 
 autopilot::~autopilot(void)
@@ -95,7 +95,7 @@ void autopilot::run(void *parg)
 
         led_blue->set_value((led_on = !led_on) ? VHIGH : VLOW);
         //msleep(1);
-		DBG("%s: task is active[%u]...\n", _os_name, cnt++);
+		//DBG("%s: task is active[%u]...\n", _os_name, cnt++);
 
 	}
 }

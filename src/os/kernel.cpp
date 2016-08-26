@@ -55,7 +55,7 @@ void kernel::systick_config(void)
 	/*Configure the SysTick to have interrupt in 1ms time basis*/
 	HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq() / configTICK_RATE_HZ);
   	/*Configure the SysTick IRQ priority */
-  	HAL_NVIC_SetPriority(SysTick_IRQn, TICK_INT_PRIORITY ,0);
+  	HAL_NVIC_SetPriority(SysTick_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY/*TICK_INT_PRIORITY*/ ,0);
 }
 
 /**

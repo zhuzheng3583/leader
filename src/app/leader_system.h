@@ -124,7 +124,6 @@ public:
     niming                  *_niming;
 
 public:
-    bool os_start;
     enum leader_system_mode    get_mode(void)		{ return _mode; }
     uart        *get_uart1(void)		    { return _puart1; }
     uart        *get_uart2(void)		    { return _puart2; }

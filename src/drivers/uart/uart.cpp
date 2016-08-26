@@ -10,7 +10,6 @@
 ***********************************************************************/
 #include "uart.h"
 #include "core.h"
-#include "leader_system.h"
 
 #define UART_POLLING_TIMEOUT_MS 	1000
 #define UART_IT_TIMEOUT_MS			10
@@ -205,6 +204,13 @@ s32 uart::recv(u8 *buf, u32 count)
 	if(HAL_UART_Receive_DMA((UART_HandleTypeDef*)_handle, (uint8_t*)buf, count) != HAL_OK) {
 		//CAPTURE_ERR();
 	}
+#if 1
+    if (_sem_rx->pend(1000) == true) {
+        readcnt = count - _dmarx->get_leftover_count();
+    } else {
+        readcnt = count - _dmarx->get_leftover_count();
+    }
+#else
 	//pend _flag_rx
 	s32 ret = 0;
 	wait_condition_ms(_flag_rx == 1, UART_DMA_TIMEOUT_MS, &ret);
@@ -214,7 +220,7 @@ s32 uart::recv(u8 *buf, u32 count)
 		_flag_rx = 0;
 		readcnt = count;
 	}
-
+#endif
 #endif
 	return readcnt;
 }
@@ -245,12 +251,14 @@ s32 uart::send(u8 *buf, u32 count)
 	if(HAL_UART_Transmit_DMA((UART_HandleTypeDef*)_handle, (uint8_t*)buf, count) != HAL_OK) {
 		//CAPTURE_ERR();
 	}
-    
+#if 1
 	//pend tx_event
-    //if (app::leader_system::get_instance()->os_start == true) {
-    //    _sem_tx->pend(1000);
-    //}
-	
+    if (_sem_tx->pend(1000) == true) {
+        writecnt = count - _dmatx->get_leftover_count();
+    } else {
+        writecnt = count - _dmatx->get_leftover_count();
+    }
+#else	
     s32 ret = 0;
 	wait_condition_ms(_flag_tx == 1, UART_DMA_TIMEOUT_MS, &ret);
 	if (ret < 0) {
@@ -259,7 +267,7 @@ s32 uart::send(u8 *buf, u32 count)
 		_flag_tx = 0;
         writecnt = count;
 	}
-
+#endif
 #endif
 	return writecnt;
 }
@@ -322,10 +330,8 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 	}
 
 	if (puart != NULL) {
-        //if (app::leader_system::get_instance()->os_start == true) {
-        //    puart->_sem_tx->post(1000);
-        //}
-		puart->_flag_tx = 1;
+        puart->_flag_tx = 1;
+        puart->_sem_tx->post(1000);
 	}
 }
 
@@ -342,8 +348,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 	if (puart != NULL) {
 		puart->_flag_rx = 1;
+        puart->_sem_rx->post(1000);
         /* notify anyone waiting for data */
-        //puart->poll_notify(POLLIN);
+        puart->poll_notify(POLLIN);
 	}
 }
 

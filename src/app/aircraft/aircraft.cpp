@@ -15,7 +15,11 @@ namespace app {
 aircraft::aircraft(void) :
 	_into_calibrate(false)
 {
-
+	_params.name = "aircraft";
+	_params.priority = 0;
+	_params.stacksize = 256;
+	_params.func = (void *)thread::func;
+	_params.parg = (thread *)this;
 }
 
 aircraft::~aircraft(void)
@@ -29,8 +33,32 @@ s32 aircraft::init(void)
 	INF("========Init LeaderUAV Aircraft App ========\n");
 
 	kernel::init();
+    
+    aircraft::create(NULL);
+    
+	return 0;
+}
 
-	/*
+void aircraft::start(void)
+{
+	INF("========Start LeaderUAV Aircraft App ========\n");
+    
+    kernel::start();
+}
+
+s32 aircraft::exit(void)
+{
+	return -1;
+}
+
+void aircraft::run(void *parg)
+{    
+  	_puart2 = new uart("uart-2", 2);
+	_puart2->probe();
+	//_puart2->self_test();
+    _logger->attach(_puart2);
+    
+    /*
 	 * 初始化LED
 	 * note P2 Pro v1.1: PE12(76):LED_BLUE PE15(79):LED_AMBER
 	 */
@@ -139,9 +167,9 @@ s32 aircraft::init(void)
 	_motor7->set_lock(false);
 	_motor7->set_throttle(50);
 	_motor8->set_lock(false);
-	_motor8->set_throttle(50);
-
-	/*
+	_motor8->set_throttle(50);  
+    
+    /*
 	 * 创建线程
 	 */
 	_heartbeat = new heartbeat;
@@ -157,27 +185,17 @@ s32 aircraft::init(void)
 	_heartbeat->create(NULL);
 	_terminal->create(NULL);
 
+
     _into_calibrate = false;
 	if (_into_calibrate == true) {
 		_calibration->create(NULL);
 	} else {
 		_autopilot->create(NULL);
-	}
-
-	return 0;
-}
-
-void aircraft::start(void)
-{
-	INF("========Start LeaderUAV Aircraft App ========\n");
-	os_start = true;
-    kernel::start();
-}
-
-s32 aircraft::exit(void)
-{
-
-	return 0;
+	}  
+    
+    //msleep(999999);
+    
+    aircraft::t_delete();
 }
 
 }

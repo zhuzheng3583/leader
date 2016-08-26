@@ -240,7 +240,7 @@ s32 device::irq_init(void)
 	 * NVIC_PRIORITYGROUP_4: 4位抢占优先级，0位响应优先级
 	 */
 	/* Set Interrupt Group Priority */
-	HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_2);
+	HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
 
 	return 0;
 }
@@ -261,7 +261,7 @@ s32 device::request_irq(s32 irq, device *owner)
 	irq_entries[irq].irq = irq;
 	irq_entries[irq].owner = owner;
 
-	HAL_NVIC_SetPriority((IRQn_Type)(irq_entries[irq].irq), 1, 1);
+	HAL_NVIC_SetPriority((IRQn_Type)(irq_entries[irq].irq), configLIBRARY_LOWEST_INTERRUPT_PRIORITY, 0);
 
 	return 0;
 }

@@ -22,8 +22,7 @@ namespace app {
 
 leader_system *leader_system::s_pactive_instance = NULL;
 
-leader_system::leader_system(void) :
-    os_start(false)
+leader_system::leader_system(void)
 {
 
 }
@@ -87,16 +86,10 @@ s32 leader_system::init(void)
 	ret = device::irq_init();
 	kernel::systick_config();
 
-	_logger = new logger;
-
-	_puart2 = new uart("uart-2", 2);
-	_puart2->probe();
-	//_puart2->self_test();
-
-	_logger->attach(_puart2);
+    _logger = new logger;
 	//_logger->self_test();
 	//在此之前不能使用log输出
-
+    
     //core::self_test();
 #if 0
 

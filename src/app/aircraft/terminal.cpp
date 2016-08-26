@@ -20,7 +20,7 @@ terminal::terminal(void)
 	_params.priority = 0;
 	_params.stacksize = 128;
 	_params.func = (void *)thread::func;
-	_params.parg = this;
+	_params.parg = (thread *)this;
 }
 
 terminal::~terminal(void)
