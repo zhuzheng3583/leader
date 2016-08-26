@@ -10,18 +10,21 @@
 ***********************************************************************/
 #include "uart.h"
 #include "core.h"
+#include "leader_system.h"
 
 #define UART_POLLING_TIMEOUT_MS 	1000
 #define UART_IT_TIMEOUT_MS			10
-#define UART_DMA_TIMEOUT_MS 		10
+#define UART_DMA_TIMEOUT_MS 		1000
 
 #define UART_POLLING_MODE			(1 << 0)
 #define UART_IT_MODE				(1 << 1)
 #define UART_DMA_MODE				(1 << 2)
-#define UART_MODE 				UART_DMA_MODE
+#define UART_MODE 				    UART_DMA_MODE
 
 
 namespace driver {
+  
+uart *uart::owner[4] = { NULL };
 
 //id = [1,3]
 uart::uart(PCSTR name, s32 id) :
@@ -31,16 +34,24 @@ uart::uart(PCSTR name, s32 id) :
 	_flag_rx(0)
 {
 	// For stm32_cube_lib C callback
-	uart_hw_table[_id].puart = this;
+    uart::owner[_id] = this;
+    
+    _sem_tx = new semaphore;
+    _sem_rx = new semaphore;
 }
 
 uart::~uart(void)
 {
-	uart_hw_table[_id].puart = NULL;
+    uart::owner[_id] = NULL;
+    delete _sem_tx;
+    delete _sem_rx;
 }
 
 s32 uart::probe(void)
 {
+    _sem_tx->create("uart_sem_tx", 1);
+    _sem_rx->create("uart_sem_rx", 1);
+    
 	UART_HandleTypeDef *huart = &uart_hw_table[_id].UART_Handle;
 	if(HAL_UART_GetState(huart) != HAL_UART_STATE_RESET)
 	{
@@ -234,14 +245,19 @@ s32 uart::send(u8 *buf, u32 count)
 	if(HAL_UART_Transmit_DMA((UART_HandleTypeDef*)_handle, (uint8_t*)buf, count) != HAL_OK) {
 		//CAPTURE_ERR();
 	}
+    
 	//pend tx_event
-	s32 ret = 0;
+    //if (app::leader_system::get_instance()->os_start == true) {
+    //    _sem_tx->pend(1000);
+    //}
+	
+    s32 ret = 0;
 	wait_condition_ms(_flag_tx == 1, UART_DMA_TIMEOUT_MS, &ret);
 	if (ret < 0) {
 		writecnt = count - _dmatx->get_leftover_count();
 	} else {
 		_flag_tx = 0;
-        	writecnt = count;
+        writecnt = count;
 	}
 
 #endif
@@ -290,23 +306,25 @@ void uart::isr(void)
 	HAL_UART_IRQHandler((UART_HandleTypeDef *)_handle);
 }
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if (UART_MODE == UART_IT_MODE || UART_MODE == UART_DMA_MODE)
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
 	//post tx_event
 	uart *puart = NULL;
-	for (s32 id = 0; id < ARRAYSIZE(uart_hw_table); id++) {
-		if (uart_hw_table[id].puart->_id == id) {
-			puart = uart_hw_table[id].puart;
+	for (s32 id = 0; id < ARRAYSIZE(uart::owner); id++) {
+		if (uart::owner[id]->_handle == (u32)huart) {
+			puart = uart::owner[id];
+            break;
 		}
 	}
 
 	if (puart != NULL) {
+        //if (app::leader_system::get_instance()->os_start == true) {
+        //    puart->_sem_tx->post(1000);
+        //}
 		puart->_flag_tx = 1;
 	}
 }
@@ -314,38 +332,38 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	//post rx_event
-	uart *puart = NULL;
-	for (s32 id = 0; id < ARRAYSIZE(uart_hw_table); id++) {
-		if (uart_hw_table[id].puart->_id == id) {
-			puart = uart_hw_table[id].puart;
+    uart *puart = NULL;
+	for (s32 id = 0; id < ARRAYSIZE(uart::owner); id++) {
+		if (uart::owner[id]->_handle == (u32)huart) {
+			puart = uart::owner[id];
+            break;
 		}
 	}
 
 	if (puart != NULL) {
 		puart->_flag_rx = 1;
         /* notify anyone waiting for data */
-        puart->poll_notify(POLLIN);
+        //puart->poll_notify(POLLIN);
 	}
 }
 
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 {
-	uart *puart = NULL;
-	for (s32 id = 0; id < ARRAYSIZE(uart_hw_table); id++) {
-		if (uart_hw_table[id].puart->_id == id) {
-			puart = uart_hw_table[id].puart;
+    uart *puart = NULL;
+	for (s32 id = 0; id < ARRAYSIZE(uart::owner); id++) {
+		if (uart::owner[id]->_handle == (u32)huart) {
+			puart = uart::owner[id];
+            break;
 		}
 	}
 
 	if (puart != NULL) {
 	}
 }
-#endif
 
 #ifdef __cplusplus
 }
 #endif
-
 
 }
 

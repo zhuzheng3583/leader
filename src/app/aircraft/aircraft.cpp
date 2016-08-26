@@ -170,7 +170,8 @@ s32 aircraft::init(void)
 void aircraft::start(void)
 {
 	INF("========Start LeaderUAV Aircraft App ========\n");
-	kernel::start();
+	os_start = true;
+    kernel::start();
 }
 
 s32 aircraft::exit(void)

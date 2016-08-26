@@ -22,7 +22,8 @@ namespace app {
 
 leader_system *leader_system::s_pactive_instance = NULL;
 
-leader_system::leader_system(void)
+leader_system::leader_system(void) :
+    os_start(false)
 {
 
 }

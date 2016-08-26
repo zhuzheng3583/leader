@@ -89,7 +89,7 @@ s32 uart_dma::recv(u8 *buf, u32 count)
 	if(HAL_UART_Receive_DMA((UART_HandleTypeDef*)_handle, (uint8_t*)buf, count) != HAL_OK) {
 		//CAPTURE_ERR();
 	}
-#if 0
+#if 1
 	//pend _flag_rx
 	s32 ret = 0;
 	wait_condition_ms(_flag_rx == 1, UART_DMA_TIMEOUT_MS, &ret);
@@ -113,7 +113,7 @@ s32 uart_dma::send(u8 *buf, u32 count)
 	if(HAL_UART_Transmit_DMA((UART_HandleTypeDef*)_handle, (uint8_t*)buf, count) != HAL_OK) {
 		//CAPTURE_ERR();
 	}
-#if 0
+#if 1
 	//pend tx_event
 	s32 ret = 0;
 	wait_condition_ms(_flag_tx == 1, UART_DMA_TIMEOUT_MS, &ret);

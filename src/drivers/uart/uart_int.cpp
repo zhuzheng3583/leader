@@ -16,9 +16,7 @@ namespace driver {
 
 //id = [1,3]
 uart_int::uart_int(PCSTR devname, s32 devid) :
-	uart(devname, devid),
-	_flag_tx(0),
-	_flag_rx(0)
+	uart(devname, devid)
 {
 
 }
@@ -116,6 +114,11 @@ s32 uart_int::read(u8 *buf, u32 size)
 s32 uart_int::write(u8 *buf, u32 size)
 {
 	return uart_int::send(buf, size);
+}
+
+void uart_int::isr(void)
+{
+	HAL_UART_IRQHandler((UART_HandleTypeDef *)_handle);
 }
 
 }

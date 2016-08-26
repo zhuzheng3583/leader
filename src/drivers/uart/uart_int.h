@@ -21,10 +21,6 @@ public:
     ~uart_int(void);
 
 public:
-    s32 _flag_tx;
-    s32 _flag_rx;
-
-public:
     virtual s32 probe(void);
     virtual s32 remove(void);
 
@@ -34,7 +30,9 @@ public:
 public:
     virtual s32 read(u8 *buf, u32 size);
     virtual s32 write(u8 *buf, u32 size);
-
+    
+public:
+	virtual void isr(void);
 };
 
 }

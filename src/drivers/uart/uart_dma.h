@@ -22,12 +22,6 @@ public:
     ~uart_dma(void);
 
 public:
-    dma *_dmatx;
-    dma *_dmarx;
-    s32 _dma_tx_id;
-    s32 _dma_rx_id;
-    
-public:
     virtual s32 probe(void);
     virtual s32 remove(void);
 

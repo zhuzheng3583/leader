@@ -15,45 +15,9 @@
 #include "core.h"
 #include "device.h"
 #include "dma.h"
+#include "semaphore.h"
 
 namespace driver {
-
-class uart : public device
-{
-public:
-    uart(PCSTR devname, s32 devid);
-    ~uart(void);
-
-public:
-    u32 _baudrate;
-
-    dma *_dmatx;
-    dma *_dmarx;
-    s32 _dma_tx_id;
-    s32 _dma_rx_id;
-
-    s32 _flag_tx;
-    s32 _flag_rx;
-
-public:
-    virtual s32 probe(void);
-    virtual s32 remove(void);
-
-    inline s32 recv(u8 *buf, u32 count);
-    inline s32 send(u8 *buf, u32 count);
-
-    void set_baudrate(u32 baudrate)	{ _baudrate = baudrate; }
-    u32 get_baudrate(void)			{ return _baudrate; }
-
-    virtual s32 self_test(void);
-
-public:
-    virtual s32 read(u8 *buf, u32 size);
-    virtual s32 write(u8 *buf, u32 size);
-
-public:
-	virtual void isr(void);
-};
 
 struct stm32_uart_hw_table
 {
@@ -64,7 +28,6 @@ struct stm32_uart_hw_table
 
 	s32                 dma_tx_id;
 	s32             	dma_rx_id;
-	uart 				*puart;
 };
 
 static struct stm32_uart_hw_table uart_hw_table[] = {
@@ -142,8 +105,53 @@ static struct stm32_uart_hw_table uart_hw_table[] = {
 		.dma_rx_id = 12,
 	},
 };
+  
+class uart : public device
+{
+public:
+    uart(PCSTR devname, s32 devid);
+    ~uart(void);
+    
+public:
+    static uart *owner[4];
+    
+public:
+    u32 _baudrate;
+
+    dma *_dmatx;
+    dma *_dmarx;
+    s32 _dma_tx_id;
+    s32 _dma_rx_id;
+
+    s32 _flag_tx;
+    s32 _flag_rx;
+
+    semaphore *_sem_tx;
+    semaphore *_sem_rx;
+    
+public:
+    virtual s32 probe(void);
+    virtual s32 remove(void);
+
+    inline s32 recv(u8 *buf, u32 count);
+    inline s32 send(u8 *buf, u32 count);
+
+    void set_baudrate(u32 baudrate)	{ _baudrate = baudrate; }
+    u32 get_baudrate(void)			{ return _baudrate; }
+
+    virtual s32 self_test(void);
+
+public:
+    virtual s32 read(u8 *buf, u32 size);
+    virtual s32 write(u8 *buf, u32 size);
+
+public:    
+    virtual void isr(void);
+
+};
 
 }
+
 /***********************************************************************
 ** End of file
 ***********************************************************************/
