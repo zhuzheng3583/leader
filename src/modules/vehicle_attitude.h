@@ -25,7 +25,6 @@ struct vehicle_attitude_s {
 	f32 rollacc;
 	f32 pitchacc;
 	f32 yawacc;
-
 };
 
 /***********************************************************************

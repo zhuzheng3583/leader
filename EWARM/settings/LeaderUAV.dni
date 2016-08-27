@@ -13,7 +13,7 @@ CStepIntDis=_ 0
 stlinkserialNo=2798FD0D
 stlinkfoundProbes=
 [DebugChecksum]
-Checksum=1299935023
+Checksum=2116100826
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -143,7 +143,8 @@ Bp29=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\ashtech.cpp}.222.4" 0 0 1 "
 Bp30=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\semaphore.cpp}.58.3" 0 0 1 "" 0 "" 0
 Bp31=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\aircraft.cpp}.201.2" 0 0 1 "" 0 "" 0
 Bp32=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\rc\sbus.cpp}.65.2" 0 0 1 "" 0 "" 0
-Count=33
+Bp33=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\rc\sbus.cpp}.160.21" 0 0 1 "" 0 "" 0
+Count=34
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
