@@ -179,7 +179,7 @@ void aircraft::run(void *parg)
 	_autopilot = new autopilot;
 	_calibration = new calibration;
 
-	_pashtech->create(NULL);
+	//_pashtech->create(NULL);
     _mpu6000->create(NULL);
     _hmc5883->create(NULL);
     _ms5611->create(NULL);
@@ -190,7 +190,7 @@ void aircraft::run(void *parg)
 	if (_into_calibrate == true) {
 		_calibration->create(NULL);
 	} else {
-		//_autopilot->create(NULL);
+		_autopilot->create(NULL);
 	}  
 
     //msleep(999999);

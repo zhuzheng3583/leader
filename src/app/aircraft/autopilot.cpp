@@ -41,6 +41,8 @@ void autopilot::run(void *parg)
 	ms5611->open();
 	hmc5883 *hmc5883 = leader_system::get_instance()->get_hmc5883();
 	hmc5883->open();
+	ashtech *ashtech = leader_system::get_instance()->get_ashtech();
+	ashtech->open();
 
 	struct accel_report accel;
 	memset(&accel, 0, sizeof(accel));
@@ -83,21 +85,20 @@ void autopilot::run(void *parg)
 		//DBG("%s: temperature=%f, pressure=%f, altitude=%f.\n",
 		//	_os_name, baro.temperature, baro.pressure, baro.altitude);
         
-        //ashtech->read_gps_position((u8 *)&gps_position, sizeof(gps_position));
-        //ashtech->read_satellite_info((u8 *)&satellite_info, sizeof(satellite_info));
+        ashtech->read_gps_position((u8 *)&gps_position, sizeof(gps_position));
+        ashtech->read_satellite_info((u8 *)&satellite_info, sizeof(satellite_info));
         //DBG("%s: lat=%d, lon=%d, alt=%d.\n",
 		//	_os_name, gps_position.lat, gps_position.lon, gps_position.alt);
         
 		imu_update(gyro.x, gyro.y, gyro.z, accel.x, accel.y, accel.z, &att);
-
 		niming->report_status(&att);
         niming->report_sensor(false, &accel, &gyro, &mag);
 
-        //led_blue->set_value((led_on = !led_on) ? VHIGH : VLOW);
+        led_blue->set_value((led_on = !led_on) ? VHIGH : VLOW);
         //msleep(1);
-		//DBG("%s: task is active[%u]...\n", _os_name, cnt++);
-
-	}
+        u32 stack_size = uxTaskGetStackHighWaterMark((TaskHandle_t)_os_handle);
+		//DBG("%s: task is active[%u], left stack size = %ubyte\n", _os_name, cnt++, stack_size);
+    }
 }
 
 }

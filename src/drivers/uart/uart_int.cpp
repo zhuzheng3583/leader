@@ -34,10 +34,10 @@ s32 uart_int::probe(void)
 		goto fail0;
 	}
 
-	_irq = uart_hw_table[_id].IRQn;
+	//_irq = uart_hw_table[_id].IRQn;
 
-	device::request_irq(_irq, this);
-	device::enable_irq(_irq);
+	//device::request_irq(_irq, this);
+	//device::enable_irq(_irq);
 
 	//INF("%s: probe success.\n", _name);
 	return 0;
@@ -48,7 +48,7 @@ fail0:
 
 s32 uart_int::remove(void)
 {
-	device::disable_irq(_irq);
+	//device::disable_irq(_irq);
 
 	s32 ret = 0;
 	ret = uart::remove();
@@ -114,11 +114,6 @@ s32 uart_int::read(u8 *buf, u32 size)
 s32 uart_int::write(u8 *buf, u32 size)
 {
 	return uart_int::send(buf, size);
-}
-
-void uart_int::isr(void)
-{
-	HAL_UART_IRQHandler((UART_HandleTypeDef *)_handle);
 }
 
 }

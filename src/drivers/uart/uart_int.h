@@ -30,9 +30,7 @@ public:
 public:
     virtual s32 read(u8 *buf, u32 size);
     virtual s32 write(u8 *buf, u32 size);
-    
-public:
-	virtual void isr(void);
+
 };
 
 }
