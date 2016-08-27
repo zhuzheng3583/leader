@@ -35,6 +35,8 @@ s32 motor::probe(pwm *ppwm, u32 pwm_channel)
 	_ppwm->set_dutycycle(_pwm_channel, 0);
 	_ppwm->start(_pwm_channel);
 
+    motor::set_lock(true);
+    
 	INF("%s: probe success.\n", _devname);
 	return 0;
 

@@ -43,14 +43,14 @@ logger::~logger(void)
 	_pcircbuf = NULL;
 }
 
-void logger::attach(device *pdev)
+void logger::attach(uart *puart)
 {
-	_pdev = pdev;
+	_puart = puart;
 }
 
 void logger::detach(void)
 {
-	_pdev = NULL;
+	_puart = NULL;
 }
 #if 1
 BOOL logger::create(struct thread_params *pparams)
@@ -105,7 +105,11 @@ s32 logger::vprintf(PCSTR fmt, va_list ap)
 
 void logger::flush(void)
 {
-    _pcircbuf->dev_consumer(_pdev, _pcircbuf->get_used_size());
+    static u8 buf[LOG_BUFFER_SIZE];
+    //_pcircbuf->dev_consumer(_puart, _pcircbuf->get_used_size());
+    u32 size = _pcircbuf->get_used_size();
+    _pcircbuf->mem_consumer(buf, size);
+    _puart->write(buf, size);
 }
 
 int32_t logger::self_test(void)
@@ -135,8 +139,7 @@ int32_t logger::self_test(void)
         logger::flush();
         core::mdelay(100);
     }
-
-
+    
     return true;
 }
 
@@ -145,9 +148,8 @@ void logger::run(void *parg)
 {
 	for ( ; ; )
 	{
-		//taskENTER_CRITICAL();
+        //_puart->self_test();
 		logger::flush();
-		//taskEXIT_CRITICAL();
         msleep(100);
 	}
 

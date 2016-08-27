@@ -142,7 +142,10 @@ s32 ashtech::reset(void)
 void ashtech::run(void *parg)
 {  
 	for (;;) {
-#if 1
+        //vTaskSuspendAll();
+        //_puart->self_test();
+        //xTaskResumeAll();
+#if 0
         u8 buf[512];
         
         struct pollfd fds = {
@@ -150,9 +153,7 @@ void ashtech::run(void *parg)
         };
     
         //poll(&fds, 200);
-        //taskENTER_CRITICAL();
 		_puart->read(buf, 400);
-        //taskEXIT_CRITICAL();
 		INF("%s", buf);
 #else
         measure();
@@ -167,7 +168,8 @@ s32 ashtech::measure(void)
         .events = POLLIN,
     };  
 
-    u8 buf[400] = "ZHUZHENG GPS TEST $GNRMC,111808.00,A,3106.06235,N,12115.08438,E,0.204,,310716,,,A*6C$GPGSV,4,1,15,02,71,050,23,05,61,314,30,06,34,104,32,07,12,072,*7B$GPGSV,4,2,15,09,02,038,,12,07,237,25,13,44,186,32,15,16,211,21*70$GPGSV,4,3,15,19,16,161,24,20,20,269,,25,05,271,,29,29,314,29*73$GPGSV,4,4,15,30,14,098,,42,46,140,,50,46,140,*49";
+    // $GNRMC,111808.00,A,3106.06235,N,12115.08438,E,0.204,,310716,,,A*6C$GPGSV,4,1,15,02,71,050,23,05,61,314,30,06,34,104,32,07,12,072,*7B$GPGSV,4,2,15,09,02,038,,12,07,237,25,13,44,186,32,15,16,211,21*70$GPGSV,4,3,15,19,16,161,24,20,20,269,,25,05,271,,29,29,314,29*73$GPGSV,4,4,15,30,14,098,,42,46,140,,50,46,140,*49
+    u8 buf[400] = "ZHUZHENG GPS TEST";
 	u32 timeoutms = 2000;
 
     /* timeout additional to poll */

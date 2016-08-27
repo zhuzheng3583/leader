@@ -23,10 +23,10 @@ device::device(PCSTR devname, s32 devid) :
     _probed(0)
 {
 	_lock = new semaphore;
-	_lock->create("dev_semaphore", 1);
+	_lock->create("device_sem", 1);
 
 	_pollset.sem = new semaphore;
-	_pollset.sem->create("poll_semaphore", 1);
+	_pollset.sem->create("poll_sem", 1);
 	_pollset.events = 0;
 	_pollset.revents = 0;
 }

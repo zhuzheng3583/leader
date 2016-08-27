@@ -56,7 +56,9 @@ void aircraft::run(void *parg)
   	_puart2 = new uart("uart-2", 2);
 	_puart2->probe();
 	//_puart2->self_test();
+    
     _logger->attach(_puart2);
+    _logger->create(NULL);
     
     /*
 	 * ³õÊ¼»¯LED
@@ -91,7 +93,7 @@ void aircraft::run(void *parg)
 	 */
 	_puart1 = new uart("uart-1", 1);
 	_puart1->probe();
-	// _puart1->self_test();
+	//_puart1->self_test();
 	//_pgps = new gps("gps", -1);
 	//_pgps->probe(_puart1);
 	_pashtech = new ashtech("ashtech", -1);
@@ -177,22 +179,20 @@ void aircraft::run(void *parg)
 	_autopilot = new autopilot;
 	_calibration = new calibration;
 
-	_logger->create(NULL);
 	_pashtech->create(NULL);
-	_mpu6000->create(NULL);
+    _mpu6000->create(NULL);
     _hmc5883->create(NULL);
     _ms5611->create(NULL);
 	_heartbeat->create(NULL);
 	_terminal->create(NULL);
 
-
     _into_calibrate = false;
 	if (_into_calibrate == true) {
 		_calibration->create(NULL);
 	} else {
-		_autopilot->create(NULL);
+		//_autopilot->create(NULL);
 	}  
-    
+
     //msleep(999999);
     
     aircraft::t_delete();

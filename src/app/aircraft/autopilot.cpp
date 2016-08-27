@@ -93,7 +93,7 @@ void autopilot::run(void *parg)
 		niming->report_status(&att);
         niming->report_sensor(false, &accel, &gyro, &mag);
 
-        led_blue->set_value((led_on = !led_on) ? VHIGH : VLOW);
+        //led_blue->set_value((led_on = !led_on) ? VHIGH : VLOW);
         //msleep(1);
 		//DBG("%s: task is active[%u]...\n", _os_name, cnt++);
 

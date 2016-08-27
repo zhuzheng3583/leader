@@ -13,7 +13,7 @@
 
 #define UART_POLLING_TIMEOUT_MS 	1000
 #define UART_IT_TIMEOUT_MS			10
-#define UART_DMA_TIMEOUT_MS 		1000
+#define UART_DMA_TIMEOUT_MS 		5000
 
 #define UART_POLLING_MODE			(1 << 0)
 #define UART_IT_MODE				(1 << 1)
@@ -96,7 +96,7 @@ s32 uart::probe(void)
 	_handle = (u32)huart;
 
 #if (UART_MODE == UART_DMA_MODE)
-	s8 str[16];
+    u8 str[16] = {0};
 	snprintf((char *)str, 16, "dma-%d", _dma_tx_id);
 	_dmatx = new dma((PCSTR)str, _dma_tx_id);
 	//INF("%s: new dmatx %s[dma%d,stream%d,channel%d].\n", _name, str, _dmatx->_dma_id, _dmatx->_stream_id, _dmatx->_channel_id);
@@ -180,6 +180,10 @@ fail0:
 
 s32 uart::recv(u8 *buf, u32 count)
 {
+    if (!(count > 0)) {
+        return 0;
+    }
+    
     u32 readcnt = 0;
 
 #if (UART_MODE == UART_POLLING_MODE)
@@ -205,7 +209,7 @@ s32 uart::recv(u8 *buf, u32 count)
 		//CAPTURE_ERR();
 	}
 #if 1
-    if (_sem_rx->pend(1000) == true) {
+    if (_sem_rx->pend(UART_DMA_TIMEOUT_MS) == true) {
         readcnt = count - _dmarx->get_leftover_count();
     } else {
         readcnt = count - _dmarx->get_leftover_count();
@@ -227,6 +231,10 @@ s32 uart::recv(u8 *buf, u32 count)
 
 s32 uart::send(u8 *buf, u32 count)
 {
+    if (!(count > 0)) {
+        return 0;
+    }
+    
     u32 writecnt = 0;
 
 #if (UART_MODE == UART_POLLING_MODE)
@@ -253,7 +261,7 @@ s32 uart::send(u8 *buf, u32 count)
 	}
 #if 1
 	//pend tx_event
-    if (_sem_tx->pend(1000) == true) {
+    if (_sem_tx->pend(UART_DMA_TIMEOUT_MS) == true) {
         writecnt = count - _dmatx->get_leftover_count();
     } else {
         writecnt = count - _dmatx->get_leftover_count();
@@ -282,12 +290,12 @@ s32 uart::self_test(void)
     uart::write(wbuf, ARRAYSIZE(wbuf));
     while (1) {
       uart::read(rbuf, ARRAYSIZE(rbuf));
-      //INF("%s", rbuf);
+      INF("%s", rbuf);
 
-      uart::write(rbuf, ARRAYSIZE(wbuf));
-      core::mdelay(500);
+      //uart::write(rbuf, ARRAYSIZE(wbuf));
+      //core::mdelay(500);
     }
-#else
+#elif 0
 	u32 n = 0;
 	while (1) {
 		INF("%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d.\n",
@@ -295,6 +303,14 @@ s32 uart::self_test(void)
 		n++;
 	}
 	core::mdelay(100);
+#else
+    u32 n = 0;
+    u8 wbuf[17] = "hello world!";
+	while (1) {
+        uart::write(wbuf, ARRAYSIZE(wbuf));
+        core::mdelay(100);
+	}
+	
 #endif
 	uart::close();
 }
@@ -331,7 +347,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 
 	if (puart != NULL) {
         puart->_flag_tx = 1;
-        puart->_sem_tx->post(1000);
+        puart->_sem_tx->post(UART_DMA_TIMEOUT_MS);
 	}
 }
 
@@ -348,7 +364,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 	if (puart != NULL) {
 		puart->_flag_rx = 1;
-        puart->_sem_rx->post(1000);
+        puart->_sem_rx->post(UART_DMA_TIMEOUT_MS);
         /* notify anyone waiting for data */
         puart->poll_notify(POLLIN);
 	}

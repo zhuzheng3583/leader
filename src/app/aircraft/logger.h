@@ -16,6 +16,7 @@
 #include "thread.h"
 #include "circbuf.h"
 #include "mutex.h"
+#include "uart.h"
 
 #define FMT_MAX_CNT							256
 
@@ -32,7 +33,7 @@ public:
 
 public:
 	circbuf *_pcircbuf;
-	device  *_pdev;
+	uart  *_puart;
 
 	u32 _buf_size;
 	u32 _buf_threshold;
@@ -45,7 +46,7 @@ public:
 	BOOL create(struct thread_params *pparams);
 	BOOL t_delete(void);
 
-	void attach(device *pdev);
+	void attach(uart *puart);
 	void detach(void)	;
 
 	s32 vprintf(PCSTR fmt, va_list ap);

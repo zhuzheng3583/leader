@@ -35,7 +35,7 @@ void terminal::run(void *parg)
 		/* TODO:÷’∂ÀΩªª• */
         msleep(100);
 		//DBG("%s: task is active[%u]...\n", _os_name, cnt);
-        core::mdelay(100);
+        //core::mdelay(100);
 
 	}
 }
