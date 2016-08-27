@@ -19,8 +19,14 @@
 //起始字节startbyte = 11110000b (0xF0)，但实际上用STM32（据说ARM核）收到的是0x0F。
 //中间22个字节就是16个通道的数据了，为什么是16个通道？因为22x8=11x16，每个通道用11bit表示，范围是0-2047。不信看波形图：
 
-namespace driver {
+#define BAUD9600_DELAY_US       ((1*1000*1000) / 9600)
+#define BAUD100000_DELAY_US     ((1*1000*1000) / 100000)
+#define BAUD115200_DELAY_US     ((1*1000*1000) / 115200)
 
+#define DEFAULT_BAUD_DELAY_US   (BAUD9600_DELAY_US)     
+
+namespace driver {
+  
 sbus::sbus(PCSTR devname, s32 devid) :
 	device(devname, devid)
 {
@@ -34,19 +40,21 @@ sbus::~sbus(void)
 
 s32 sbus::probe(void)
 {
-#if 0
-    _rx = new gpio("sbus_rx[gpio-39]", 38);
+#if 1
+    _rx = new gpio("gpio-39[sbus_rx]", 39);
     _rx->probe();
     _rx->set_direction_input();
-    s8 c1 = 0;
-    s8 c2 = 0;
-    while (1) {
-        c1 = sbus::read_byte();
-        c2 = sbus::read_byte();
-        core::mdelay(200);
+    u8 c[25] = {0};
+    for (u32 i = 0; i < 25; i++) {
+        c[i] = sbus::read_byte();
     }
+    
+    for (u32 i = 0; i < 25; i++) {
+        DBG("c[%d] = 0x%02x ", i, c[i]);
+    }
+    
 #else
-    _tx = new gpio("sbus_tx[gpio-39]", 38);
+    _tx = new gpio("gpio-39[sbus_tx]", 38);
     _tx->probe();
     _tx->set_direction_output();
     while (1) {

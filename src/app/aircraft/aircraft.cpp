@@ -77,7 +77,7 @@ void aircraft::run(void *parg)
 	 * 初始化RC
 	 */
     sbus *_sbus = new sbus("sbus", -1);
-    //_sbus->probe();
+    _sbus->probe();
 
 	/*
 	 * 初始化匿名通讯协议

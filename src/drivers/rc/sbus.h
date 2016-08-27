@@ -10,13 +10,7 @@
 ***********************************************************************/
 #pragma once
 #include "device.h"
-#include "gpio.h"
-
-#define BAUD9600_DELAY_US       ((1*1000*1000) / 9600)
-#define BAUD100000_DELAY_US     ((1*1000*1000) / 100000)
-#define BAUD115200_DELAY_US     ((1*1000*1000) / 115200)
-
-#define DEFAULT_BAUD_DELAY_US   (BAUD9600_DELAY_US)      
+#include "gpio.h" 
 
 namespace driver {
 
