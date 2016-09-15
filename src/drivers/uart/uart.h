@@ -104,6 +104,33 @@ static struct stm32_uart_hw_table uart_hw_table[] = {
 		.dma_tx_id = 28,
 		.dma_rx_id = 12,
 	},
+    
+    //SBUS:串口配置为波特率100kbps，8位数据，偶校验(even)，2位停止位，无流控。
+    [6] = {
+		.GPIOx = GPIOC,//GPIOC,
+		.IRQn = USART6_IRQn,
+		.UART_Handle = {
+			.Instance = USART6,
+			.Init = {
+				.BaudRate   = 100000,
+				.WordLength = UART_WORDLENGTH_8B,
+				.StopBits   = UART_STOPBITS_2,
+				.Parity     = UART_PARITY_EVEN,
+				.HwFlowCtl  = UART_HWCONTROL_NONE,
+				.Mode       = UART_MODE_RX,
+			},
+		},
+		.GPIO_Init = {
+			.Pin       = GPIO_PIN_7,
+			.Mode      = GPIO_MODE_AF_PP,
+			.Pull      = GPIO_NOPULL,
+			.Speed     = GPIO_SPEED_FREQ_HIGH,
+			.Alternate = GPIO_AF8_USART6,
+		},
+		.dma_tx_id = -1,
+		.dma_rx_id = 77,
+	},
+    
 };
   
 class uart : public device
@@ -113,7 +140,7 @@ public:
     ~uart(void);
     
 public:
-    static uart *owner[4];
+    static uart *owner[ARRAYSIZE(uart_hw_table)];
     
 public:
     u32 _baudrate;

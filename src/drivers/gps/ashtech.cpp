@@ -204,7 +204,7 @@ s32 ashtech::measure(void)
 	    /* everything is read */
 	    j = bytes_count = 0;
         //poll(&fds, 2000);
-	    bytes_count = _puart->read(buf, sizeof(buf));
+	    bytes_count = _puart->read(buf, 16/*sizeof(buf)*/);
         DBG("%s", buf);
     }
 }

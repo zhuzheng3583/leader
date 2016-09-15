@@ -13,7 +13,7 @@ CStepIntDis=_ 0
 stlinkserialNo=2798FD0D
 stlinkfoundProbes=
 [DebugChecksum]
-Checksum=791194176
+Checksum=145303394
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -44,15 +44,14 @@ ITMlogFile=$PROJ_DIR$\ITM.log
 Show=1 1
 Sort=4 0
 [struct_types]
-Fmt0=class driver::device-_handle	4	0
-Fmt1=struct os::thread_params-stackbase	4	0
-Fmt2=struct os::thread_params-stacksize	4	0
-Fmt3=struct prom_s-c3_temp_coeff_pres_sens	3	0
-Fmt4=struct prom_s-c4_temp_coeff_pres_offset	3	0
-Fmt5=struct prom_s-c5_reference_temp	3	0
-Fmt6=struct prom_s-c6_temp_coeff_temp	3	0
-Fmt7=struct prom_s-factory_setup	3	0
-Fmt8=struct prom_s-serial_and_crc	4	0
+Fmt0=struct os::thread_params-stackbase	4	0
+Fmt1=struct os::thread_params-stacksize	4	0
+Fmt2=struct prom_s-c3_temp_coeff_pres_sens	3	0
+Fmt3=struct prom_s-c4_temp_coeff_pres_offset	3	0
+Fmt4=struct prom_s-c5_reference_temp	3	0
+Fmt5=struct prom_s-c6_temp_coeff_temp	3	0
+Fmt6=struct prom_s-factory_setup	3	0
+Fmt7=struct prom_s-serial_and_crc	4	0
 [array_types]
 Fmt0=u16[8]	3	0
 Fmt1=u8[4]	4	0
@@ -139,19 +138,12 @@ Bp25=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart\uart_dma.cpp}.139.2" 0 0 1
 Bp26=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart\uart_dma.cpp}.124.9" 0 0 1 "" 0 "" 0
 Bp27=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart\uart_dma.cpp}.121.3" 0 0 1 "" 0 "" 0
 Bp28=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\uart\uart_int.cpp}.127.1" 0 0 1 "" 0 "" 0
-Bp29=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\gps\ashtech.cpp}.222.4" 0 0 1 "" 0 "" 0
-Bp30=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\os\semaphore.cpp}.58.3" 0 0 1 "" 0 "" 0
-Bp31=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\aircraft.cpp}.201.2" 0 0 1 "" 0 "" 0
-Bp32=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\rc\sbus.cpp}.65.2" 0 0 1 "" 0 "" 0
-Bp33=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\drivers\rc\sbus.cpp}.160.21" 0 0 1 "" 0 "" 0
-Count=34
+Bp29=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\app\aircraft\aircraft.cpp}.204.2" 0 0 1 "" 0 "" 0
+Count=30
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
 Category=_ 0
-[TermIOLog]
-LoggingEnabled=_ 0
-LogFile=_ ""
 [Aliases]
 A0=_ "E:\code\SKYVIEW_H_SUB\LeaderUAV\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
 A1=_ "E:\code\leader\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
@@ -167,3 +159,6 @@ Exclusions=
 Enabled=0
 [CallStackStripe]
 ShowTiming=1
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""

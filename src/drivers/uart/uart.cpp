@@ -23,9 +23,9 @@
 
 namespace driver {
   
-uart *uart::owner[4] = { NULL };
+uart *uart::owner[ARRAYSIZE(uart_hw_table)] = { NULL };
 
-//id = [1,3]
+
 uart::uart(PCSTR name, s32 id) :
 	device(name, id),
 	_baudrate(115200),
@@ -75,8 +75,13 @@ s32 uart::probe(void)
         __HAL_RCC_GPIOD_CLK_ENABLE();
 		__HAL_RCC_GPIOC_CLK_ENABLE();
   		__HAL_RCC_USART3_CLK_ENABLE();
+		break; 
+	case 6:
+		__HAL_RCC_GPIOC_CLK_ENABLE();
+  		__HAL_RCC_USART6_CLK_ENABLE();
 		break;
 	default:
+        CAPTURE_ERR();
 		break;
     	}
 	/* 2- Configure peripheral GPIO */
@@ -97,20 +102,23 @@ s32 uart::probe(void)
 
 #if (UART_MODE == UART_DMA_MODE)
     u8 str[16] = {0};
-	snprintf((char *)str, 16, "dma-%d", _dma_tx_id);
-	_dmatx = new dma((PCSTR)str, _dma_tx_id);
-	//INF("%s: new dmatx %s[dma%d,stream%d,channel%d].\n", _name, str, _dmatx->_dma_id, _dmatx->_stream_id, _dmatx->_channel_id);
-	_dmatx->probe();
-	_dmatx->config(DMA_DIR_MEM_TO_PERIPH, DMA_ALIGN_BYTE, DMA_PRI_LOW, 1, 0);
-	/* Associate the initialized DMA handle to the UART handle */
-	__HAL_LINKDMA(huart, hdmatx, *(DMA_HandleTypeDef *)(_dmatx->_handle));
-
-    snprintf((char *)str, 16, "dma-%d", _dma_rx_id);
-	_dmarx = new dma((PCSTR)str, _dma_rx_id);
-	//INF("%s: new dmarx %s[dma%d,stream%d,channel%d].\n", _name, str, _dmarx->_dma_id, _dmarx->_stream_id, _dmarx->_channel_id);
-	_dmarx->probe();
-	_dmarx->config(DMA_DIR_PERIPH_TO_MEM, DMA_ALIGN_BYTE, DMA_PRI_HIGH, 0, 1);
-	__HAL_LINKDMA(huart, hdmarx, *(DMA_HandleTypeDef *)(_dmarx->_handle));
+    if (_dma_tx_id > 0) {
+        snprintf((char *)str, 16, "dma-%d", _dma_tx_id);
+        _dmatx = new dma((PCSTR)str, _dma_tx_id);
+        //INF("%s: new dmatx %s[dma%d,stream%d,channel%d].\n", _name, str, _dmatx->_dma_id, _dmatx->_stream_id, _dmatx->_channel_id);
+        _dmatx->probe();
+        _dmatx->config(DMA_DIR_MEM_TO_PERIPH, DMA_ALIGN_BYTE, DMA_PRI_LOW, 1, 0);
+        /* Associate the initialized DMA handle to the UART handle */
+        __HAL_LINKDMA(huart, hdmatx, *(DMA_HandleTypeDef *)(_dmatx->_handle));
+    }
+    if (_dma_rx_id > 0) {
+        snprintf((char *)str, 16, "dma-%d", _dma_rx_id);
+        _dmarx = new dma((PCSTR)str, _dma_rx_id);
+        //INF("%s: new dmarx %s[dma%d,stream%d,channel%d].\n", _name, str, _dmarx->_dma_id, _dmarx->_stream_id, _dmarx->_channel_id);
+        _dmarx->probe();
+        _dmarx->config(DMA_DIR_PERIPH_TO_MEM, DMA_ALIGN_BYTE, DMA_PRI_HIGH, 0, 1);
+        __HAL_LINKDMA(huart, hdmarx, *(DMA_HandleTypeDef *)(_dmarx->_handle));
+    }
 #endif
 #if (UART_MODE == UART_IT_MODE || UART_MODE == UART_DMA_MODE)
 	/*##-3- Configure the NVIC for UART ########################################*/
@@ -285,15 +293,18 @@ s32 uart::self_test(void)
 	uart::open();
 #if 1
 	u8 wbuf[16] = "hello world!";
-	u8 rbuf[16] = { 0 };
+	u8 rbuf[25] = { 0 };
 
     uart::write(wbuf, ARRAYSIZE(wbuf));
     while (1) {
-      uart::read(rbuf, ARRAYSIZE(rbuf));
-      INF("%s", rbuf);
+        uart::read(rbuf, sizeof(rbuf));
+        for (u32 i = 0; i < sizeof(rbuf); i++) {
+            DBG("rbuf[%d] = 0x%02x ", i, rbuf[i]);
+        }
+        //INF("%s", rbuf);
 
-      //uart::write(rbuf, ARRAYSIZE(wbuf));
-      //core::mdelay(500);
+        //uart::write(rbuf, ARRAYSIZE(rbuf));
+        //core::mdelay(1);
     }
 #elif 0
 	u32 n = 0;

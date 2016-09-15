@@ -11,6 +11,7 @@
 #pragma once
 #include "device.h"
 #include "gpio.h" 
+#include "uart.h"
 
 namespace driver {
 
@@ -23,9 +24,10 @@ public:
 public:
 	gpio *_rx;
 	gpio *_tx;
-
+    uart *_puart;
+    
 public:
-    s32 probe(void);
+    s32 probe(uart *puart);
     s32 remove(void);
 
 public:

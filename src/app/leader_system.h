@@ -79,6 +79,7 @@ public:
     uart                    *_puart1;
     uart                    *_puart2;
     uart                    *_puart3;
+    uart                    *_puart6;
 
     i2c                     *_i2c1;
 

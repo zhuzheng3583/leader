@@ -363,6 +363,15 @@ void DMA1_Stream3_IRQHandler(void)
 	irq_entries[DMA1_Stream3_IRQn].owner->isr();
 }
 
+void DMA2_Stream1_IRQHandler(void)
+{
+	irq_entries[DMA2_Stream1_IRQn].owner->isr();
+}
+void USART6_IRQHandler(void)
+{
+	irq_entries[USART6_IRQn].owner->isr();
+}
+
 
 void DMA2_Stream2_IRQHandler(void)
 {

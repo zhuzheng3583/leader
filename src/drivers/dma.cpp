@@ -116,6 +116,22 @@ static struct stm32_dma_hw_table dma_hw_table[] = {
 			},
 		},
 	},
+    [77] = {
+		.DMAx = DMA2,
+		.IRQn = DMA2_Stream1_IRQn,
+		.DMA_Handle = {
+			.Instance = DMA2_Stream1,
+			.Init = {
+				.Channel		= DMA_CHANNEL_5,
+				.Mode 			= DMA_NORMAL,
+				.FIFOMode       = DMA_FIFOMODE_DISABLE,
+				.FIFOThreshold	= DMA_FIFO_THRESHOLD_FULL,
+				.MemBurst      	= DMA_MBURST_INC4,
+				.PeriphBurst    = DMA_PBURST_INC4,
+			},
+		},
+	},
+    
     [83] = {
         .DMAx = DMA2,
         .IRQn = DMA2_Stream2_IRQn,
@@ -194,17 +210,11 @@ dma::~dma(void)
 s32 dma::probe(void)
 {
 	//ASSERT(_id <= DMA_CHANNEL_MAX_NUM && _id > 0);
-	if (device::probe() < 0) {
-		CAPTURE_ERR();
-		//ERR("%s: failed to probe.\n", _name);
-		goto fail0;
-	}
-
 	DMA_HandleTypeDef *hdma = &dma_hw_table[_id].DMA_Handle;
 	if(HAL_DMA_GetState(hdma) != HAL_DMA_STATE_RESET)
 	{
 		//ERR("%s: failed HAL_DMA_GetState.\n", _name);
-		goto fail1;
+		goto fail0;
 	}
 
 	switch(_dma_id)
@@ -229,31 +239,23 @@ s32 dma::probe(void)
 	//INF("%s: probe success.\n", _name);
 	return 0;
 
-fail2:
-fail1:
-	device::remove();
 fail0:
-	free(hdma);
 	return -1;
 }
 
 s32 dma::remove(void)
 {
 	DMA_HandleTypeDef *hdma = (DMA_HandleTypeDef *)_handle;
-	if (device::remove() < 0) {
-		goto fail0;
-	}
 
 	device::disable_irq(_irq);
 
 	if(HAL_DMA_DeInit(hdma)!= HAL_OK) {
-    		goto fail1;
+        goto fail0;
 	}
 	_handle = NULL;
 
 	return 0;
 
-fail1:
 fail0:
     return -1;
 }

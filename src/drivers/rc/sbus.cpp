@@ -38,21 +38,33 @@ sbus::~sbus(void)
 
 }
 
-s32 sbus::probe(void)
+s32 sbus::probe(uart *puart)
 {
 #if 1
+    _puart = puart;
+    _puart->open();
+
+    u8 c[25] = {0};
+    while (1) {
+        _puart->read(c, sizeof(c));
+        for (u32 i = 0; i < sizeof(c); i++) {
+            DBG("c[%d] = 0x%02x ", i, c[i]);
+        }
+    }
+#elif 0
     _rx = new gpio("gpio-39[sbus_rx]", 39);
     _rx->probe();
     _rx->set_direction_input();
     u8 c[25] = {0};
-    for (u32 i = 0; i < 25; i++) {
-        c[i] = sbus::read_byte();
-    }
     
-    for (u32 i = 0; i < 25; i++) {
-        DBG("c[%d] = 0x%02x ", i, c[i]);
+    while (1) {
+        for (u32 i = 0; i < 25; i++) {
+            c[i] = sbus::read_byte();
+        }
+        for (u32 i = 0; i < 25; i++) {
+            DBG("c[%d] = 0x%02x ", i, c[i]);
+        }
     }
-    
 #else
     _tx = new gpio("gpio-39[sbus_tx]", 38);
     _tx->probe();
