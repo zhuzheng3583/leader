@@ -10,10 +10,10 @@ LimitSize=0
 ByteLimit=50
 [StLinkDriver]
 CStepIntDis=_ 0
-stlinkserialNo=037B5AB6
+stlinkserialNo=2798FD0D
 stlinkfoundProbes=
 [DebugChecksum]
-Checksum=-372784798
+Checksum=-1457623441
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -144,13 +144,12 @@ Count=30
 LoggingEnabled=_ 0
 LogFile=_ ""
 Category=_ 0
-[TermIOLog]
-LoggingEnabled=_ 0
-LogFile=_ ""
 [Aliases]
-A0=_ "E:\code\SKYVIEW_H_SUB\LeaderUAV\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
-A1=_ "E:\code\leader\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
-Count=2
+A0=_ "E:\code\LeaderUAV\src\app\main.cpp" ""
+A1=_ "E:\code\LeaderUAV\src\app\user\system_stm32f4xx.c" ""
+A2=_ "E:\code\SKYVIEW_H_SUB\LeaderUAV\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
+A3=_ "E:\code\leader\src\os\ucos\ucos_cpu\ARM-Cortex-M4\IAR\cpu_a.asm" ""
+Count=4
 SuppressDialog=0
 [DriverProfiling]
 Enabled=0
@@ -162,3 +161,6 @@ Exclusions=
 Enabled=0
 [CallStackStripe]
 ShowTiming=1
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""
