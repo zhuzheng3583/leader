@@ -79,7 +79,7 @@ void aircraft::run(void *parg)
     _puart6 = new uart("uart-6", 6);
 	_puart6->probe();
     //_puart6->self_test();
-    sbus *_sbus = new sbus("sbus", -1);
+    _sbus = new sbus("sbus", -1);
     _sbus->probe(_puart6);
 
 	/*
@@ -96,7 +96,7 @@ void aircraft::run(void *parg)
 	 */
 	_puart1 = new uart("uart-1", 1);
 	_puart1->probe();
-	_puart1->self_test();
+	//_puart1->self_test();
 	//_pgps = new gps("gps", -1);
 	//_pgps->probe(_puart1);
 	_pashtech = new ashtech("ashtech", -1);
@@ -183,6 +183,7 @@ void aircraft::run(void *parg)
 	_calibration = new calibration;
 
 	_pashtech->create(NULL);
+    _sbus->create(NULL);
     _mpu6000->create(NULL);
     _hmc5883->create(NULL);
     _ms5611->create(NULL);

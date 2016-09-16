@@ -108,6 +108,8 @@ public:
 
     ashtech                 *_pashtech;
     gps                     *_pgps;
+    
+    sbus                    *_sbus;
 
     flash                   *_pflash;
 
@@ -143,6 +145,8 @@ public:
 	hmc5883		*get_hmc5883(void)        	{ return _hmc5883; }
 
     ashtech		*get_ashtech(void)        	{ return _pashtech; }
+    
+    sbus        *get_sbus(void)        	     { return _sbus; }
     
 	gpio 		*get_led_blue(void)			{ return _led_blue; }
 	gpio		*get_led_amber(void) 		{ return _led_amber; }

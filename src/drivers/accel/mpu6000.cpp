@@ -33,10 +33,10 @@ const u8 mpu6000::_checked_registers[MPU6000_NUM_CHECKED_REGISTERS] = {
 
 mpu6000::mpu6000(PCSTR devname, s32 devid) :
     device(devname, devid),
-    _accel_reports(NULL),
+    _accel_ringbuffer(NULL),
     _accel_range_scale(0.0f),
     _accel_range_m_s2(0.0f),
-    _gyro_reports(NULL),
+    _gyro_ringbuffer(NULL),
     _gyro_range_scale(0.0f),
     _gyro_range_rad_s(0.0f),
 
@@ -119,7 +119,7 @@ s32 mpu6000::read_accel(u8 *buf, u32 size)
 	//}
 
 	/* if no data, error (we could block here) */
-	if (_accel_reports->empty())
+	if (_accel_ringbuffer->empty())
 		return -EAGAIN;
 
 	//perf_count(_accel_reads);
@@ -128,7 +128,7 @@ s32 mpu6000::read_accel(u8 *buf, u32 size)
 	accel_report *arp = reinterpret_cast<accel_report *>(buf);
 	int transferred = 0;
 	while (count--) {
-		if (!_accel_reports->get(arp))
+		if (!_accel_ringbuffer->get(arp))
 			break;
 		transferred++;
 		arp++;
@@ -153,7 +153,7 @@ s32 mpu6000::read_gyro(u8 *buf, u32 size)
 	//}
 
 	/* if no data, error (we could block here) */
-	if (_gyro_reports->empty())
+	if (_gyro_ringbuffer->empty())
 		return -EAGAIN;
 
 	//perf_count(_gyro_reads);
@@ -162,7 +162,7 @@ s32 mpu6000::read_gyro(u8 *buf, u32 size)
 	gyro_report *grp = reinterpret_cast<gyro_report *>(buf);
 	int transferred = 0;
 	while (count--) {
-		if (!_gyro_reports->get(grp))
+		if (!_gyro_ringbuffer->get(grp))
 			break;
 		transferred++;
 		grp++;
@@ -210,13 +210,13 @@ s32 mpu6000::init(void)
 #endif
 
 	/* allocate basic report buffers */
-	_accel_reports = new ringbuffer(5, sizeof(accel_report));
-	if (_accel_reports == NULL) {
+	_accel_ringbuffer = new ringbuffer(5, sizeof(accel_report));
+	if (_accel_ringbuffer == NULL) {
 		goto out;
 	}
 
-	_gyro_reports = new ringbuffer(5, sizeof(gyro_report));
-	if (_gyro_reports == NULL) {
+	_gyro_ringbuffer = new ringbuffer(5, sizeof(gyro_report));
+	if (_gyro_ringbuffer == NULL) {
 		goto out;
 	}
 
@@ -241,8 +241,8 @@ s32 mpu6000::init(void)
 	_gyro_scale.z_scale  = 1.0f;
 
 	/* discard any stale data in the buffers */
-	_accel_reports->flush();
-	_gyro_reports->flush();
+	_accel_ringbuffer->flush();
+	_gyro_ringbuffer->flush();
 
 	measure();
 
@@ -504,8 +504,8 @@ void mpu6000::measure(void)
 	grb.temperature_raw = report.temp;
 	grb.temperature = _last_temperature;
 
-	_accel_reports->force(&arb);
-	_gyro_reports->force(&grb);
+	_accel_ringbuffer->force(&arb);
+	_gyro_ringbuffer->force(&grb);
 
 	/* notify anyone waiting for data */
 	poll_notify(POLLIN);

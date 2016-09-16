@@ -43,6 +43,8 @@ void autopilot::run(void *parg)
 	hmc5883->open();
 	ashtech *ashtech = leader_system::get_instance()->get_ashtech();
 	ashtech->open();
+    sbus *sbus = leader_system::get_instance()->get_sbus();
+	sbus->open();
 
 	struct accel_report accel;
 	memset(&accel, 0, sizeof(accel));
@@ -58,6 +60,8 @@ void autopilot::run(void *parg)
 	memset(&satellite_info, 0, sizeof(satellite_info));   
     struct vehicle_attitude_s att;
     memset(&att, 0, sizeof(att));
+    struct rc_input_values rc_values;
+    memset(&rc_values, 0, sizeof(rc_values));
     float euler[3] = { 0 };
 
     //mpu6000->calibrate_accel();
@@ -89,6 +93,13 @@ void autopilot::run(void *parg)
         ashtech->read_satellite_info((u8 *)&satellite_info, sizeof(satellite_info));
         //DBG("%s: lat=%d, lon=%d, alt=%d.\n",
 		//	_os_name, gps_position.lat, gps_position.lon, gps_position.alt);
+        
+        sbus->read((u8 *)&rc_values, sizeof(rc_values));
+        DBG("%s: rc_values:\n", _os_name);
+        for (u8 i = 0; i < SBUS_INPUT_CHANNELS; i++) {
+            DBG("val[%d]=%d ", i, rc_values.values[i]);
+        }
+        DBG("\n%s: rc_values end.\n", _os_name);
         
 		imu_update(gyro.x, gyro.y, gyro.z, accel.x, accel.y, accel.z, &att);
 		niming->report_status(&att);

@@ -3142,6 +3142,9 @@
     <group>
       <name>rc</name>
       <file>
+        <name>$PROJ_DIR$\..\src\drivers\rc\rc_input.h</name>
+      </file>
+      <file>
         <name>$PROJ_DIR$\..\src\drivers\rc\sbus.cpp</name>
       </file>
       <file>

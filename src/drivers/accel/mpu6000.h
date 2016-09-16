@@ -334,12 +334,12 @@ protected:
 	spi	    *_spi;
 	gpio    *_gpio_cs;
 
-	ringbuffer	*_accel_reports;
+	ringbuffer	*_accel_ringbuffer;
 	struct accel_scale  _accel_scale;
 	f32			_accel_range_scale;
 	f32			_accel_range_m_s2;
 
-	ringbuffer	*_gyro_reports;
+	ringbuffer	*_gyro_ringbuffer;
 	struct gyro_scale   _gyro_scale;
 	f32			_gyro_range_scale;
 	f32			_gyro_range_rad_s;
